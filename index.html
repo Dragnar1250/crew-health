@@ -822,7 +822,7 @@ function answer(q, days, env, notes){
   }
   if(mine) return r===null ? mine : mine+'\n\n'+r;
   if(r!==null) return r;
-  return 'I can answer from your logged readings. Try "how am I today", "interpret my day", "what should I do now", "who should I contact", name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation, or describe a problem such as headache, nausea, fire, air leak or power loss. Ask "what problems do you cover" for the full list. You can also teach me a crew note below.';
+  return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
 if(typeof module!=='undefined') module.exports={answer:answer,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
