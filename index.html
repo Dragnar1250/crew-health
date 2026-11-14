@@ -268,6 +268,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .smain{display:flex;flex-direction:column;gap:2px;min-width:0}
 .smain ol{margin:4px 0 0;padding-left:18px}
 .scen .btn{padding:5px 12px;font-size:12px}
+.scenmore{list-style:none;padding:8px 0 0;border-top:1px solid var(--line)} .scenmore .scenlist{list-style:none;margin:0;padding:0}
 @media (max-width:640px){
   .zlist li{grid-template-columns:minmax(0,1fr) auto}
   .zlist li .zbar{grid-column:1/-1}
@@ -316,6 +317,23 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .exportbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px}
 .exportbar .seg button{font-size:13px}
 .pdfbtn{white-space:nowrap}
+.tabpanel .head .label{display:none}
+.envline{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.envline b{font-weight:500;color:var(--ink)}
+.tabpanel > section + section, .tabpanel + .tabpanel.joined{margin-top:16px}
+.hero{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px 24px;align-items:start}
+@media (max-width:760px){ .hero{grid-template-columns:minmax(0,1fr)} }
+.herobox{border-radius:12px;padding:14px 16px;background:var(--s-soft);border:1px solid var(--s)}
+.herobox .hsnum b{font-size:48px}
+.herobox p{margin:6px 0 0}
+.dolist{margin:0;padding-left:22px;font-size:15px;line-height:1.45} .dolist li{margin:4px 0} .dolist li:first-child{font-weight:600}
+.qtiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+.qtile{font:inherit;text-align:left;cursor:pointer;border:1px solid var(--line);border-left:4px solid var(--s);border-radius:10px;padding:10px 12px;background:var(--bg);color:var(--ink);min-width:0}
+.qtile:hover{border-color:var(--s)} .qtile:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.qtile span{display:block;font-size:12px;color:var(--muted)} .qtile b{display:block;font-size:20px;font-weight:600;margin-top:2px} .qtile em{display:block;font-style:normal;font-size:12px;color:var(--s);margin-top:2px}
+details.how{margin-top:10px;font-size:13px;color:var(--muted)} details.how summary{cursor:pointer;color:var(--accent);font-weight:500} details.how p{margin:6px 0 0}
+details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:500;padding:4px 0}
+.ztxt{font-size:12px;font-weight:600;color:var(--s,var(--muted));white-space:nowrap}
 .tipgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .tip{border:1px solid var(--s);border-left-width:4px;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .tip h3{font-size:14px;color:var(--s)}
@@ -353,9 +371,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto}
 .alerts li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
 .alerts li span:last-child{color:var(--s)}
-.topright{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
-.seg.lang{margin-bottom:6px}
-@media (max-width:560px){ .topright{align-items:flex-start} }
+.topright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:auto}
+.seg.lang{margin:0} .toprow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+@media (max-width:560px){ .topright{align-items:flex-start;margin-left:0} }
 </style>
 
 </head>
@@ -365,19 +383,18 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <div>
       <p class="label">Team Kuasar Selçuklu · 2026 NASA Space Apps Challenge</p>
       <h1>Kuasar Crew Health</h1>
-      <p class="muted small">Daily self-assessment for astronauts. Mission day <span class="num" id="missionDay">–</span>.</p>
+      <p class="envline">Mission day <b class="num" id="missionDay">–</b> · <span id="envFacts"></span></p>
     </div>
-    <div class="topright"><button class="btn pdfbtn" type="button" id="hdrPdf" title="Export a PDF report">⇩ Export PDF</button>
+    <div class="topright"><div class="toprow"><button class="btn pdfbtn" type="button" id="hdrPdf" title="Export a PDF report">⇩ Export PDF</button>
       <div class="seg lang" role="group" aria-label="Language">
         <button type="button" id="langEn" aria-pressed="true" lang="en">EN</button>
         <button type="button" id="langTr" aria-pressed="false" lang="tr">TR</button>
-      </div>
+      </div></div>
       <p class="label" id="envLabel">Mission environment</p>
       <div class="seg" role="group" aria-labelledby="envLabel" id="envSeg"></div>
     </div>
   </header>
 
-  <div class="panel envfacts" id="envFacts"></div>
 
   <div class="simbar" id="simBar" role="status" hidden></div>
   <section id="banner" class="banner st0" aria-live="polite"></section>
@@ -386,36 +403,27 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <nav class="tabbar" id="tabbar" aria-label="Sections">
     <div class="tabrow"><button type="button" class="tabarrow" id="tabPrev" aria-label="Previous tab" title="Previous tab">‹</button>
     <div class="tabs" role="tablist" id="tabs">
-      <button type="button" role="tab" id="t-overview" data-tab="overview" aria-controls="tab-overview" aria-selected="true" tabindex="0">Overview<span class="tdot" id="d-overview" hidden></span></button>
-      <button type="button" role="tab" id="t-report" data-tab="report" aria-controls="tab-report" aria-selected="false" tabindex="-1">Report<span class="tdot" id="d-report" hidden></span></button>
-      <button type="button" role="tab" id="t-checkin" data-tab="checkin" aria-controls="tab-checkin" aria-selected="false" tabindex="-1">Check-in<span class="tdot" id="d-checkin" hidden></span></button>
-      <button type="button" role="tab" id="t-live" data-tab="live" aria-controls="tab-live" aria-selected="false" tabindex="-1">Live<span class="tdot" id="d-live" hidden></span></button>
-      <button type="button" role="tab" id="t-analysis" data-tab="analysis" aria-controls="tab-analysis" aria-selected="false" tabindex="-1">Analysis<span class="tdot" id="d-analysis" hidden></span></button>
-      <button type="button" role="tab" id="t-perf" data-tab="perf" aria-controls="tab-perf" aria-selected="false" tabindex="-1">Performance<span class="tdot" id="d-perf" hidden></span></button>
-      <button type="button" role="tab" id="t-body" data-tab="body" aria-controls="tab-body" aria-selected="false" tabindex="-1">Body map<span class="tdot" id="d-body" hidden></span></button>
-      <button type="button" role="tab" id="t-trends" data-tab="trends" aria-controls="tab-trends" aria-selected="false" tabindex="-1">Trends<span class="tdot" id="d-trends" hidden></span></button>
-      <button type="button" role="tab" id="t-radiation" data-tab="radiation" aria-controls="tab-radiation" aria-selected="false" tabindex="-1">Radiation<span class="tdot" id="d-radiation" hidden></span></button>
-      <button type="button" role="tab" id="t-morale" data-tab="morale" aria-controls="tab-morale" aria-selected="false" tabindex="-1">Morale<span class="tdot" id="d-morale" hidden></span></button>
-      <button type="button" role="tab" id="t-medkit" data-tab="medkit" aria-controls="tab-medkit" aria-selected="false" tabindex="-1">Med kit<span class="tdot" id="d-medkit" hidden></span></button>
-      <button type="button" role="tab" id="t-sources" data-tab="sources" aria-controls="tab-sources" aria-selected="false" tabindex="-1">Sources<span class="tdot" id="d-sources" hidden></span></button>
+      <button type="button" role="tab" id="t-overview" data-tab="overview" aria-selected="true" tabindex="0">Today<span class="tdot" id="d-overview" hidden></span></button>
+      <button type="button" role="tab" id="t-checkin" data-tab="checkin" aria-selected="false" tabindex="-1">Check-in<span class="tdot" id="d-checkin" hidden></span></button>
+      <button type="button" role="tab" id="t-health" data-tab="health" aria-selected="false" tabindex="-1">Health<span class="tdot" id="d-health" hidden></span></button>
+      <button type="button" role="tab" id="t-perf" data-tab="perf" aria-selected="false" tabindex="-1">Performance<span class="tdot" id="d-perf" hidden></span></button>
+      <button type="button" role="tab" id="t-trends" data-tab="trends" aria-selected="false" tabindex="-1">Trends<span class="tdot" id="d-trends" hidden></span></button>
+      <button type="button" role="tab" id="t-morale" data-tab="morale" aria-selected="false" tabindex="-1">Morale<span class="tdot" id="d-morale" hidden></span></button>
+      <button type="button" role="tab" id="t-medkit" data-tab="medkit" aria-selected="false" tabindex="-1">Med kit<span class="tdot" id="d-medkit" hidden></span></button>
+      <button type="button" role="tab" id="t-report" data-tab="report" aria-selected="false" tabindex="-1">Report<span class="tdot" id="d-report" hidden></span></button>
+      <button type="button" role="tab" id="t-sources" data-tab="sources" aria-selected="false" tabindex="-1">Sources<span class="tdot" id="d-sources" hidden></span></button>
     </div>
     <button type="button" class="tabarrow" id="tabNext" aria-label="Next tab" title="Next tab">›</button></div>
   </nav>
 
   <section class="tabpanel" id="tab-overview" role="tabpanel" aria-labelledby="t-overview">
-  <section class="panel">
-    <div class="head">
-      <div>
-        <p class="label">At a glance</p>
-        <h2>Body systems, performance and the last 14 days</h2>
-      </div>
+  <section class="panel" aria-labelledby="todayH">
+    <div class="head"><h2 id="todayH">Today</h2><button class="btn" type="button" data-goto="report">Open the health report</button></div>
+    <div class="hero">
+      <div class="herobox" id="heroScore"></div>
+      <div><h3 style="margin:0 0 6px">Do this now</h3><ol class="dolist" id="heroSteps"></ol></div>
     </div>
-    <div class="hscore" id="hscoreMini"></div>
-    <div class="glance">
-      <figure><div id="radar"></div><figcaption class="small muted">Body systems score (100 = every reading in range)</figcaption></figure>
-      <figure><div id="miniGauge"></div><figcaption class="small muted">Performance risk <button class="btn linkbtn" type="button" data-goto="perf">Details</button></figcaption></figure>
-      <figure class="wide"><div id="heat"></div><figcaption class="small muted">Status of each body system per mission day</figcaption></figure>
-    </div>
+    <div class="qtiles" id="heroTiles"></div>
   </section>
 
   <section class="panel" aria-labelledby="waterTitle">
@@ -439,7 +447,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
           <button class="btn quiet" type="button" id="waterUndo">Undo last</button>
         </div>
         <ul class="wlog" id="waterLog" aria-label="Drinks logged today"></ul>
-        <p class="small muted" style="margin-top:10px">Count drinks and the water you add to food. The total is filled in as the fluid intake of your next check-in, and the list is cleared when you save it.</p>
+        <details class="how"><summary>How the water tracker works</summary><p>Count drinks and the water you add to food. The total is filled in as the fluid intake of your next check-in, and the list is cleared when you save it.</p></details>
       </div>
       <figure><div id="waterWeek"></div><figcaption class="small muted">Fluid intake in your last 7 check-ins against your target</figcaption></figure>
     </div>
@@ -453,7 +461,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       </div>
       <p class="small muted" id="goalsNote"></p>
     </div>
-    <p class="small muted" style="margin:-4px 0 12px">A streak counts the days in a row on which every daily goal was met, and the weeks in a row on which every weekly goal was met.</p>
     <div class="streaks" id="streaks"></div>
     <div class="gcols">
       <div>
@@ -471,29 +478,15 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <div class="head">
       <div>
         <p class="label">Health analysis · several readings together · personal baseline</p>
-        <h2>Today's analysis</h2>
+        <h2>What the data says</h2>
       </div>
-      <button class="btn primary" type="button" data-goto="analysis">Open the full analysis</button>
+      <button class="btn" type="button" data-goto="analysis">Open the full analysis</button>
     </div>
     <ul class="insights" id="insights"></ul>
     <p class="small muted" id="learned"></p>
-    <div class="actions" style="margin-top:12px">
-      <button class="btn" type="button" data-goto="checkin">Log today's check-in</button>
-      <button class="btn" type="button" data-goto="body">Open the body map</button>
-      <button class="btn" type="button" data-open-survey>Take the morale survey</button>
-    </div>
+
   </section>
 
-  <section class="panel">
-    <div class="head">
-      <div>
-        <p class="label">Targeted advice</p>
-        <h2>What to do for the flagged body regions</h2>
-      </div>
-      <button class="btn" type="button" data-goto="body">Open the body map</button>
-    </div>
-    <div class="tipgrid" id="tipsOverview"></div>
-  </section>
   </section>
 
   <section class="tabpanel" id="tab-report" role="tabpanel" aria-labelledby="t-report" hidden>
@@ -504,7 +497,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <h2 id="exportTitle">Export a PDF report</h2>
       </div>
     </div>
-    <p class="small muted" style="margin:-4px 0 12px">One file with the health score, every reading, the analysis, performance, sleep, hydration, radiation, morale, the medical kit, the goals and the next steps. The daily report covers the latest check-in, the weekly one the last 7 and the monthly one the last 30. It is written in the language you are using.</p>
+    <p class="small muted" style="margin:-4px 0 12px">Choose a period and save a short PDF with your score, what needs attention and what to do next. It is written in the language you are using.</p>
     <div class="exportbar">
       <div class="seg" role="group" aria-label="Report period" id="periodSeg">
         <button type="button" data-period="day" aria-pressed="false">Daily</button>
@@ -530,7 +523,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <p class="small" id="reportMsg" aria-live="polite"></p>
     <div id="reportBody"></div>
     <textarea id="reportCopy" readonly hidden aria-label="Report as text"></textarea>
-    <p class="small muted" style="margin-top:16px">The general health score runs from 0 to 100. It combines the body systems score (45%), the performance risk (20%), the routine of the last 7 days for sleep, exercise and fluid (20%), morale (10%) and the share of the career radiation limit still unused (5%). It is capped at 69 while a reading needs action and at 49 while an extreme situation is detected. The score and its weights are the team's own proposal, not a clinical index.</p>
+    <details class="how"><summary>How the score is calculated</summary><p>The general health score runs from 0 to 100. It combines the body systems score (45%), the performance risk (20%), the routine of the last 7 days for sleep, exercise and fluid (20%), morale (10%) and the share of the career radiation limit still unused (5%). It is capped at 69 while a reading needs action and at 49 while an extreme situation is detected. The score and its weights are the team's own proposal, not a clinical index.</p></details>
   </section>
 
   <section class="panel" aria-labelledby="profileTitle">
@@ -582,41 +575,25 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </section>
   </section>
 
-  <section class="tabpanel" id="tab-live" role="tabpanel" aria-labelledby="t-live" hidden>
+  <section class="tabpanel" id="tab-body" role="tabpanel" aria-labelledby="t-body" hidden>
   <section class="panel">
     <div class="head">
       <div>
-        <p class="label">Wearable sensors · simulation mode</p>
-        <h2>Live telemetry</h2>
-        <p class="small muted">Simulated sensor readings arrive once a second, starting from your latest check-in. A flight version would read the crew member's wearable sensors.</p>
+        <p class="label">Targeted advice</p>
+        <h2>What to do for the flagged body regions</h2>
       </div>
-      <div class="actions">
-        <span class="livebadge" id="liveBadge">● Paused</span>
-        <button class="btn primary" type="button" id="liveToggle">Start simulation</button>
-      </div>
+      
     </div>
-    <div class="injects">
-      <span class="small muted">Inject an event:</span>
-      <button class="btn" type="button" data-inject="tachy">Fast heart rate</button>
-      <button class="btn" type="button" data-inject="desat">Oxygen drop</button>
-      <button class="btn" type="button" data-inject="fever">Fever</button>
-      <button class="btn" type="button" data-inject="calm">Back to normal</button>
-    </div>
-    <div class="livegrid" id="liveGrid"></div>
-    <div class="formfoot">
-      <button class="btn" type="button" id="liveUse">Use the last 30 seconds in today's check-in</button>
-      <span class="small" id="liveMsg" aria-live="polite"></span>
-    </div>
+    <div class="tipgrid" id="tipsOverview"></div>
   </section>
-  <div class="two">
-    <section class="panel">
-      <div class="head"><h2>Sensor alerts</h2><span class="small muted">Newest first</span></div>
-      <ul class="alerts" id="liveAlerts"></ul>
+
+  <div class="grid">
+    <section class="panel figure" aria-label="Body map">
+      <p class="label">Body map · select a region</p>
+      <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
+      <div class="chips" id="chips"></div>
     </section>
-    <section class="panel">
-      <div class="head"><div><h2>Last night's sleep stages</h2><p class="small muted">Simulated from the sleep length in your latest check-in.</p></div></div>
-      <div id="hypno"></div>
-    </section>
+    <section class="panel detail" id="detail" aria-live="polite"></section>
   </div>
   </section>
 
@@ -685,7 +662,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <ol class="small" id="perfActions"></ol>
       </div>
     </div>
-    <p class="small muted">The score adds points for sleep debt, short sleep, stress, low mood, isolation, slower reactions, attention lapses, high CO2 and low fluid intake. The forecast continues the trend of the last 3 days. The weights are the team's own proposal, built on NASA's risk of performance decrements from sleep loss and circadian desynchronization.</p>
+    <details class="how"><summary>How the risk is calculated</summary><p>The score adds points for sleep debt, short sleep, stress, low mood, isolation, slower reactions, attention lapses, high CO2 and low fluid intake. The forecast continues the trend of the last 3 days. The weights are the team's own proposal, built on NASA's risk of performance decrements from sleep loss and circadian desynchronization.</p></details>
   </section>
 
   <section class="panel">
@@ -717,18 +694,59 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </div>
   </section>
 
-  <section class="tabpanel" id="tab-body" role="tabpanel" aria-labelledby="t-body" hidden>
-  <div class="grid">
-    <section class="panel figure" aria-label="Body map">
-      <p class="label">Body map · select a region</p>
-      <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
-      <div class="chips" id="chips"></div>
+  <section class="tabpanel" id="tab-live" role="tabpanel" aria-labelledby="t-live" hidden>
+  <section class="panel">
+    <div class="head">
+      <div>
+        <p class="label">Wearable sensors · simulation mode</p>
+        <h2>Live telemetry</h2>
+        <p class="small muted">Simulated sensor readings arrive once a second, starting from your latest check-in. A flight version would read the crew member's wearable sensors.</p>
+      </div>
+      <div class="actions">
+        <span class="livebadge" id="liveBadge">● Paused</span>
+        <button class="btn primary" type="button" id="liveToggle">Start simulation</button>
+      </div>
+    </div>
+    <div class="injects">
+      <span class="small muted">Inject an event:</span>
+      <button class="btn" type="button" data-inject="tachy">Fast heart rate</button>
+      <button class="btn" type="button" data-inject="desat">Oxygen drop</button>
+      <button class="btn" type="button" data-inject="fever">Fever</button>
+      <button class="btn" type="button" data-inject="calm">Back to normal</button>
+    </div>
+    <div class="livegrid" id="liveGrid"></div>
+    <div class="formfoot">
+      <button class="btn" type="button" id="liveUse">Use the last 30 seconds in today's check-in</button>
+      <span class="small" id="liveMsg" aria-live="polite"></span>
+    </div>
+  </section>
+  <div class="two">
+    <section class="panel">
+      <div class="head"><h2>Sensor alerts</h2><span class="small muted">Newest first</span></div>
+      <ul class="alerts" id="liveAlerts"></ul>
     </section>
-    <section class="panel detail" id="detail" aria-live="polite"></section>
+    <section class="panel">
+      <div class="head"><div><h2>Last night's sleep stages</h2><p class="small muted">Simulated from the sleep length in your latest check-in.</p></div></div>
+      <div id="hypno"></div>
+    </section>
   </div>
   </section>
 
   <section class="tabpanel" id="tab-trends" role="tabpanel" aria-labelledby="t-trends" hidden>
+  <section class="panel">
+    <div class="head">
+      <div>
+        <p class="label">At a glance</p>
+        <h2>Body systems at a glance</h2>
+      </div>
+    </div>
+        <div class="glance">
+      <figure><div id="radar"></div><figcaption class="small muted">Body systems score (100 = every reading in range)</figcaption></figure>
+      <figure><div id="miniGauge"></div><figcaption class="small muted">Performance risk <button class="btn linkbtn" type="button" data-goto="perf">Details</button></figcaption></figure>
+      <figure class="wide"><div id="heat"></div><figcaption class="small muted">Status of each body system per mission day</figcaption></figure>
+    </div>
+  </section>
+
   <section class="panel">
     <div class="head">
       <h2>Trend over the mission</h2>
@@ -2228,6 +2246,17 @@ PdfDoc.prototype.output=function(){
    the medical kit and the goals on a few A4 pages. o.t translates a text (identity in English). */
 var REPORT_PERIODS={day:{n:1, title:'Daily health report', file:'daily'}, week:{n:7, title:'Weekly health report', file:'weekly'}, month:{n:30, title:'Monthly health report', file:'monthly'}};
 var PDF_COL={ink:'#121a27', muted:'#566275', line:'#d7dee8', soft:'#f2f4f8', accent:'#1f52c4', st:['#18734a','#9a5b00','#bd2626'], stSoft:['#dff3e8','#fdefd2','#fde3e1']};
+/* the most useful next steps, most urgent first */
+function nextSteps(days, env, max){
+  var steps=[], push=function(s){ s=String(s||'').replace(/\.$/,''); if(s && steps.indexOf(s)<0) steps.push(s); };
+  var an=analyze(days, env), pr=perfRisk(days);
+  an.scenarios.filter(function(s){ return s.state===2; }).forEach(function(s){ push(s.steps[0]); push(s.steps[1]); });
+  an.findings.forEach(function(f){ push(f.actions[0]); });
+  tipsFor(days, env).forEach(function(x){ push(x.steps[0]); });
+  if(pr) pr.factors.slice(0,2).forEach(function(f){ push(PERF_ACTIONS[f.id]); });
+  if(!steps.length) push('Keep your routine');
+  return steps.slice(0, max||6);
+}
 function avgOf(a){ return a.length ? a.reduce(function(s,x){ return s+x; },0)/a.length : 0; }
 function buildReport(o){
   var t=o.t || function(s){ return s; }, tr=o.lang==='tr', days=o.days, env=o.env, P=REPORT_PERIODS[o.period]||REPORT_PERIODS.week;
@@ -2322,8 +2351,11 @@ function buildReport(o){
   if(extreme.length) facts.push('Extreme situation detected: '+extreme.map(function(s){ return t(s.title); }).join(', ')+'.');
   facts.push(an.findings.length ? (an.findings.length===1 ? '1 problem shows up in several readings at once.' : an.findings.length+' problems show up in several readings at once.') : 'No problem shows up in two or more readings at once today.');
   if(pr) facts.push('Performance risk is '+pr.score+' of 100'+(pr.warn ? ', and the early warning expects about '+pr.next+' tomorrow.' : '.'));
-  h2('Summary');
+  h2('What this means');
   facts.forEach(function(f){ para('• '+t(f), {raw:true}); });
+  y+=2;
+  h2('Do this next');
+  nextSteps(days, env, 4).forEach(function(s, i){ para((i+1)+'. '+t(s)+'.', {raw:true, bold:i===0}); });
   y+=4;
   /* score trend and heat map */
   if(n>1){
@@ -2349,28 +2381,31 @@ function buildReport(o){
     }));
 
   /* ---------- readings ---------- */
-  h2(n>1 ? 'Readings over the period' : 'Readings today');
+  var offIds=ORDER.filter(function(id){ return rows.some(function(r){ return statusOf(id, r[id], env)>0; }); });
+  h2(n>1 ? 'Readings that left their normal range' : 'Readings outside their normal range');
+  if(!offIds.length) para(n>1 ? 'Every reading stayed in its normal range on every day.' : 'Every reading is in its normal range.');
   var rd=function(id, v){ return IND[id].scale ? t(SYM_WORD[Math.round(v)]) : num(v, IND[id].step<1 || id==='rad' ? (id==='rad' ? 2 : 1) : 0); };
-  table(n>1 ? [{h:'Reading', w:150}, {h:'Latest', w:68}, {h:'Average', w:60, align:'right'}, {h:'Min–max', w:84, align:'right'}, {h:'Reference', w:100}, {h:'In range', w:53, align:'right'}]
-            : [{h:'Reading', w:150}, {h:'Value', w:80}, {h:'Reference', w:105}, {h:'Status', w:106}, {h:'Usual', w:74, align:'right'}],
-    ORDER.map(function(id){
+  if(offIds.length) table(n>1 ? [{h:'Reading', w:160}, {h:'Latest', w:90}, {h:'Average', w:70, align:'right'}, {h:'Normal range', w:120}, {h:'Days in range', w:75, align:'right'}]
+            : [{h:'Reading', w:150}, {h:'Value', w:80}, {h:'Normal range', w:105}, {h:'Status', w:106}, {h:'Your usual', w:74, align:'right'}],
+    offIds.map(function(id){
       var I=IND[id], st=statusOf(id, d[id], env), vals=rows.map(function(r){ return +r[id]; }), unit=I.scale ? '' : ' '+t(I.unit);
       var ref=I.scale ? t('none')+'–'+t('mild') : t(rangeText(id, env))+unit;
-      if(n>1) return [t(I.label), {s:rd(id, d[id])+unit, st:st}, rd(id, avgOf(vals)), rd(id, Math.min.apply(null, vals))+'–'+rd(id, Math.max.apply(null, vals)), ref, rows.filter(function(r){ return statusOf(id, r[id], env)===0; }).length+' / '+n];
+      if(n>1) return [t(I.label), {s:rd(id, d[id])+unit, st:st}, rd(id, avgOf(vals)), ref, rows.filter(function(r){ return statusOf(id, r[id], env)===0; }).length+' / '+n];
       var z=zOf(id, days);
       return [t(I.label), {s:rd(id, d[id])+unit, st:st}, ref, {s:stLabel(st), st:st}, z ? rd(id, z.mean)+unit : '–'];
-    }), {size:7.5});
+    }), {size:8});
+  var okN=ORDER.length-offIds.length;
+  if(offIds.length && okN) para(n>1 ? 'The other '+okN+' readings stayed in their normal range on every day.' : 'The other '+okN+' readings are in their normal range.', {color:PDF_COL.muted});
 
   /* ---------- analysis ---------- */
   h2('Health analysis');
   var cb=an.combined;
-  para(cb.ready ? (cb.level ? (cb.level===2 ? 'Strongly unusual combination' : 'Unusual combination')+': '+cb.moved.length+' readings moved away from your usual pattern at the same time ('+cb.moved.slice(0,4).map(function(m){ return t(IND[m.id].label); }).join(', ')+').'
-                             : 'Combined check: within your usual pattern. '+cb.k+' readings were compared with your personal baseline.')
-                : 'The combined check needs at least 5 earlier check-ins to learn your usual pattern.', {raw:false});
+  if(cb.ready) para(cb.level ? t('Compared with your usual days')+': '+cb.moved.slice(0,4).map(function(m){ return t(IND[m.id].label)+' '+t(m.z>0 ? 'higher than usual' : 'lower than usual'); }).join(', ')+'.'
+                             : t('Compared with your usual days, today looks normal.'), {raw:true});
   if(extreme.length){
     para('Extreme situation checks', {bold:true, after:1});
     extreme.forEach(function(s){ para('■ '+t(s.title)+(s.ev ? ' · '+t(s.ev) : '')+'. '+t('First step')+': '+t(s.steps[0]), {raw:true, color:PDF_COL.st[2]}); });
-  } else para('Extreme situation checks: none detected among the 14 checks.', {color:PDF_COL.muted});
+  } else para('No emergency pattern found (14 checks).', {color:PDF_COL.muted});
   if(an.findings.length){
     para('Problems found across several readings', {bold:true, after:1});
     an.findings.slice(0, 5).forEach(function(f){
@@ -2378,15 +2413,6 @@ function buildReport(o){
       para(t('Because')+': '+f.evidence.map(t).join(', ')+'. '+t('What to do')+': '+t(f.actions[0])+'.', {raw:true, x:M+12, w:CW-12, size:8.4, color:'#2b3443'});
     });
   } else para('No problem shows up in two or more readings at once today.');
-  var why=an.why.slice(0, 4);
-  if(why.length){
-    para('Why is a reading off', {bold:true, after:1});
-    why.forEach(function(w){
-      var sup=w.causes.filter(function(c){ return c.s===true; }).map(function(c){ return t(c.t); }), open=w.causes.filter(function(c){ return c.s===null; }).map(function(c){ return t(c.t); });
-      para(t(w.value)+': '+(sup.length ? t('supported by your data')+': '+sup.join('; ') : t('cannot be checked')+': '+open.slice(0,2).join('; '))+'.', {raw:true, size:8.4});
-    });
-  }
-
   /* ---------- performance, sleep and hydration ---------- */
   h2('Performance, sleep and hydration');
   if(pr){
@@ -2405,10 +2431,9 @@ function buildReport(o){
   if(n>1 && debt>0) stats.splice(1, 0, ['Sleep debt', num(debt)+' '+t('h below 8 h')]);
   table([{h:'Area', w:120}, {h:'Result', w:CW-120}], stats.map(function(s){ return [t(s[0]), s[1]]; }));
   if(n>1){
-    need(104); var cwid=(CW-16)/3;
+    need(104); var cwid=(CW-8)/2;
     lineChart(M, y, cwid, 96, rows.map(function(r){ return {day:r.day, v:r.sleep, s:statusOf('sleep', r.sleep, env)}; }), {title:'Sleep (h)', min:Math.min(4, Math.min.apply(null, sl)), max:Math.max(10, Math.max.apply(null, sl)), band:[7,9], dec:0});
     lineChart(M+cwid+8, y, cwid, 96, rows.map(function(r){ return {day:r.day, v:r.fluid, s:statusOf('fluid', r.fluid, env)}; }), {title:'Fluid intake (L)', min:0, max:Math.max(ft*1.3, Math.max.apply(null, rows.map(function(r){ return r.fluid; }))), target:ft, dec:1});
-    lineChart(M+2*(cwid+8), y, cwid, 96, rows.map(function(r){ return {day:r.day, v:r.rt, s:statusOf('rt', r.rt, env)}; }), {title:'Reaction time (ms)', min:200, max:Math.max(420, Math.max.apply(null, rows.map(function(r){ return r.rt; }))), band:[100,354], dec:0});
     y+=104;
   }
 
@@ -2426,16 +2451,7 @@ function buildReport(o){
     [t('Goals'), {s:stLabel(dstreak>0 ? 0 : 1), st:dstreak>0 ? 0 : 1}, t('Daily streak')+' '+dstreak+' · '+t('Best daily streak')+' '+bestStreak(days, env)+' · '+t('Mission week '+wg.week)+': '+wg.goals.filter(function(g){ return g.done; }).length+' / '+wg.goals.length]
   ]);
 
-  /* ---------- next steps ---------- */
-  h2('Recommended next steps');
-  var steps=[], push=function(s){ s=String(s||'').replace(/\.$/,''); if(s && steps.indexOf(s)<0) steps.push(s); };
-  extreme.forEach(function(s){ push(s.steps[0]); push(s.steps[1]); });
-  an.findings.forEach(function(f){ push(f.actions[0]); });
-  tipsFor(days, env).forEach(function(x){ push(x.steps[0]); });
-  if(pr) pr.factors.slice(0,2).forEach(function(f){ push(PERF_ACTIONS[f.id]); });
-  if(!steps.length) push('Keep your routine');
-  steps.slice(0, 6).forEach(function(s, i){ para((i+1)+'. '+t(s)+'.', {raw:true}); });
-  y+=6;
+  y+=10;
   para('This report comes from a prototype made for the NASA Space Apps Challenge. It is not a medical device. The health score, the performance risk, the "Act now" steps and the morale index are the team\'s own proposal; reference ranges come from the sources listed in the tool.', {size:7.5, color:PDF_COL.muted});
 
   /* page numbers */
@@ -2462,10 +2478,7 @@ if(typeof document!=='undefined'){ (function(){
     $('envSeg').innerHTML=Object.keys(ENV).map(function(k){
       return '<button type="button" data-env="'+k+'" aria-pressed="'+(k===state.env)+'">'+ENV[k].name+'</button>'; }).join('');
     var e=ENV[state.env];
-    $('envFacts').innerHTML='<span><span class="label">Location</span> '+e.full+'</span>'+
-      '<span><span class="label">Gravity</span> '+e.g+'</span>'+
-      '<span><span class="label">Signal delay to Earth</span> '+e.delay+'</span>'+
-      '<span><span class="label">Expected dose</span> <span class="num">'+e.dose+'</span> mSv/day</span>';
+    $('envFacts').innerHTML='<b>'+e.full+'</b> · '+e.g+' · '+'<span>Signal delay to Earth</span>: '+e.delay;
   }
   function renderBanner(){
     var d=latest(), b=$('banner');
@@ -2553,7 +2566,8 @@ if(typeof document!=='undefined'){ (function(){
   function renderChart(){
     var id=state.chart, I=IND[id], days=state.days, svg=$('chart');
     $('chartSel').innerHTML=ORDER.map(function(k){ return '<option value="'+k+'"'+(k===id?' selected':'')+'>'+IND[k].label+'</option>'; }).join('');
-    if(days.length<2){ svg.innerHTML='<text x="320" y="115" text-anchor="middle" fill="var(--muted)" font-size="14">Log at least two days to see a trend.</text>'; $('chartNote').textContent=''; return; }
+    svg.parentNode.hidden=days.length<2;
+    if(days.length<2){ svg.innerHTML=''; $('chartNote').textContent='Log at least two days to see a trend.'; return; }
     var W=640,H=230,L=50,Rm=18,T=14,B=30, vals=days.map(function(x){return x[id];}), ok=ranges(id,state.env).ok;
     var vmin=Math.min.apply(null,vals), vmax=Math.max.apply(null,vals);
     var okHi=isFinite(ok[1])?ok[1]:Math.max(vmax,ok[0]);
@@ -2771,17 +2785,15 @@ if(typeof document!=='undefined'){ (function(){
       var word=['Within your usual pattern','Unusual combination','Strongly unusual combination'][c.level];
       $('anLevel').innerHTML='<span class="pill st'+c.level+'">'+SYMBOL[c.level]+' '+word+'</span>';
       var pText=c.p<0.001 ? 'less than 0.1%' : (c.p<0.01 ? 'less than 1%' : Math.round(c.p*100)+'%');
-      $('anCombined').innerHTML='<div class="anstats"><div><b class="num">'+c.moved.length+'</b><span class="small muted">of '+c.k+' readings far from your usual value</span></div>'+
-        '<div><b class="num">'+pText+'</b><span class="small muted">chance of a day this unusual by normal day-to-day variation</span></div>'+
-        '<div><b class="num">'+c.n+'</b><span class="small muted">earlier check-ins in your baseline</span></div></div>'+
+      $('anCombined').innerHTML='<p style="margin:0 0 10px">'+(c.moved.length ? c.moved.length+' of '+c.k+' readings are far from your usual value today.' : 'Every reading is close to your usual value today.')+'</p>'+
         (c.moved.length ? '<ul class="zlist">'+c.moved.map(function(x){
           var I=IND[x.id], up=x.z>0, w=Math.min(100, Math.abs(x.z)/6*100);
           return '<li><span>'+I.label+'</span><span class="num">'+(I.scale ? SYM_WORD[latest()[x.id]] : fx(x.id, latest()[x.id])+' '+I.unit)+'</span>'+
             '<span class="small muted">usual '+fx(x.id, x.mean)+(I.scale?'':' '+I.unit)+'</span>'+
             '<span class="zbar '+(up?'up':'down')+'" aria-label="'+Math.abs(x.z).toFixed(1)+' spreads '+(up?'above':'below')+' usual"><span style="width:'+w.toFixed(0)+'%"></span></span>'+
-            '<span class="num small">'+(up?'+':'−')+Math.abs(x.z).toFixed(1)+'σ</span></li>'; }).join('')+'</ul>'
+            '<span class="ztxt st'+(Math.abs(x.z)>=3?2:1)+'">'+(Math.abs(x.z)>=3 ? (up?'Far above usual':'Far below usual') : (up?'Above usual':'Below usual'))+'</span></li>'; }).join('')+'</ul>'
           : '<p class="small muted">No reading is more than 2 spreads away from your usual value.</p>')+
-        '<p class="small muted">Method: each reading is compared with your own mean and spread from up to 30 earlier check-ins. The squared distances are added and tested against a chi-square distribution. The test treats readings as independent, so it is a screening signal, not a diagnosis.</p>';
+        '<details class="how"><summary>How this check works</summary><p>Your baseline comes from '+c.n+' earlier check-ins. The chance of a day this unusual by normal day-to-day variation is '+pText+'.</p><p>Each reading is compared with your own mean and spread from up to 30 earlier check-ins. The squared distances are added and tested against a chi-square distribution. The test treats readings as independent, so it is a screening signal, not a diagnosis.</p></details>';
     }
     $('anFindCount').textContent=a.findings.length ? a.findings.length+' found' : '';
     $('anFindings').innerHTML=a.findings.length ? a.findings.map(function(f){
@@ -2792,18 +2804,21 @@ if(typeof document!=='undefined'){ (function(){
       : '<p class="small muted">No problem shows up in two or more readings at once today.</p>';
     $('anWhy').innerHTML=a.why.length ? a.why.map(function(w){
       return '<article class="wcard"><h3>'+esc(w.value)+' <span class="pill st'+(w.unusual?1:w.level)+'">'+(w.unusual ? '▲ Unusual for you' : SYMBOL[w.level]+' '+WORD[w.level])+'</span></h3>'+
-        '<p class="small muted">Possible causes, best supported first:</p><ul class="causes">'+w.causes.map(function(x){
+        '<p class="small muted">Possible causes, best supported first:</p><ul class="causes">'+w.causes.filter(function(x){ return x.s!==false; }).map(function(x){
           var k=x.s===true?'cy':(x.s===false?'cn':'cq'), m=x.s===true?'✓':(x.s===false?'✗':'?');
-          return '<li class="'+k+'"><i aria-label="'+(x.s===true?'supported':(x.s===false?'ruled out':'cannot be checked'))+'">'+m+'</i><span>'+esc(x.t)+'<span class="small muted"> · '+esc(x.ev)+'</span></span></li>'; }).join('')+'</ul></article>'; }).join('')
+          return '<li class="'+k+'"><i aria-label="'+(x.s===true?'supported':(x.s===false?'ruled out':'cannot be checked'))+'">'+m+'</i><span>'+esc(x.t)+'<span class="small muted"> · '+esc(x.ev)+'</span></span></li>'; }).join('')+'</ul>'+
+        (function(){ var no=w.causes.filter(function(x){ return x.s===false; }); return no.length ? '<details class="more"><summary>'+no.length+' ruled out by your data</summary><ul class="causes">'+no.map(function(x){ return '<li class="cn"><i aria-label="ruled out">✗</i><span>'+esc(x.t)+'<span class="small muted"> · '+esc(x.ev)+'</span></span></li>'; }).join('')+'</ul></details>' : ''; })()+'</article>'; }).join('')
       : '<p class="small muted">Every reading is in range and close to your usual value, so there is nothing to explain today.</p>';
     var det=a.scenarios.filter(function(s){ return s.state===2; }).length, pos=a.scenarios.filter(function(s){ return s.state===1; }).length;
     $('anScenCount').textContent=a.scenarios.length+' checks · '+det+' detected · '+pos+' possible';
-    $('anScen').innerHTML=a.scenarios.slice().sort(function(x,y){ return y.state-x.state; }).map(function(s){
+    var scenLi=function(s){
       var lab=['● Not detected','▲ Possible','■ Detected'][s.state];
       return '<li class="scen st'+s.state+'"><div class="smain"><strong>'+esc(s.title)+'</strong><span class="small muted">Looks for: '+esc(s.looks)+'</span>'+
         (s.state ? '<span class="small">Found: '+esc(s.ev)+'</span><ol class="small">'+s.steps.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ol>' : '')+'</div>'+
         '<span class="pill st'+s.state+'">'+lab+'</span>'+
-        '<button class="btn" type="button" data-sim="'+s.id+'"'+(state.sim===s.id?' disabled':'')+'>'+(state.sim===s.id?'Running':'Test')+'</button></li>'; }).join('');
+        '<button class="btn" type="button" data-sim="'+s.id+'"'+(state.sim===s.id?' disabled':'')+'>'+(state.sim===s.id?'Running':'Test')+'</button></li>'; };
+    var hot=a.scenarios.filter(function(s){ return s.state>0; }).sort(function(x,y){ return y.state-x.state; }), calm=a.scenarios.filter(function(s){ return !s.state; });
+    $('anScen').innerHTML=hot.map(scenLi).join('')+(calm.length ? '<li class="scenmore"><details class="more"><summary>'+(hot.length ? 'Show '+calm.length+' more checks (not detected) and test them' : 'Show all '+calm.length+' checks (none detected) and test them')+'</summary><ul class="scenlist">'+calm.map(scenLi).join('')+'</ul></details></li>' : '');
   }
   /* Simulation: a test day added on top of the real data, never saved. */
   function startSim(id){
@@ -2875,7 +2890,7 @@ if(typeof document!=='undefined'){ (function(){
     $('waterNote').textContent=PROFILE ? 'Target from your profile' : 'General target · save your profile for a personal one';
     $('waterLog').innerHTML=water.length ? water.map(function(x){ return '<li><span class="num">'+esc(x.t)+'</span> · '+x.ml+' mL</li>'; }).join('') : '<li>Nothing logged yet</li>';
     $('waterUndo').disabled=!water.length;
-    var wk7=state.days.slice(-7), W=300, H=150, Lm=30, B=22, T=10, mx=Math.max(ft*1.2, Math.max.apply(null, wk7.map(function(d){ return d.fluid||0; }).concat([0]))), bw=(W-Lm-8)/Math.max(1, wk7.length);
+    var wk7=state.days.slice(-7), W=300, H=150, Lm=30, B=22, T=10, mx=Math.max(ft*1.2, Math.max.apply(null, wk7.map(function(d){ return d.fluid||0; }).concat([0]))), bw=Math.min(40, (W-Lm-8)/Math.max(1, wk7.length));
     var y=function(v){ return T+(H-T-B)*(1-v/mx); }, g='';
     wk7.forEach(function(d,i){ var ok=d.fluid>=ft, x=Lm+i*bw+4;
       g+='<rect x="'+x.toFixed(1)+'" y="'+y(d.fluid).toFixed(1)+'" width="'+(bw-8).toFixed(1)+'" height="'+Math.max(1, H-B-y(d.fluid)).toFixed(1)+'" rx="3" fill="var('+(ok?'--accent':'--warn')+')"><title>Day '+d.day+': '+d.fluid+' L</title></rect>'+
@@ -2884,6 +2899,7 @@ if(typeof document!=='undefined'){ (function(){
        '<text x="'+(Lm-4)+'" y="'+(y(ft)+4).toFixed(1)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">'+ft+'</text>'+
        '<text x="'+(Lm-4)+'" y="'+(H-B+3)+'" text-anchor="end" font-size="10" fill="var(--muted)" font-family="var(--mono)">0</text>';
     $('waterWeek').innerHTML=wk7.length ? '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Fluid intake per mission day against the target">'+g+'</svg>' : '<p class="small muted">No check-in yet.</p>';
+    if($('heroTiles') && state.days.length) renderHero();
     var hint=$('waterHint'); hint.hidden=!water.length;
     if(water.length) hint.textContent='Water tracker: '+waterL()+' L logged today. It is filled in as your fluid intake.';
   }
@@ -2909,12 +2925,8 @@ if(typeof document!=='undefined'){ (function(){
     var days=state.days, env=state.env, d=latest(), hs=healthScore(days, env);
     $('reportCopy').hidden=true; $('reportMsg').textContent='';
     if(!hs){
-      $('hscoreMini').innerHTML='<p class="small muted" style="margin:0">Log a check-in to get your general health score.</p>';
-      $('reportBody').innerHTML='<p class="small muted">Log a check-in to build the report.</p>'; return;
+        $('reportBody').innerHTML='<p class="small muted">Log a check-in to build the report.</p>'; return;
     }
-    $('hscoreMini').innerHTML='<div class="hsnum st'+hs.level+'"><b class="num">'+hs.score+'</b><span>/ 100</span></div>'+
-      '<div class="hstxt"><p class="label">General health score</p><p><span class="pill st'+hs.level+'">'+SYMBOL[hs.level]+' Grade '+hs.grade+'</span> '+hs.word+'</p></div>'+
-      '<button class="btn" type="button" data-goto="report">Open the health report</button>';
     var p=PROFILE, ft=fluidTarget(), an=analyze(days, env), pr=perfRisk(days), dz=doseStatus(days), rs=regionScores(days, env);
     var h='<p class="rmeta">Mission day '+d.day+' · '+ENV[env].name+' · '+fmtDate(isoDate(Date.now()))+(state.sim ? ' · Simulation' : '')+(d.example ? ' · example data' : '')+'</p>';
     h+='<div class="hscore" style="margin-bottom:0"><div class="hsnum st'+hs.level+'"><b class="num">'+hs.score+'</b><span>/ 100</span></div>'+
@@ -2957,6 +2969,26 @@ if(typeof document!=='undefined'){ (function(){
     try{ navigator.clipboard.writeText(txt).then(function(){ msg.textContent='Report copied as text.'; }, fallback); }catch(e){ fallback(); }
   });
 
+  function renderHero(){
+    var days=state.days, env=state.env, d=latest(), hs=healthScore(days, env);
+    if(!hs){
+      $('heroScore').className='herobox st1'; $('heroScore').innerHTML='<p class="label">General health score</p><p>Log a check-in to get your general health score.</p>';
+      $('heroSteps').innerHTML='<li><button class="btn linkbtn" type="button" data-goto="checkin">Log today\'s check-in</button></li>'; $('heroTiles').innerHTML=''; return;
+    }
+    $('heroScore').className='herobox st'+hs.level;
+    $('heroScore').innerHTML='<p class="label">General health score</p><div class="hsnum"><b class="num">'+hs.score+'</b><span>/ 100</span></div><p><span class="pill st'+hs.level+'">'+SYMBOL[hs.level]+' Grade '+hs.grade+'</span> '+hs.word+'</p>';
+    $('heroSteps').innerHTML=nextSteps(days, env, 3).map(function(x){ return '<li>'+esc(x)+'.</li>'; }).join('');
+    var flagged=ORDER.filter(function(id){ return statusOf(id, d[id], env)>0; }), worst=Math.max.apply(null, ORDER.map(function(id){ return statusOf(id, d[id], env); }));
+    var pr=perfRisk(days), wl=waterTotal(water)/1000, ft=fluidTarget();
+    var tiles=[
+      {go:'health', st:worst, k:'Readings', v:flagged.length ? flagged.length+' to check' : 'All in range', e:flagged.length ? flagged.slice(0,2).map(function(id){ return IND[id].label; }).join(', ') : ''},
+      {go:'checkin', st:statusOf('sleep', d.sleep, env), k:'Sleep last night', v:d.sleep+' h', e:d.sleep<7 ? 'Below 7 h' : (d.sleep>9 ? 'Above 9 h' : '')},
+      wl>0 ? {go:'overview', st:wl>=ft ? 0 : 1, k:'Water today', v:wl.toFixed(1)+' / '+ft+' L', e:wl>=ft ? 'Target reached' : 'Keep drinking'}
+           : {go:'overview', st:statusOf('fluid', d.fluid, env), k:'Water, last check-in', v:d.fluid+' / '+ft+' L', e:d.fluid>=ft ? '' : 'Below target'},
+      {go:'perf', st:pr ? Math.max(pr.level, pr.warn ? 1 : 0) : 0, k:'Performance risk', v:pr ? pr.score+' / 100' : '–', e:pr && pr.warn ? 'Rising' : ''}
+    ];
+    $('heroTiles').innerHTML=tiles.map(function(x){ return '<button type="button" class="qtile st'+x.st+'" data-goto="'+x.go+'"><span>'+x.k+'</span><b>'+x.v+'</b>'+(x.e ? '<em>'+esc(x.e)+'</em>' : '')+'</button>'; }).join('');
+  }
   function renderGlance(){
     var days=state.days, env=state.env, sc=regionScores(days, env), n=sc.length, cx=130, cy=118, R=82;
     if(!n){ $('radar').innerHTML='<p class="small muted">No check-in yet.</p>'; $('miniGauge').innerHTML=''; $('heat').innerHTML=''; return; }
@@ -2977,7 +3009,7 @@ if(typeof document!=='undefined'){ (function(){
       col.cells.forEach(function(st,r){ hs+='<rect x="'+(lx+c*cw)+'" y="'+(top+r*ch)+'" width="'+(cw-3)+'" height="'+(ch-3)+'" rx="3" fill="var('+['--ok-soft','--warn','--crit'][st]+')" stroke="'+(st===0?'var(--ok)':'none')+'" stroke-opacity=".5"'+(col.sim?' stroke-dasharray="2 2"':'')+'><title>Day '+col.day+' · '+REGIONS[k=keys[r]].title+': '+WORD[st]+'</title></rect>'; });
       if(c%2===0 || c===hm.length-1) hs+='<text x="'+(lx+c*cw+(cw-3)/2)+'" y="'+(top+keys.length*ch+12)+'" text-anchor="middle" font-size="10" fill="var(--muted)">'+col.day+'</text>';
     });
-    $('heat').innerHTML='<div class="chartbox"><svg viewBox="0 0 '+(lx+hm.length*cw+4)+' '+(top+keys.length*ch+18)+'" style="min-width:'+(lx+hm.length*cw+4)+'px" role="img" aria-label="Status heat map of the last 14 days">'+hs+'</svg></div>';
+    $('heat').innerHTML='<div class="chartbox"><svg viewBox="0 0 '+(lx+hm.length*cw+4)+' '+(top+keys.length*ch+18)+'" width="'+(lx+hm.length*cw+4)+'" height="'+(top+keys.length*ch+18)+'" style="width:'+(lx+hm.length*cw+4)+'px;min-width:0;max-width:none;height:auto" role="img" aria-label="Status heat map of the last 14 days">'+hs+'</svg></div>';
   }
   function gauge(score, lvl, w){
     var cx=100, cy=100, r=78;
@@ -3017,8 +3049,10 @@ if(typeof document!=='undefined'){ (function(){
     renderLight(); renderHygiene();
   }
   function renderHygiene(){
-    $('hygiene').innerHTML=hygieneTips(state.days, state.env).sort(function(a,b){ return (b.on?1:0)-(a.on?1:0); }).map(function(x){
-      return '<li class="'+(x.on?'on':'')+'">'+(x.on?'<span class="pill st1">For you today</span> ':'')+esc(x.t)+'</li>'; }).join('');
+    var all=hygieneTips(state.days, state.env), on=all.filter(function(x){ return x.on; }), off=all.filter(function(x){ return !x.on; });
+    var li=function(x){ return '<li class="'+(x.on?'on':'')+'">'+(x.on?'<span class="pill st1">For you today</span> ':'')+esc(x.t)+'</li>'; };
+    $('hygiene').innerHTML=(on.length ? on.map(li).join('') : '<li>Your sleep data looks fine. Keep your routine.</li>')+
+      (off.length ? '<li class="scenmore" style="border:0;padding:0"><details class="more"><summary>'+off.length+' more general tips</summary><ul class="tips">'+off.map(li).join('')+'</ul></details></li>' : '');
   }
   var LKEY='kuasar-crew-light-v1';
   try{ var lk=JSON.parse(localStorage.getItem(LKEY)||'null'); if(lk && toMin(lk.s)!==null && toMin(lk.w)!==null){ $('lpSleep').value=lk.s; $('lpWake').value=lk.w; } }catch(e){}
@@ -3038,7 +3072,7 @@ if(typeof document!=='undefined'){ (function(){
       '<p class="nowlight"><span class="sw" style="background:var('+cols[mode]+')"></span><strong>Now ('+fmtMin(nm)+'): '+LIGHT_MODES[mode].t+'.</strong> '+LIGHT_MODES[mode].d+'</p>'+
       '<ul class="legend2 small">'+['blue','general','presleep','dark'].map(function(k){ var b=plan.blocks.filter(function(x){ return x.mode===k; })[0];
         return '<li><span class="sw" style="background:var('+cols[k]+')"></span>'+LIGHT_MODES[k].t+' · '+fmtMin(b.from)+'–'+fmtMin(b.to)+'</li>'; }).join('')+'</ul>'+
-      '<p class="small muted">The ISS LED lights have a general setting, a brighter blue-enriched setting that raises alertness, and a dimmer pre-sleep setting with less blue light. The 2-hour windows are the team\'s proposal.</p>';
+      '<details class="how"><summary>About the light settings</summary><p>The ISS LED lights have a general setting, a brighter blue-enriched setting that raises alertness, and a dimmer pre-sleep setting with less blue light. The 2-hour windows are the team\'s proposal.</p></details>';
   }
   ['lpSleep','lpWake'].forEach(function(id){ $(id).addEventListener('change', function(){ try{ localStorage.setItem(LKEY, JSON.stringify({s:$('lpSleep').value, w:$('lpWake').value})); }catch(e){} renderLight(); }); });
   setInterval(function(){ if(!$('tab-perf').hidden) renderLight(); }, 60000);
@@ -3165,22 +3199,27 @@ if(typeof document!=='undefined'){ (function(){
     $('f_hr').value=Math.round(avg('hr')); $('f_spo2').value=Math.round(avg('spo2')); $('f_temp').value=avg('temp').toFixed(1); $('f_rr').value=Math.round(avg('rr'));
     $('formMsg').textContent='Live averages added for heart rate, blood oxygen, temperature and breathing rate. Fill in the rest and save.';
   });
-  var TABS=['overview','report','checkin','live','analysis','perf','body','trends','radiation','morale','medkit','sources'];
+  var TABS=['overview','checkin','health','perf','trends','morale','medkit','report','sources'];
+  var GROUPS={overview:['overview'], checkin:['checkin'], health:['body','analysis'], perf:['perf','live'], trends:['trends','radiation'], morale:['morale'], medkit:['medkit'], report:['report'], sources:['sources']};
+  var GROUP_OF={}; Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn){ GROUP_OF[pn]=g; }); });
+  Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn, i){ var el=$('tab-'+pn); el.setAttribute('aria-labelledby', 't-'+g); if(i) el.classList.add('joined'); }); $('t-'+g).setAttribute('aria-controls', GROUPS[g].map(function(pn){ return 'tab-'+pn; }).join(' ')); });
   function showTab(name, focus){
-    if(TABS.indexOf(name)<0) name='overview';
+    var g=GROUPS[name] ? name : (GROUP_OF[name] || 'overview'), part=GROUP_OF[name] && GROUP_OF[name]!==name ? name : null;
     TABS.forEach(function(t){
-      var on=t===name, b=$('t-'+t);
-      $('tab-'+t).hidden=!on; b.setAttribute('aria-selected', String(on)); b.tabIndex=on?0:-1;
+      var on=t===g, b=$('t-'+t);
+      GROUPS[t].forEach(function(pn){ $('tab-'+pn).hidden=!on; }); b.setAttribute('aria-selected', String(on)); b.tabIndex=on?0:-1;
     });
+    name=g;
     var bar=$('tabbar'), y=bar.getBoundingClientRect().top+window.scrollY;
     if(window.scrollY>y) window.scrollTo(0, y);
     var tb=$('t-'+name); if(tb.scrollIntoView) tb.scrollIntoView({block:'nearest', inline:'nearest'});
     if(focus) tb.focus();
-    if(name==='live'){ if(!LIVE.on && !LIVE.started){ LIVE.started=true; liveStart(); } drawLive(); }
+    if(name==='perf'){ if(!LIVE.on && !LIVE.started){ LIVE.started=true; liveStart(); } drawLive(); }
     renderTabNav();
+    if(part && part!==GROUPS[g][0]){ var pe=$('tab-'+part); if(pe.scrollIntoView) pe.scrollIntoView({block:'start'}); }
   }
-  var TAB_NAMES={overview:'Overview', report:'Report', checkin:'Check-in', live:'Live', analysis:'Analysis', perf:'Performance', body:'Body map', trends:'Trends', radiation:'Radiation', morale:'Morale', medkit:'Med kit', sources:'Sources'};
-  function curTab(){ var c=TABS.filter(function(t){ return !$('tab-'+t).hidden; })[0]; return c || 'overview'; }
+  var TAB_NAMES={overview:'Today', checkin:'Check-in', health:'Health', perf:'Performance', trends:'Trends', morale:'Morale', medkit:'Med kit', report:'Report', sources:'Sources'};
+  function curTab(){ var c=TABS.filter(function(t){ return $('t-'+t).getAttribute('aria-selected')==='true'; })[0]; return c || 'overview'; }
   function renderTabNav(){
     var i=TABS.indexOf(curTab()), pv=TABS[i-1], nx=TABS[i+1];
     $('tabPrev').disabled=!pv; $('tabNext').disabled=!nx;
@@ -3246,8 +3285,13 @@ if(typeof document!=='undefined'){ (function(){
     var j = ev.key==='ArrowRight' ? (i+1)%TABS.length : ev.key==='ArrowLeft' ? (i-1+TABS.length)%TABS.length : ev.key==='Home' ? 0 : ev.key==='End' ? TABS.length-1 : -1;
     if(j<0) return; ev.preventDefault(); goTab(TABS[j], true);
   });
+  var DOTS={};
   function dot(id, st, label){
-    var e=$('d-'+id); if(!st){ e.hidden=true; return; }
+    DOTS[id]={st:st, label:label};
+    var g=GROUP_OF[id]||id, best=null;
+    GROUPS[g].forEach(function(pn){ var x=DOTS[pn]; if(!x || !x.st) return; var r=x.st==='due' ? 0.5 : x.st; if(!best || r>best.r) best={r:r, st:x.st, label:x.label}; });
+    st=best ? best.st : 0; label=best ? best.label : '';
+    var e=$('d-'+g); if(!st){ e.hidden=true; return; }
     e.hidden=false; e.className='tdot '+(st==='due'?'due':'st'+st); e.textContent=st==='due'?'●':SYMBOL[st];
     e.setAttribute('title', label); e.setAttribute('aria-label', label);
   }
@@ -3264,7 +3308,7 @@ if(typeof document!=='undefined'){ (function(){
     var sv=LAST_SURVEY ? LAST_SURVEY.level : 0, due=!weeklyGoals(state.days, env).goals[4].done;
     if(sv) dot('morale', sv, sv===2?'Morale needs attention':'Morale to watch'); else dot('morale', due?'due':0, 'Survey due this week');
   }
-  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderKit(); renderInsights(); renderGlance(); renderTips(); renderPerf(); renderHypno(); renderProfile(); renderWater(); renderReport(); renderTabDots(); }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderKit(); renderInsights(); renderGlance(); renderTips(); renderPerf(); renderHypno(); renderProfile(); renderWater(); renderReport(); renderHero(); renderTabDots(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
@@ -3440,6 +3484,7 @@ if(typeof document!=='undefined'){ (function(){
   showTab(location.hash.slice(1));
 /*I18N*/
 var TR_EXACT = {
+"# / # L": "# / # L",
 "# L to go today": "Bugün # L kaldı",
 "# NASA Space Apps Challenge": "# NASA Space Apps Challenge",
 "# Sv = # mSv = # rem": "# Sv = # mSv = # rem",
@@ -3494,6 +3539,7 @@ var TR_EXACT = {
 "# min today": "bugün # dk",
 "# minus age": "# eksi yaş",
 "# mmHg is about #% of normal sea-level air pressure": "# mmHg, deniz seviyesindeki normal hava basıncının yaklaşık yüzde # kadarı",
+"# more general tips": "# genel öneri daha",
 "# need attention": "# dikkat gerektiriyor",
 "# of # L": "# / # L",
 "# of # answered": "#/# yanıtlandı",
@@ -3503,6 +3549,7 @@ var TR_EXACT = {
 "# of # mSv (#%)": "# / # mSv (%#)",
 "# of # mSv (#%), of which # mSv is from this mission": "#/# mSv (%#), bunun # mSv'si bu görevden",
 "# of # nights in # to # h": "#2 gecenin #1 gecesi #3–#4 sa aralığında",
+"# of # readings are far from your usual value today": "Bugün #2 ölçümün #1 tanesi olağan değerinizden uzak",
 "# of # systems flagged": "#2 sistemden #1 tanesi işaretli",
 "# possible": "# olası",
 "# problem shows up in several readings at once": "# sorun aynı anda birden fazla ölçümde görünüyor",
@@ -3512,6 +3559,7 @@ var TR_EXACT = {
 "# readings moved away from your usual pattern at the same time": "# ölçüm aynı anda olağan düzeninden uzaklaştı",
 "# readings need action now": "# ölçüm hemen müdahale gerektiriyor",
 "# readings were compared with your personal baseline": "# ölçüm kişisel temel değerinizle karşılaştırıldı",
+"# ruled out by your data": "# neden verilerinizle dışlandı",
 "# spreads above usual": "olağanın # sapma üstünde",
 "# spreads below usual": "olağanın # sapma altında",
 "# strip": "# şerit",
@@ -3528,6 +3576,7 @@ var TR_EXACT = {
 "# tablets left": "# tablet kaldı",
 "# to # bpm for adults, close to # bpm for very fit athletes": "yetişkinlerde # ile # atım/dk, çok formda sporcularda # atım/dk civarı",
 "# to # is normal weight (WHO)": "# ile # arası normal kilodur (DSÖ)",
+"# to check": "# kontrol edilmeli",
 "# to watch": "# izlenecek",
 "# trials, about # seconds": "# deneme, yaklaşık # saniye",
 "# tube": "# tüp",
@@ -3595,7 +3644,10 @@ var TR_EXACT = {
 "A warm cabin or heavy exercise without enough cooling": "Sıcak kabin ya da yeterli soğutma olmadan ağır egzersiz",
 "ALERT": "ALARM",
 "About # s one way": "Tek yön yaklaşık # sn",
+"About the light settings": "Işık ayarları hakkında",
+"Above # h": "# sa üstünde",
 "Above the # mmHg limit": "# mmHg sınırının üstünde",
+"Above usual": "Olağandan yüksek",
 "Acetaminophen # mg tablets": "Parasetamol # mg tablet",
 "Act now": "Hemen müdahale et",
 "Act on the steps below today": "Bugün aşağıdaki adımları uygulayın",
@@ -3665,8 +3717,11 @@ var TR_EXACT = {
 "Because": "Çünkü",
 "Behavioral health": "Davranışsal sağlık",
 "Behind pace: about # L would be on pace by #:#": "Tempo gerisinde: saat #2:#3 itibarıyla yaklaşık #1 L içilmiş olmalıydı",
+"Below # h": "# sa altında",
 "Below # mg/dL (# mmol/L) is low blood sugar, and below # mg/dL (# mmol/L) is clinically significant low blood sugar (American Diabetes Association)": "# mg/dL (# mmol/L) altı düşük kan şekeri, # mg/dL (# mmol/L) altı klinik olarak anlamlı düşük kan şekeridir (Amerikan Diyabet Derneği)",
 "Below # mmHg is normal, # to # is stage # high blood pressure, and above # is a crisis (American Heart Association)": "# mmHg altı normal, # ile # arası evre # yüksek tansiyon, # üstü krizdir (Amerikan Kalp Derneği)",
+"Below target": "Hedefin altında",
+"Below usual": "Olağandan düşük",
 "Best daily streak": "En iyi günlük seri",
 "Blocked Nose": "Burun tıkanıklığı",
 "Blocked nose": "Burun tıkanıklığı",
@@ -3694,6 +3749,7 @@ var TR_EXACT = {
 "Body mass matters in flight too: crews are weighed regularly because losing body mass is a sign of eating or drinking too little": "Kilo uçuşta da önemlidir: mürettebat düzenli tartılır, çünkü kilo kaybı az yemenin ya da az içmenin işaretidir",
 "Body short of oxygen": "Vücut oksijen yetersizliğinde",
 "Body systems": "Vücut sistemleri",
+"Body systems at a glance": "Bir bakışta vücut sistemleri",
 "Body systems per day": "Günlere göre vücut sistemleri",
 "Body systems radar chart": "Vücut sistemleri radar grafiği",
 "Body systems score (# = every reading in range)": "Vücut sistemleri puanı (# = her ölçüm aralıkta)",
@@ -3763,6 +3819,7 @@ var TR_EXACT = {
 "Check your temperature and mood, keep to the light schedule, and tell the crew medical officer if it happens again": "Ateşinizi ve ruh halinizi kontrol edin, ışık programına uyun ve tekrarlarsa mürettebat sağlık görevlisine söyleyin",
 "Check-in": "Günlük kayıt",
 "Choose": "Seçin",
+"Choose a period and save a short PDF with your score, what needs attention and what to do next": "Bir dönem seçin; puanınız, dikkat gerektirenler ve sonraki adımlarla kısa bir PDF kaydedin",
 "Choose female or male": "Kadın ya da erkek seçin",
 "Choose the number that fits the whole day so far, not one moment": "Tek bir anı değil, günün şu ana kadarki tamamını yansıtan sayıyı seçin",
 "Choose the number that fits the worst part of the day": "Günün en kötü anına uyan sayıyı seçin",
@@ -3783,6 +3840,8 @@ var TR_EXACT = {
 "Combined check: within your usual pattern": "Birleşik kontrol: olağan düzeninizin içinde",
 "Compare it with your preflight value": "Uçuş öncesi değerinizle karşılaştırın",
 "Compare with how you feel during your usual exercise": "Olağan egzersizinizde nasıl hissettiğinizle karşılaştırın",
+"Compared with your usual days": "Olağan günlerinizle karşılaştırıldığında",
+"Compared with your usual days, today looks normal": "Olağan günlerinizle karşılaştırıldığında bugün normal görünüyor",
 "Complete the morale survey": "Moral anketini tamamla",
 "Completed surveys appear here with their risk index": "Tamamlanan anketler risk endeksleriyle burada görünür",
 "Completely": "Tamamen",
@@ -3852,6 +3911,8 @@ var TR_EXACT = {
 "Do not start a safety-critical task until it is back in range": "Değer aralığa dönene kadar güvenlik açısından kritik bir göreve başlamayın",
 "Do not talk or move while the cuff inflates": "Manşet şişerken konuşmayın ve kıpırdamayın",
 "Do not use it without asking the flight surgeon": "Uçuş hekimine sormadan kullanmayın",
+"Do this next": "Sıradaki adımlar",
+"Do this now": "Şimdi bunu yapın",
 "Done": "Bitti",
 "Dose above the expected level for this environment": "Bu ortam için beklenenin üstünde doz",
 "Dose in this period": "Bu dönemdeki doz",
@@ -3878,6 +3939,7 @@ var TR_EXACT = {
 "Dust or dry air, if there is no fever": "Ateş yoksa toz ya da kuru hava",
 "EN": "EN",
 "Each check looks for the combination of readings that a serious event would cause": "Her kontrol, ciddi bir olayın yol açacağı ölçüm birleşimini arar",
+"Each reading is compared with your own mean and spread from up to # earlier check-ins": "Her ölçüm en fazla # önceki kayıttan çıkan kendi ortalamanız ve sapmanızla karşılaştırılır",
 "Earlier career dose saved": "Önceki kariyer dozu kaydedildi",
 "Earlier missions": "Önceki görevler",
 "Early warning": "Erken uyarı",
@@ -3912,7 +3974,10 @@ var TR_EXACT = {
 "Every check-in uses # glucose test strip, # lancets and # blood analyzer cartridge": "Her kayıt # glukoz test şeridi, # lanset ve # kan analizörü kartuşu kullanır",
 "Every daily goal is done today": "Bugün bütün günlük hedefler tamam",
 "Every reading in range": "Her ölçüm aralıkta",
+"Every reading is close to your usual value today": "Bugün her ölçüm olağan değerinize yakın",
+"Every reading is in its normal range": "Her ölçüm normal aralığında",
 "Every reading is in range and close to your usual value, so there is nothing to explain today": "Her ölçüm aralıkta ve olağan değerinize yakın, bu yüzden bugün açıklanacak bir şey yok",
+"Every reading stayed in its normal range on every day": "Her ölçüm her gün normal aralığında kaldı",
 "Everything is in stock and in date": "Her şey stokta ve süresi geçerli",
 "Example data removed": "Örnek veriler kaldırıldı",
 "Exercise": "Egzersiz",
@@ -3941,6 +4006,8 @@ var TR_EXACT = {
 "Eyes": "Gözler",
 "Eyes and brain fluid pressure": "Gözler ve beyin sıvısı basıncı",
 "Fair": "Orta",
+"Far above usual": "Olağandan çok yüksek",
+"Far below usual": "Olağandan çok düşük",
 "Far from Earth a reply can take # minutes or more, so start the onboard protocol while you wait": "Dünya'dan uzakta yanıt # dakika ya da daha uzun sürebilir, bu yüzden beklerken araçtaki protokole başlayın",
 "Fast breathing": "Hızlı solunum",
 "Fast head movements while still adapting": "Henüz uyum sağlarken hızlı baş hareketleri",
@@ -4026,6 +4093,7 @@ var TR_EXACT = {
 "Hazard": "Tehlike",
 "Headache": "Baş ağrısı",
 "Headache, tiredness and poor sleep become more likely": "Baş ağrısı, yorgunluk ve kötü uyku olasılığı artar",
+"Health": "Sağlık",
 "Health analysis": "Sağlık analizi",
 "Health report": "Sağlık raporu",
 "Heart": "Kalp",
@@ -4075,6 +4143,10 @@ var TR_EXACT = {
 "How often are you irritable or impatient": "Ne sıklıkla sinirli ya da sabırsızsınız",
 "How strong is your anxiety or sense of emergency pressure": "Kaygınız ya da acil durum baskısı hissiniz ne kadar güçlü",
 "How the medical kit works": "Tıbbi çanta nasıl çalışır",
+"How the risk is calculated": "Risk nasıl hesaplanır",
+"How the score is calculated": "Puan nasıl hesaplanır",
+"How the water tracker works": "Su takibi nasıl çalışır",
+"How this check works": "Bu kontrol nasıl çalışır",
 "How your profile changes the readings": "Profiliniz ölçümleri nasıl değiştirir",
 "Human Performance Resource Center, heart rate zones (CDC figures)": "Human Performance Resource Center, kalp hızı bölgeleri (CDC değerleri)",
 "Hydration is low": "Sıvı alımı düşük",
@@ -4136,6 +4208,7 @@ var TR_EXACT = {
 "Jones et al": "Jones ve ark",
 "Keep a fixed bedtime and dim the lights # hour before it": "Yatış saatinizi sabit tutun ve ışıkları # saat önce kısın",
 "Keep at least": "En az tut",
+"Keep drinking": "İçmeye devam edin",
 "Keep head movements slow and keep your eyes on a fixed point": "Baş hareketlerinizi yavaş tutun ve gözünüzü sabit bir noktaya dikin",
 "Keep head movements slow, sip fluids, and take anti-nausea medicine only as the procedure directs": "Baş hareketlerinizi yavaş tutun, yudum yudum sıvı alın ve bulantı ilacını yalnızca prosedürün dediği gibi alın",
 "Keep sipping with meals and exercise": "Yemeklerde ve egzersizde yudumlamaya devam edin",
@@ -4350,6 +4423,7 @@ var TR_EXACT = {
 "Next: Analysis →": "Sonraki: Analiz →",
 "Next: Body map →": "Sonraki: Vücut haritası →",
 "Next: Check-in →": "Sonraki: Günlük kayıt →",
+"Next: Health →": "Sonraki: Sağlık →",
 "Next: Live →": "Sonraki: Canlı →",
 "Next: Med kit →": "Sonraki: İlaç çantası →",
 "Next: Morale →": "Sonraki: Moral →",
@@ -4358,6 +4432,7 @@ var TR_EXACT = {
 "Next: Radiation →": "Sonraki: Radyasyon →",
 "Next: Report →": "Sonraki: Rapor →",
 "Next: Sources →": "Sonraki: Kaynaklar →",
+"Next: Today →": "Sonraki: Bugün →",
 "Next: Trends →": "Sonraki: Eğilimler →",
 "Nitrogen bubbles forming after the pressure change of a spacewalk": "Uzay yürüyüşündeki basınç değişiminden sonra oluşan azot kabarcıkları",
 "No NASA branding is used": "NASA markası kullanılmamıştır",
@@ -4365,6 +4440,7 @@ var TR_EXACT = {
 "No body region is flagged today, so there is no targeted advice": "Bugün işaretli vücut bölgesi yok, bu yüzden hedefli öneri yok",
 "No check-in yet": "Henüz kayıt yok",
 "No early warning": "Erken uyarı yok",
+"No emergency pattern found (# checks)": "Acil durum düzeni bulunmadı (# kontrol)",
 "No expiry date": "Son kullanma tarihi yok",
 "No further spacewalks or surface excursions, and spend as much time as possible in the most shielded area": "Başka uzay yürüyüşü ya da yüzey gezisi yok, olabildiğince çok zamanı en korunaklı bölgede geçirin",
 "No medicines in the kit": "Çantada ilaç yok",
@@ -4379,6 +4455,7 @@ var TR_EXACT = {
 "Noise, light or a shifted schedule": "Gürültü, ışık ya da kaymış program",
 "Noise, light or carbon dioxide in the sleep station": "Uyku istasyonunda gürültü, ışık ya da karbondioksit",
 "None": "Yok",
+"Normal range": "Normal aralık",
 "Normal weight": "Normal kilo",
 "Normal working light for the day": "Gündüz için normal çalışma ışığı",
 "Normal, stable": "Normal, stabil",
@@ -4542,9 +4619,12 @@ var TR_EXACT = {
 "Read the vision card at the usual distance": "Görme kartını olağan mesafeden okuyun",
 "Reading": "Ölçüm",
 "Reading or target": "Ölçüm ya da hedef",
+"Readings": "Ölçümler",
 "Readings outside the range": "Aralık dışındaki ölçümler",
+"Readings outside their normal range": "Normal aralığının dışındaki ölçümler",
 "Readings over the period": "Dönem boyunca ölçümler",
 "Readings return to the baseline": "Ölçümler temel değere döner",
+"Readings that left their normal range": "Normal aralığının dışına çıkan ölçümler",
 "Readings today": "Bugünkü ölçümler",
 "Recommended next steps": "Önerilen sonraki adımlar",
 "Red": "Kırmızı",
@@ -4594,6 +4674,7 @@ var TR_EXACT = {
 "Restock with a new date": "Yeni tarihle yenile",
 "Restore example kit": "Örnek çantayı geri yükle",
 "Result": "Sonuç",
+"Rising": "Yükseliyor",
 "Rising solar activity over several days": "Birkaç gün boyunca artan güneş etkinliği",
 "Risk index": "Risk endeksi",
 "Risk score # of #": "Risk puanı #/#",
@@ -4641,6 +4722,8 @@ var TR_EXACT = {
 "Sex": "Cinsiyet",
 "Short sleep": "Kısa uyku",
 "Shortness of breath": "Nefes darlığı",
+"Show # more checks (not detected) and test them": "# kontrol daha göster (tespit edilmedi) ve test et",
+"Show all # checks (none detected) and test them": "# kontrolün hepsini göster (hiçbiri tespit edilmedi) ve test et",
 "Signal delay": "Sinyal gecikmesi",
 "Signal delay to Earth": "Dünya'ya sinyal gecikmesi",
 "Signs of pressure behind the eyes": "Göz arkası basıncı belirtileri",
@@ -4798,6 +4881,8 @@ var TR_EXACT = {
 "The analysis rules (which readings together point to a problem, the possible causes and the steps) and the extreme situation checks are the team's own first-response summaries": "Analiz kuralları (hangi ölçümlerin birlikte bir soruna işaret ettiği, olası nedenler ve adımlar) ile aşırı durum kontrolleri takımın kendi ilk müdahale özetleridir",
 "The balance system adapting to a new gravity level": "Denge sisteminin yeni bir yerçekimi düzeyine uyum sağlaması",
 "The career limit is reached": "Kariyer sınırına ulaşıldı",
+"The chance of a day this unusual by normal day-to-day variation is #%": "Olağan günlük değişkenlikle bu kadar olağandışı bir gün görülme olasılığı %#",
+"The chance of a day this unusual by normal day-to-day variation is less than #%": "Olağan günlük değişkenlikle bu kadar olağandışı bir gün görülme olasılığı %# altında",
 "The combined check compares each reading with the crew member's own mean and spread and tests the sum of squared distances with a chi-square distribution": "Birleşik kontrol her ölçümü mürettebatın kendi ortalaması ve sapmasıyla karşılaştırır ve kare uzaklıkların toplamını ki-kare dağılımıyla test eder",
 "The combined check needs at least # earlier check-ins to learn your usual pattern": "Birleşik kontrolün olağan düzeninizi öğrenmesi için en az # önceki kayıt gerekir",
 "The crew medical officer should check in with you today": "Mürettebat sağlık görevlisi bugün sizinle görüşmeli",
@@ -4833,6 +4918,8 @@ var TR_EXACT = {
 "The median is used": "Ortanca değer kullanılır",
 "The medical kit is an example": "Tıbbi çanta bir örnektir",
 "The number of responses out of # that took # ms or longer": "# yanıttan # ms ya da daha uzun sürenlerin sayısı",
+"The other # readings are in their normal range": "Diğer # ölçüm normal aralığında",
+"The other # readings stayed in their normal range on every day": "Diğer # ölçüm her gün normal aralığında kaldı",
 "The performance risk score, its weights and its forecast, the targeted advice, the light plan windows and the reaction test thresholds for \"Watch\" and \"Act now\" are the team's own proposal": "Performans risk puanı, ağırlıkları ve tahmini, hedefli öneriler, ışık planı pencereleri ve reaksiyon testinin \"İzle\" ve \"Hemen müdahale et\" eşikleri takımın kendi önerisidir",
 "The profile stays on this device": "Profil bu cihazda kalır",
 "The report could not be built": "Rapor oluşturulamadı",
@@ -4943,6 +5030,7 @@ var TR_EXACT = {
 "Watch for headache, confusion and fast breathing": "Baş ağrısı, bilinç bulanıklığı ve hızlı solunuma dikkat edin",
 "Water today": "Bugünkü su",
 "Water tracker: # L logged today": "Su takibi: bugün # L kaydedildi",
+"Water, last check-in": "Su, son kayıt",
 "Weaker immune defences in spaceflight, which can also wake up dormant viruses": "Uzay uçuşunda zayıflayan bağışıklık, uyuyan virüsleri de uyandırabilir",
 "Wear a mask and clean shared surfaces": "Maske takın ve ortak yüzeyleri temizleyin",
 "Wear a mask near crewmates": "Mürettebat arkadaşlarınızın yanında maske takın",
@@ -4959,7 +5047,9 @@ var TR_EXACT = {
 "What happened": "Ne oldu",
 "What needs attention": "Dikkat gerektirenler",
 "What raises the risk today": "Bugün riski ne artırıyor",
+"What the data says": "Veriler ne diyor",
 "What the unit means and how to measure": "Birimin anlamı ve nasıl ölçülür",
+"What this means": "Bu ne anlama geliyor",
 "What to do": "Ne yapmalı",
 "What to do for the flagged body regions": "İşaretli vücut bölgeleri için ne yapmalı",
 "What to do for this region": "Bu bölge için ne yapmalı",
@@ -4991,6 +5081,7 @@ var TR_EXACT = {
 "You may be breathing too fast": "Çok hızlı nefes alıyor olabilirsiniz",
 "You slept more than # hours on # of the last # nights": "Son #3 gecenin #2 gecesinde #1 saatten fazla uyudunuz",
 "Your answers stay on this device until you submit": "Yanıtlarınız gönderene kadar bu cihazda kalır",
+"Your baseline comes from # earlier check-ins": "Temel değeriniz # önceki kayıttan geliyor",
 "Your best run was # day": "En iyi seriniz # gündü",
 "Your best run was # days": "En iyi seriniz # gündü",
 "Your fluid target is now # L a day": "Sıvı hedefiniz artık günde # L",
@@ -5000,7 +5091,9 @@ var TR_EXACT = {
 "Your profile": "Profiliniz",
 "Your readings match your personal baseline": "Ölçümleriniz kişisel temel değerinizle uyumlu",
 "Your result is shown above": "Sonucunuz yukarıda gösteriliyor",
+"Your sleep data looks fine": "Uyku verileriniz iyi görünüyor",
 "Your streak restarts today": "Seriniz bugün yeniden başlıyor",
+"Your usual": "Olağan değeriniz",
 "Your value": "Sizin değeriniz",
 "Your written answers were saved for review by the flight psychologist": "Yazılı yanıtlarınız uçuş psikoloğunun incelemesi için kaydedildi",
 "Zhang et al": "Zhang ve ark",
@@ -5176,6 +5269,7 @@ var TR_EXACT = {
 "high CO# and low fluid intake": "yüksek CO# ve düşük sıvı alımı",
 "high blood pressure or pulse with breathlessness": "nefes darlığıyla yüksek tansiyon ya da nabız",
 "high dose with nausea": "bulantıyla birlikte yüksek doz",
+"higher than usual": "olağandan yüksek",
 "hold for #": "# tutun",
 "how many times the heart beats in # seconds while you are at rest": "dinlenirken kalbin # saniyede kaç kez attığı",
 "how many times you breathe in during # seconds at rest": "dinlenirken # saniyede kaç kez nefes aldığınız",
@@ -5214,6 +5308,7 @@ var TR_EXACT = {
 "low": "az",
 "low blood pressure or fast pulse": "düşük tansiyon ya da hızlı nabız",
 "low mood": "düşük ruh hali",
+"lower than usual": "olağandan düşük",
 "mSv": "mSv",
 "mSv means millisievert, the unit of dose equivalent": "mSv, eşdeğer doz birimi olan milisievert demektir",
 "mSv/day": "mSv/gün",
@@ -5431,6 +5526,8 @@ var TR_EXACT = {
 "zolpidem logged in the last day": "son bir günde zolpidem kaydı var",
 "°C": "°C",
 "°C means degrees Celsius": "°C, santigrat derece demektir",
+"· # g ·": "· # g ·",
+"· Microgravity ·": "· Mikro yerçekimi ·",
 "← Previous": "← Önceki",
 "⇩ Export PDF": "⇩ PDF dışa aktar"
 };
