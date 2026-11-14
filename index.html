@@ -218,6 +218,40 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 }
 .check{display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--muted)}
 .check input{margin-top:3px}
+.attn{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.attn li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 12px;align-items:center;border:1px solid var(--s);background:var(--s-soft);border-radius:10px;padding:10px 12px;font-size:14px}
+.attn li>i{font-style:normal;font-weight:600;color:var(--s)}
+.attn .actions{display:flex;flex-wrap:wrap;gap:6px}
+.attn .btn{padding:5px 10px;font-size:12px}
+.howto{margin-top:14px}
+.howto summary{cursor:pointer;color:var(--accent);font-weight:500;font-size:14px}
+.howto ol{margin:8px 0 0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.kitlist{list-style:none;margin:0;padding:0}
+.khead,.kitem{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.4fr) auto;gap:6px 16px;align-items:center}
+.khead{padding:0 0 6px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)}
+.kitem{padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+.kitem.st1{box-shadow:inset 3px 0 0 var(--warn)}
+.kitem.st2{box-shadow:inset 3px 0 0 var(--crit)}
+.kempty{padding:12px 0}
+.kmain,.kstock,.kexp{display:flex;flex-direction:column;gap:2px;min-width:0}
+.kname{font-weight:500}
+.kbar{position:relative;display:block;height:6px;border-radius:999px;background:var(--line);margin:3px 0;max-width:140px}
+.kbar>span{display:block;height:100%;border-radius:999px;background:var(--ok)}
+.kbar.st1>span{background:var(--warn)}
+.kbar.st2>span{background:var(--crit)}
+.kbar i{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--muted)}
+.kact{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.btn.quiet{border-color:transparent;background:none;color:var(--muted)}
+.toast{position:fixed;z-index:30;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom, 0px));width:max-content;max-width:min(520px, calc(100% - 32px));
+  background:var(--ink);color:var(--bg);border-radius:10px;padding:10px 14px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+@media (max-width:760px){
+  .khead{display:none}
+  .kitem{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kmain,.kstat,.kact{grid-column:1/-1}
+  .kact{justify-content:flex-start}
+  .attn li{grid-template-columns:auto minmax(0,1fr)}
+  .attn .actions{grid-column:2}
+}
 </style>
 
 </head>
@@ -401,50 +435,73 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <section class="panel">
     <div class="head">
       <div>
-        <p class="label">Medical kit · NASA-STD-3001 [V2 7059] inventory tracking</p>
-        <h2>Medicines and supplies</h2>
+        <p class="label">Medical kit · inventory tracking, NASA-STD-3001 [V2 7059]</p>
+        <h2>What needs attention</h2>
       </div>
-      <div class="kitsum" id="kitSum"></div>
+      <span class="small muted" id="kitCount"></span>
     </div>
-    <p class="small muted">Example inventory: the medicine names come from the ISS formulary items named in NASA's pharmaceuticals brief, while amounts, strengths and dates are invented for the demo. Take medicines only as your mission procedures and the flight surgeon direct.</p>
-    <div class="tablewrap" style="margin-top:12px">
-      <table class="htable kittable">
-        <thead><tr><th scope="col">Item</th><th scope="col">Pack</th><th scope="col">Stock</th><th scope="col">Minimum</th><th scope="col">Expires</th><th scope="col">Status</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
-        <tbody id="kitRows"></tbody>
-      </table>
+    <ul class="attn" id="kitAttention"></ul>
+    <details class="howto" open>
+      <summary>How the medical kit works</summary>
+      <ol class="small">
+        <li><strong>Took a medicine or used a supply?</strong> Press <em>Took 1</em> or <em>Used 1</em> next to it. To log more than one, or to note why, use <em>Log a use</em> further down.</li>
+        <li><strong>Test supplies count themselves.</strong> Every check-in uses 1 glucose test strip, 2 lancets and 1 blood analyzer cartridge.</li>
+        <li><strong>The kit warns you</strong> when an item drops to its minimum, runs out, has expired or expires within 30 days.</li>
+        <li><strong>Got new stock?</strong> Press <em>Restock</em> next to the item and enter how many you add and the new expiry date.</li>
+      </ol>
+    </details>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <div>
+        <h2>Medicines</h2>
+        <p class="small muted">Names from NASA's ISS medicine list. Take them only as your mission procedures and the flight surgeon direct.</p>
+      </div>
+      <span class="small muted" id="kitMedCount"></span>
     </div>
-    <div class="formfoot">
-      <button class="btn" type="button" id="kitRestore">Restore example kit</button>
-      <span class="small" id="kitMsg" aria-live="polite"></span>
+    <div class="khead" aria-hidden="true"><span>Item and use</span><span>In the kit</span><span>Expires</span><span>Status</span><span></span></div>
+    <ul class="kitlist" id="kitMeds"></ul>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <div>
+        <h2>Test and care supplies</h2>
+        <p class="small muted">Used for check-ins, wound care and eye scans.</p>
+      </div>
+      <span class="small muted" id="kitSupCount"></span>
     </div>
+    <div class="khead" aria-hidden="true"><span>Item and use</span><span>In the kit</span><span>Expires</span><span>Status</span><span></span></div>
+    <ul class="kitlist" id="kitSupplies"></ul>
   </section>
 
   <div class="two">
     <section class="panel">
-      <div class="head"><h2>Log a use</h2></div>
+      <div class="head"><div><h2>Log a use</h2><p class="small muted">For more than one at a time, or to note why.</p></div></div>
       <form id="useForm" novalidate>
         <div class="fields">
-          <div class="field"><label for="useItem">Item</label><select id="useItem"></select></div>
-          <div class="field"><label for="useQty">Amount</label><input id="useQty" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
-          <div class="field" style="grid-column:1/-1"><label for="useWhy">Reason (optional)</label><input id="useWhy" type="text" maxlength="80" autocomplete="off" placeholder="For example: headache after exercise"></div>
+          <div class="field" style="grid-column:1/-1"><label for="useItem">Item</label><select id="useItem"></select><span class="small muted" id="useStock"></span></div>
+          <div class="field"><label for="useQty">How many</label><input id="useQty" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
+          <div class="field"><label for="useWhy">Why (optional)</label><input id="useWhy" type="text" maxlength="80" autocomplete="off" placeholder="For example: headache"></div>
         </div>
         <div class="formfoot"><button class="btn primary" type="submit">Log use</button><span class="small" id="useMsg" aria-live="polite"></span></div>
       </form>
     </section>
-    <section class="panel">
-      <div class="head"><h2>Add or restock an item</h2></div>
+    <section class="panel" id="addPanel">
+      <div class="head"><div><h2>Restock or add an item</h2><p class="small muted">Typing the name of an item that is already in the kit adds to its stock.</p></div></div>
       <form id="addForm" novalidate>
         <div class="fields">
           <div class="field" style="grid-column:1/-1"><label for="addName">Name</label><input id="addName" type="text" maxlength="60" autocomplete="off" list="kitNames" placeholder="For example: Ibuprofen 400 mg tablets"><datalist id="kitNames"></datalist></div>
-          <div class="field"><label for="addType">Type</label><select id="addType"><option>Medication</option><option>Supply</option></select></div>
-          <div class="field"><label for="addPack">Pack</label><select id="addPack"><option>Emergency Medical</option><option>Convenience Med</option><option>Oral Med</option><option>Topical and Injectable Med</option><option>Diagnostic</option><option>Minor Treatment</option><option>Medical Supply</option><option>IV Supply</option><option>Physician Equipment</option></select></div>
-          <div class="field"><label for="addQty">Amount to add</label><input id="addQty" type="number" inputmode="numeric" min="0" max="10000" step="1" value="10"></div>
+          <div class="field" style="grid-column:1/-1"><label for="addUse">Used for</label><input id="addUse" type="text" maxlength="40" autocomplete="off" placeholder="For example: Pain and fever"></div>
+          <div class="field"><label for="addQty">How many you add</label><input id="addQty" type="number" inputmode="numeric" min="0" max="10000" step="1" value="10"></div>
           <div class="field"><label for="addUnit">Unit</label><input id="addUnit" type="text" maxlength="20" autocomplete="off" value="tablets"></div>
-          <div class="field"><label for="addMin">Minimum to keep</label><input id="addMin" type="number" inputmode="numeric" min="0" max="10000" step="1" value="5"></div>
-          <div class="field"><label for="addExp">Expiry date</label><input id="addExp" type="date"></div>
+          <div class="field"><label for="addMin">Keep at least</label><input id="addMin" type="number" inputmode="numeric" min="0" max="10000" step="1" value="5"></div>
+          <div class="field"><label for="addExp">New expiry date</label><input id="addExp" type="date"></div>
+          <div class="field"><label for="addType">Type</label><select id="addType"><option value="Medication">Medicine</option><option value="Supply">Supply</option></select></div>
+          <div class="field"><label for="addPack">Pack</label><select id="addPack"><option>Emergency Medical</option><option>Convenience Med</option><option>Oral Med</option><option>Topical and Injectable Med</option><option>Diagnostic</option><option>Minor Treatment</option><option>Medical Supply</option><option>IV Supply</option><option>Physician Equipment</option></select></div>
         </div>
-        <p class="small muted" style="margin-top:8px">If the name matches an item in the kit, the amount is added to it and its expiry date, minimum and pack are updated.</p>
-        <div class="formfoot"><button class="btn primary" type="submit">Save item</button><span class="small" id="addMsg" aria-live="polite"></span></div>
+        <div class="formfoot"><button class="btn primary" type="submit">Save</button><button class="btn" type="button" id="addClear">Clear</button><span class="small" id="addMsg" aria-live="polite"></span></div>
       </form>
     </section>
   </div>
@@ -452,6 +509,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <section class="panel">
     <div class="head"><h2>Use log</h2><span class="small muted">Newest first</span></div>
     <div id="kitLog"></div>
+  </section>
+
+  <section class="panel">
+    <p class="small muted">This is an example kit. Amounts, strengths and dates are invented for the demo, and the tool does not give medicine doses.</p>
+    <div class="formfoot">
+      <button class="btn" type="button" id="kitRestore">Restore example kit</button>
+      <span class="small" id="kitMsg" aria-live="polite"></span>
+    </div>
   </section>
   </section>
 
@@ -534,6 +599,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </div>
 </div>
 
+<p class="toast" id="kitToast" role="status" aria-live="polite" hidden></p>
 <button class="fab" id="fab" type="button" aria-expanded="false" aria-controls="drawer">Ask the assistant</button>
 <aside class="drawer" id="drawer" aria-label="Onboard assistant" hidden>
   <div class="head" style="margin:0">
@@ -1274,7 +1340,7 @@ function kitLevel(kit, nowMs){ return kitIssues(kit, nowMs).reduce(function(a,x)
 function itemText(it, nowMs){
   var s=itemStatus(it, nowMs);
   return it.name+': '+amt(it.qty, it.unit)+' left (minimum '+it.min+'), '+(it.exp ? 'expires '+it.exp : 'no expiry date')+', in the '+it.pack+' pack.'+
-    (s.flags.length ? ' '+s.flags.map(function(f){ return f.t; }).join('. ')+'.' : '');
+    (s.flags.length ? ' '+s.flags.map(function(f){ return f.t; }).join('. ')+'.' : '')+(it.use ? ' Used for: '+it.use.toLowerCase()+'.' : '');
 }
 function kitText(kit, log, nowMs){
   if(!kit) return 'No medical kit inventory is loaded.';
@@ -1299,12 +1365,18 @@ function useItem(kit, id, qty){
   if(qty>it.qty) return {ok:false, msg:'Only '+it.qty+' '+it.unit+' of '+it.name+' are left.'};
   it.qty-=qty; return {ok:true, item:it};
 }
+var KIT_USES = {ibuprofen:'Pain and fever',acetaminophen:'Pain and fever',zolpidem:'Sleep',melatonin:'Sleep',loratadine:'Allergy',pseudoephedrine:'Blocked nose',promethazine:'Space motion sickness',loperamide:'Diarrhea',modafinil:'Staying alert',strips:'Blood glucose test',lancets:'Finger-prick samples',cartridges:'Blood gas test',gauze:'Wound care',gel:'Eye ultrasound'};
+var MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(iso){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||''); if(!m || daysUntil(iso, 0)===null) return '';
+  return (+m[3])+' '+MONTHS[+m[2]-1]+' '+m[1];
+}
 function amt(n, unit){ return n+' '+(n===1 ? String(unit).replace(/s$/,'') : unit); }
 function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'item'; }
 function restockItem(kit, f){
   var name=String(f.name||'').trim();
   if(!name || name.length>60) return {ok:false, msg:'Enter an item name of up to 60 characters.'};
-  if(!(Number.isInteger(f.qty) && f.qty>=0 && f.qty<=10000)) return {ok:false, msg:'Enter a quantity from 0 to 10000.'};
+  if(!(Number.isInteger(f.qty) && f.qty>=0 && f.qty<=10000)) return {ok:false, msg:'Enter how many you add, from 0 to 10000. Enter 0 to change only the date.'};
   if(f.exp && daysUntil(f.exp, 0)===null) return {ok:false, msg:'Enter the expiry date as a full date.'};
   var it=kit.filter(function(x){ return x.name.toLowerCase()===name.toLowerCase(); })[0];
   if(it){
@@ -1312,10 +1384,11 @@ function restockItem(kit, f){
     if(f.exp) it.exp=f.exp;
     if(Number.isInteger(f.min) && f.min>=0) it.min=f.min;
     if(MED_PACKS.indexOf(f.pack)>=0) it.pack=f.pack;
+    if(f.use && String(f.use).trim()) it.use=String(f.use).trim().slice(0,40);
     return {ok:true, item:it, added:false};
   }
   var id=slug(name), n=2; while(kit.some(function(x){ return x.id===id; })) id=slug(name)+'-'+(n++);
-  it={id:id, name:name, type:f.type==='Supply'?'Supply':'Medication', pack:MED_PACKS.indexOf(f.pack)>=0?f.pack:'Medical Supply',
+  it={id:id, name:name, use:String(f.use||'').trim().slice(0,40), type:f.type==='Supply'?'Supply':'Medication', pack:MED_PACKS.indexOf(f.pack)>=0?f.pack:'Medical Supply',
       qty:f.qty, unit:String(f.unit||'units').trim().slice(0,20)||'units', min:Number.isInteger(f.min)&&f.min>=0?f.min:0, exp:f.exp||''};
   kit.push(it); return {ok:true, item:it, added:true};
 }
@@ -1333,20 +1406,20 @@ function consumeCheckin(kit){
 function sampleKit(nowMs){
   function on(days){ return isoDate(nowMs+days*86400000); }
   return [
-    {id:'ibuprofen',    name:'Ibuprofen 400 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:40, unit:'tablets',    min:10, exp:on(420)},
-    {id:'acetaminophen',name:'Acetaminophen 500 mg tablets',   type:'Medication', pack:'Oral Med',                   qty:30, unit:'tablets',    min:10, exp:on(300)},
-    {id:'zolpidem',     name:'Zolpidem 5 mg tablets',          type:'Medication', pack:'Oral Med',                   qty:8,  unit:'tablets',    min:10, exp:on(500)},
-    {id:'melatonin',    name:'Melatonin 3 mg tablets',         type:'Medication', pack:'Convenience Med',            qty:20, unit:'tablets',    min:5,  exp:on(-12)},
-    {id:'loratadine',   name:'Loratadine 10 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:14, unit:'tablets',    min:5,  exp:on(22)},
-    {id:'pseudoephedrine',name:'Pseudoephedrine 60 mg tablets',type:'Medication', pack:'Oral Med',                   qty:20, unit:'tablets',    min:5,  exp:on(380)},
-    {id:'promethazine', name:'Promethazine 25 mg/mL injection',type:'Medication', pack:'Topical and Injectable Med', qty:4,  unit:'ampoules',   min:2,  exp:on(250)},
-    {id:'loperamide',   name:'Loperamide 2 mg capsules',       type:'Medication', pack:'Oral Med',                   qty:12, unit:'capsules',   min:4,  exp:on(600)},
-    {id:'modafinil',    name:'Modafinil 100 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:10, unit:'tablets',    min:4,  exp:on(410)},
-    {id:'strips',       name:'Glucose test strips',            type:'Supply',     pack:'Diagnostic',                 qty:46, unit:'strips',     min:10, exp:on(200)},
-    {id:'lancets',      name:'Lancets',                        type:'Supply',     pack:'Diagnostic',                 qty:60, unit:'lancets',    min:20, exp:on(900)},
-    {id:'cartridges',   name:'Blood analyzer cartridges',      type:'Supply',     pack:'Diagnostic',                 qty:12, unit:'cartridges', min:5,  exp:on(40)},
-    {id:'gauze',        name:'Sterile gauze dressings',        type:'Supply',     pack:'Minor Treatment',            qty:25, unit:'dressings',  min:10, exp:on(1000)},
-    {id:'gel',          name:'Ultrasound gel',                 type:'Supply',     pack:'Diagnostic',                 qty:3,  unit:'tubes',      min:1,  exp:on(500)}
+    {id:'ibuprofen',    use:'Pain and fever', name:'Ibuprofen 400 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:40, unit:'tablets',    min:10, exp:on(420)},
+    {id:'acetaminophen',use:'Pain and fever', name:'Acetaminophen 500 mg tablets',   type:'Medication', pack:'Oral Med',                   qty:30, unit:'tablets',    min:10, exp:on(300)},
+    {id:'zolpidem',     use:'Sleep', name:'Zolpidem 5 mg tablets',          type:'Medication', pack:'Oral Med',                   qty:8,  unit:'tablets',    min:10, exp:on(500)},
+    {id:'melatonin',    use:'Sleep', name:'Melatonin 3 mg tablets',         type:'Medication', pack:'Convenience Med',            qty:20, unit:'tablets',    min:5,  exp:on(-12)},
+    {id:'loratadine',   use:'Allergy', name:'Loratadine 10 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:14, unit:'tablets',    min:5,  exp:on(22)},
+    {id:'pseudoephedrine',use:'Blocked nose', name:'Pseudoephedrine 60 mg tablets',type:'Medication', pack:'Oral Med',                   qty:20, unit:'tablets',    min:5,  exp:on(380)},
+    {id:'promethazine', use:'Space motion sickness', name:'Promethazine 25 mg/mL injection',type:'Medication', pack:'Topical and Injectable Med', qty:4,  unit:'ampoules',   min:2,  exp:on(250)},
+    {id:'loperamide',   use:'Diarrhea', name:'Loperamide 2 mg capsules',       type:'Medication', pack:'Oral Med',                   qty:12, unit:'capsules',   min:4,  exp:on(600)},
+    {id:'modafinil',    use:'Staying alert', name:'Modafinil 100 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:10, unit:'tablets',    min:4,  exp:on(410)},
+    {id:'strips',       use:'Blood glucose test', name:'Glucose test strips',            type:'Supply',     pack:'Diagnostic',                 qty:46, unit:'strips',     min:10, exp:on(200)},
+    {id:'lancets',      use:'Finger-prick samples', name:'Lancets',                        type:'Supply',     pack:'Diagnostic',                 qty:60, unit:'lancets',    min:20, exp:on(900)},
+    {id:'cartridges',   use:'Blood gas test', name:'Blood analyzer cartridges',      type:'Supply',     pack:'Diagnostic',                 qty:12, unit:'cartridges', min:5,  exp:on(40)},
+    {id:'gauze',        use:'Wound care', name:'Sterile gauze dressings',        type:'Supply',     pack:'Minor Treatment',            qty:25, unit:'dressings',  min:10, exp:on(1000)},
+    {id:'gel',          use:'Eye ultrasound', name:'Ultrasound gel',                 type:'Supply',     pack:'Diagnostic',                 qty:3,  unit:'tubes',      min:1,  exp:on(500)}
   ];
 }
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
@@ -1543,7 +1616,7 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,kitText:kitText,itemText:itemText,findItem:findItem,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,fmtDate:fmtDate,KIT_USES:KIT_USES,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,kitText:kitText,itemText:itemText,findItem:findItem,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -1702,6 +1775,7 @@ if(typeof document!=='undefined'){ (function(){
   try{ var ks=JSON.parse(localStorage.getItem(KKEY)||'null');
        if(ks && Array.isArray(ks.kit) && Array.isArray(ks.log)) kitState={kit:ks.kit.filter(function(x){ return x && typeof x.name==='string' && typeof x.qty==='number'; }), log:ks.log}; }catch(e){}
   if(!kitState.kit) kitState={kit:sampleKit(Date.now()), log:[]};
+  kitState.kit.forEach(function(it){ if(!it.use && KIT_USES[it.id]) it.use=KIT_USES[it.id]; });
   setKit(kitState.kit, kitState.log);
   function saveKit(){ setKit(kitState.kit, kitState.log); try{ localStorage.setItem(KKEY, JSON.stringify(kitState)); }catch(e){} }
   function logUse(it, qty, reason, src){
@@ -1709,57 +1783,105 @@ if(typeof document!=='undefined'){ (function(){
     kitState.log.push({day:d?d.day:null, at:new Date().toISOString(), id:it.id, name:it.name, qty:qty, unit:it.unit, reason:reason||'', src:src});
   }
   function statusPills(s){
-    if(!s.flags.length) return '<span class="pill st0">● OK</span>';
+    if(!s.flags.length) return '<span class="pill st0">● In stock</span>';
     return s.flags.map(function(f){ return '<span class="pill st'+f.l+'">'+SYMBOL[f.l]+' '+f.t+'</span>'; }).join(' ');
+  }
+  function stockBar(it){
+    var lvl=it.qty<=0 ? 2 : (it.qty<=it.min ? 1 : 0), full=Math.max(it.min*3, it.qty, 1), w=Math.min(100, it.qty/full*100), m=it.min/full*100;
+    return '<span class="kbar st'+lvl+'" aria-hidden="true"><span style="width:'+w.toFixed(1)+'%"></span><i style="left:'+m.toFixed(1)+'%"></i></span>';
+  }
+  function whenText(d){ return d<0 ? 'expired '+(-d)+' day'+(d===-1?'':'s')+' ago' : d===0 ? 'expires today' : 'in '+d+' day'+(d===1?'':'s'); }
+  function itemRow(it, now){
+    var s=itemStatus(it, now), med=it.type!=='Supply';
+    return '<li class="kitem'+(s.level?' st'+s.level:'')+'">'+
+      '<div class="kmain"><span class="kname">'+esc(it.name)+'</span><span class="small muted">'+(it.use ? 'For '+esc(it.use.toLowerCase())+' · ' : '')+esc(it.pack)+' pack</span></div>'+
+      '<div class="kstock"><span class="num">'+esc(amt(it.qty, it.unit))+'</span>'+stockBar(it)+'<span class="small muted">keep at least '+it.min+'</span></div>'+
+      '<div class="kexp">'+(it.exp ? '<span class="num">'+esc(fmtDate(it.exp))+'</span><span class="small muted">'+whenText(s.days)+'</span>' : '<span class="small muted">No expiry date</span>')+'</div>'+
+      '<div class="kstat">'+statusPills(s)+'</div>'+
+      '<div class="kact"><button class="btn" type="button" data-use="'+esc(it.id)+'"'+(it.qty<1?' disabled':'')+'>'+(med?'Took 1':'Used 1')+'</button>'+
+        '<button class="btn" type="button" data-restock="'+esc(it.id)+'">Restock</button>'+
+        '<button class="btn quiet" type="button" data-remove="'+esc(it.id)+'">Remove</button></div></li>';
+  }
+  function attnItem(x){
+    var it=x.it, d=x.s.days, parts=[], expired=false;
+    x.s.flags.forEach(function(f){
+      if(f.c==='expired'){ parts.push('expired '+(-d)+' day'+(d===-1?'':'s')+' ago'); expired=true; }
+      if(f.c==='out') parts.push('is out of stock');
+      if(f.c==='low') parts.push('is running low: '+amt(it.qty, it.unit)+' left, keep at least '+it.min);
+      if(f.c==='expiring') parts.push((d===0 ? 'expires today' : 'expires in '+d+' day'+(d===1?'':'s'))+' ('+fmtDate(it.exp)+')');
+    });
+    var text=parts.map(function(p,i){ return i===0 ? p : 'It '+p.replace(/^is /,'is ').replace(/^expired/,'has expired'); }).join('. ')+'.';
+    var advice = expired ? ' Do not use it without asking the flight surgeon.' : (x.s.flags.some(function(f){ return f.c==='expiring'; }) && !x.s.flags.some(function(f){ return f.c==='low'||f.c==='out'; }) ? ' Plan a replacement.' : '');
+    var dateNeeded=x.s.flags.some(function(f){ return f.c==='expired'||f.c==='expiring'; });
+    return '<li class="st'+x.s.level+'"><i aria-hidden="true">'+SYMBOL[x.s.level]+'</i>'+
+      '<div><strong>'+esc(it.name)+'</strong> '+esc(text+advice)+'</div>'+
+      '<div class="actions"><button class="btn" type="button" data-restock="'+esc(it.id)+'">'+(dateNeeded?'Restock with a new date':'Restock')+'</button>'+
+      (expired ? '<button class="btn quiet" type="button" data-remove="'+esc(it.id)+'">Remove</button>' : '')+'</div></li>';
   }
   function renderKit(){
     var now=Date.now(), kit=kitState.kit, iss=kitIssues(kit, now);
-    var c={expired:0,out:0,low:0,expiring:0}; iss.forEach(function(x){ x.s.flags.forEach(function(f){ c[f.c]++; }); });
-    $('kitSum').innerHTML = iss.length ? Object.keys(c).filter(function(k){ return c[k]; }).map(function(k){
-        var l=(k==='expired'||k==='out')?2:1; return '<span class="pill st'+l+'">'+SYMBOL[l]+' '+c[k]+' '+(k==='out'?'out of stock':k)+'</span>'; }).join(' ')
-      : '<span class="pill st0">● All items OK</span>';
-    $('kitRows').innerHTML = kit.length ? kit.map(function(it){
-      var s=itemStatus(it, now), dd=s.days;
-      return '<tr class="'+(s.level?'st'+s.level:'')+'"><td><span class="kname">'+esc(it.name)+'</span><br><span class="small muted">'+esc(it.type)+'</span></td>'+
-        '<td data-label="Pack">'+esc(it.pack)+'</td><td class="num" data-label="Stock">'+it.qty+' '+esc(it.unit)+'</td><td class="num" data-label="Minimum">'+it.min+'</td>'+
-        '<td class="num" data-label="Expires">'+(it.exp ? esc(it.exp)+'<br><span class="small muted">'+(dd<0 ? (-dd)+' days ago' : dd===0 ? 'today' : 'in '+dd+' days')+'</span>' : '–')+'</td>'+
-        '<td class="kstat">'+statusPills(s)+'</td>'+
-        '<td class="kact"><button class="btn" type="button" data-use="'+esc(it.id)+'"'+(it.qty<1?' disabled':'')+'>Use 1</button> '+
-        '<button class="btn" type="button" data-remove="'+esc(it.id)+'">Remove</button></td></tr>'; }).join('')
-      : '<tr><td colspan="7" class="muted">The kit is empty. Add an item below or restore the example kit.</td></tr>';
+    var meds=kit.filter(function(it){ return it.type!=='Supply'; }), sups=kit.filter(function(it){ return it.type==='Supply'; });
+    $('kitCount').textContent=kit.length+' item'+(kit.length===1?'':'s')+': '+meds.length+' medicine'+(meds.length===1?'':'s')+', '+sups.length+' suppl'+(sups.length===1?'y':'ies');
+    $('kitAttention').innerHTML = iss.length ? iss.map(attnItem).join('')
+      : '<li class="st0"><i aria-hidden="true">●</i><div>Everything is in stock and in date. Nothing needs attention.</div></li>';
+    $('kitMeds').innerHTML = meds.length ? meds.map(function(it){ return itemRow(it, now); }).join('') : '<li class="kempty small muted">No medicines in the kit. Add one with the form below.</li>';
+    $('kitSupplies').innerHTML = sups.length ? sups.map(function(it){ return itemRow(it, now); }).join('') : '<li class="kempty small muted">No supplies in the kit. Add one with the form below.</li>';
+    function cnt(list){ var n=list.filter(function(it){ return itemStatus(it, now).level>0; }).length; return n ? n+' need'+(n===1?'s':'')+' attention' : 'All fine'; }
+    $('kitMedCount').textContent=cnt(meds); $('kitSupCount').textContent=cnt(sups);
     var sel=$('useItem').value;
-    $('useItem').innerHTML=kit.map(function(it){ return '<option value="'+esc(it.id)+'">'+esc(it.name)+' ('+it.qty+' '+esc(it.unit)+' left)</option>'; }).join('');
+    function opts(list){ return list.map(function(it){ return '<option value="'+esc(it.id)+'">'+esc(it.name)+'</option>'; }).join(''); }
+    $('useItem').innerHTML=(meds.length ? '<optgroup label="Medicines">'+opts(meds)+'</optgroup>' : '')+(sups.length ? '<optgroup label="Supplies">'+opts(sups)+'</optgroup>' : '');
     if(kit.some(function(it){ return it.id===sel; })) $('useItem').value=sel;
+    useStock();
     $('kitNames').innerHTML=kit.map(function(it){ return '<option value="'+esc(it.name)+'"></option>'; }).join('');
     var log=kitState.log;
-    $('kitLog').innerHTML = log.length ? '<div class="tablewrap"><table class="htable"><thead><tr><th scope="col">Mission day</th><th scope="col">Time</th><th scope="col">Item</th><th scope="col">Amount</th><th scope="col">Reason</th><th scope="col">Logged by</th></tr></thead><tbody>'+
+    $('kitLog').innerHTML = log.length ? '<div class="tablewrap"><table class="htable"><thead><tr><th scope="col">When</th><th scope="col">What happened</th><th scope="col">Why</th><th scope="col">Logged by</th></tr></thead><tbody>'+
       log.slice().reverse().slice(0,50).map(function(e){
-        var t=new Date(e.at); var tt=isNaN(t) ? '–' : isoDate(t.getTime())+' '+(t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
-        return '<tr><td class="num">'+(e.day||'–')+'</td><td class="num">'+tt+'</td><td>'+esc(e.name)+'</td><td class="num">'+esc(amt(e.qty, e.unit))+'</td><td>'+(e.reason?esc(e.reason):'–')+'</td><td>'+(e.src==='check-in'?'Check-in':'Crew')+'</td></tr>'; }).join('')+
-      '</tbody></table></div>' : '<p class="small muted">No uses logged yet. Log a medicine you take or a supply you use, and it appears here.</p>';
+        var t=new Date(e.at), hm=isNaN(t) ? '' : ' · '+(t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
+        var it=kit.filter(function(x){ return x.id===e.id; })[0], verb=(e.src==='check-in' || (it && it.type==='Supply')) ? 'Used ' : 'Took ';
+        return '<tr><td class="num">'+(e.day ? 'Day '+e.day : '–')+hm+'</td><td>'+esc(verb+amt(e.qty, e.unit)+' of '+e.name)+'</td><td>'+(e.reason ? esc(e.reason) : '–')+'</td><td>'+(e.src==='check-in' ? 'Check-in' : 'Crew')+'</td></tr>'; }).join('')+
+      '</tbody></table></div>' : '<p class="small muted">Nothing logged yet. When you press Took 1 or Used 1, or save a check-in, it appears here.</p>';
+  }
+  function useStock(){
+    var it=kitState.kit.filter(function(x){ return x.id===$('useItem').value; })[0];
+    $('useStock').textContent = it ? 'In the kit: '+amt(it.qty, it.unit)+(it.use ? ' · for '+it.use.toLowerCase() : '') : '';
+  }
+  var toastTimer=null;
+  function toast(t){
+    var e=$('kitToast'); e.textContent=t; e.hidden=false;
+    clearTimeout(toastTimer); toastTimer=setTimeout(function(){ e.hidden=true; }, 4500);
   }
   function kitChanged(){ saveKit(); renderKit(); renderInsights(); renderTabDots(); }
+  function refocus(sel){ var b=document.querySelector(sel); if(b && !b.disabled) b.focus(); }
+  function prefillRestock(id){
+    var it=kitState.kit.filter(function(x){ return x.id===id; })[0]; if(!it) return;
+    $('addName').value=it.name; $('addUse').value=it.use||''; $('addType').value=it.type==='Supply'?'Supply':'Medication';
+    $('addPack').value=it.pack; $('addUnit').value=it.unit; $('addMin').value=it.min; $('addQty').value=''; $('addExp').value='';
+    $('addMsg').textContent='Restocking '+it.name+'. Enter how many you add and the new expiry date, then press Save.';
+    $('addPanel').scrollIntoView({block:'start'}); $('addQty').focus({preventScroll:true});
+  }
   var armed=null;
   $('tab-medkit').addEventListener('click', function(ev){
-    var u=ev.target.closest('[data-use]'), rm=ev.target.closest('[data-remove]');
+    var u=ev.target.closest('[data-use]'), rs=ev.target.closest('[data-restock]'), rm=ev.target.closest('[data-remove]');
     if(u){
-      var r=useItem(kitState.kit, u.dataset.use, 1);
-      if(!r.ok){ $('kitMsg').textContent=r.msg; return; }
+      var id=u.dataset.use, r=useItem(kitState.kit, id, 1);
+      if(!r.ok){ toast(r.msg); return; }
+      var med=r.item.type!=='Supply';
       logUse(r.item, 1, '', 'crew'); kitChanged();
-      $('kitMsg').textContent='Logged '+amt(1, r.item.unit)+' of '+r.item.name+'. '+r.item.qty+' left.';
-      var again=document.querySelector('[data-use="'+u.dataset.use+'"]'); if(again && !again.disabled) again.focus();
+      toast((med ? 'Took ' : 'Used ')+amt(1, r.item.unit)+' of '+r.item.name+'. '+amt(r.item.qty, r.item.unit)+' left.');
+      refocus('[data-use="'+id+'"]');
       return;
     }
+    if(rs){ prefillRestock(rs.dataset.restock); return; }
     if(rm){
-      var id=rm.dataset.remove;
-      if(armed!==id){ armed=id; rm.textContent='Confirm remove'; rm.classList.add('danger');
-        $('kitMsg').textContent='Press "Confirm remove" to delete this item from the kit.';
-        setTimeout(function(){ if(armed===id){ armed=null; renderKit(); } }, 5000); return; }
+      var rid=rm.dataset.remove;
+      if(armed!==rid){ armed=rid; rm.textContent='Confirm remove'; rm.classList.remove('quiet'); rm.classList.add('danger');
+        toast('Press "Confirm remove" to delete this item from the kit.');
+        setTimeout(function(){ if(armed===rid){ armed=null; renderKit(); } }, 5000); return; }
       armed=null;
-      var gone=kitState.kit.filter(function(x){ return x.id===id; })[0];
-      kitState.kit=kitState.kit.filter(function(x){ return x.id!==id; }); kitChanged();
-      $('kitMsg').textContent=gone ? gone.name+' was removed from the kit.' : '';
-      $('kitRestore').focus();
+      var gone=kitState.kit.filter(function(x){ return x.id===rid; })[0];
+      kitState.kit=kitState.kit.filter(function(x){ return x.id!==rid; }); kitChanged();
+      toast(gone ? gone.name+' was removed from the kit.' : 'Removed.');
     }
   });
   var restoreArmed=false;
@@ -1770,23 +1892,29 @@ if(typeof document!=='undefined'){ (function(){
     kitState={kit:sampleKit(Date.now()), log:[]}; kitChanged();
     $('kitMsg').textContent='The example kit was restored and the use log was cleared.';
   });
+  $('useItem').addEventListener('change', useStock);
   $('useForm').addEventListener('submit', function(ev){
     ev.preventDefault();
     var qty=Number($('useQty').value), r=useItem(kitState.kit, $('useItem').value, qty);
     if(!r.ok){ $('useMsg').textContent=r.msg; $('useQty').focus(); return; }
     logUse(r.item, qty, $('useWhy').value.trim(), 'crew'); kitChanged();
-    $('useMsg').textContent='Logged '+amt(qty, r.item.unit)+' of '+r.item.name+'. '+r.item.qty+' left.';
+    $('useMsg').textContent='Logged: '+amt(qty, r.item.unit)+' of '+r.item.name+'. '+amt(r.item.qty, r.item.unit)+' left.';
     $('useWhy').value=''; $('useQty').value=1;
+  });
+  $('addClear').addEventListener('click', function(){
+    ['addName','addUse','addExp'].forEach(function(id){ $(id).value=''; });
+    $('addQty').value=10; $('addUnit').value='tablets'; $('addMin').value=5; $('addType').value='Medication'; $('addPack').value='Emergency Medical';
+    $('addMsg').textContent=''; $('addName').focus();
   });
   $('addForm').addEventListener('submit', function(ev){
     ev.preventDefault();
-    var f={name:$('addName').value, type:$('addType').value, pack:$('addPack').value, qty:Number($('addQty').value),
+    var f={name:$('addName').value, use:$('addUse').value, type:$('addType').value, pack:$('addPack').value, qty:$('addQty').value==='' ? NaN : Number($('addQty').value),
            unit:$('addUnit').value, min:$('addMin').value==='' ? undefined : Number($('addMin').value), exp:$('addExp').value};
     var r=restockItem(kitState.kit, f);
     if(!r.ok){ $('addMsg').textContent=r.msg; return; }
     kitChanged();
-    $('addMsg').textContent=(r.added ? 'Added ' : 'Restocked ')+r.item.name+': '+r.item.qty+' '+r.item.unit+' in the kit.';
-    $('addName').value='';
+    var msg=(r.added ? 'Added ' : 'Restocked ')+r.item.name+'. The kit now has '+amt(r.item.qty, r.item.unit)+(r.item.exp ? ', expiring '+fmtDate(r.item.exp) : '')+'.';
+    $('addMsg').textContent=msg; toast(msg);
   });
   var TABS=['overview','checkin','body','trends','radiation','morale','medkit','sources'];
   function showTab(name, focus){
