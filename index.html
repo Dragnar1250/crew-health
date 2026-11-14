@@ -209,6 +209,7 @@ footer{font-size:12px;color:var(--muted)}
       <span class="small muted" id="surveyTag"></span>
     </div>
     <div id="surveyResult" aria-live="polite"></div>
+    <p class="small muted">On every question, 1 is the least and 5 is the most of what is asked.</p>
     <form id="surveyForm" novalidate>
       <div id="surveyQs"></div>
       <div class="two" style="margin-top:12px">
@@ -827,21 +828,21 @@ function buildMessages(q, days, env, notes, history, ruleAnswer){
   return [{role:'system', content:sys}].concat((history||[]).slice(-6)).concat([{role:'user', content:String(q)}]);
 }
 /* Weekly morale survey, designed by team Kuasar Selçuklu.
-   12 scored questions on a 1-5 scale (higher = more risk; q05 is reverse coded), 2 open questions that are logged but not scored.
+   12 scored questions on a 1-5 scale. The number always means more of what the question asks, so questions about good things (rev:true) are reverse coded into risk points, 2 open questions that are logged but not scored.
    General Psychological Risk Index (GPRI) = mood + physical + social + isolation, range 12-60. */
 var SURVEY = [
-  {id:'q01', dim:'mood',   cat:'Mood',        q:'How are your energy and motivation?',                    a1:'Very high',          a3:'Medium',          a5:'Very low'},
-  {id:'q02', dim:'mood',   cat:'Stress',      q:'How often are you irritable or impatient?',              a1:'Never',              a3:'Sometimes',       a5:'Constantly'},
-  {id:'q03', dim:'mood',   cat:'Stress',      q:'How strong is your anxiety or sense of emergency pressure?', a1:'None',           a3:'Sometimes',       a5:'Intense'},
-  {id:'q04', dim:'mood',   cat:'Mood',        q:'Do you feel emotionally exhausted or withdrawn?',        a1:'Not at all',         a3:'Partly',          a5:'Completely'},
-  {id:'q05', dim:'mood',   cat:'Motivation',  q:'How meaningful do your tasks and experiments feel?',     a1:'Meaningless, empty', a3:'Medium',          a5:'Very meaningful', rev:true},
-  {id:'q06', dim:'phys',   cat:'Sleep',       q:'How are your sleep quality and feeling of rest?',        a1:'Very good',          a3:'Medium',          a5:'Very poor'},
-  {id:'q07', dim:'phys',   cat:'Cognitive',   q:'How often are you distracted or forgetful?',             a1:'Never',              a3:'Rarely',          a5:'Constantly'},
-  {id:'q08', dim:'phys',   cat:'Environment', q:'How much do the noise and light of the habitat bother you?', a1:'Not at all',     a3:'Moderately',      a5:'Unbearably'},
-  {id:'q09', dim:'social', cat:'Social',      q:'How are communication and harmony within the crew?',     a1:'Very harmonious',    a3:'Tense at times',  a5:'Serious conflict'},
-  {id:'q10', dim:'social', cat:'Social',      q:'Do you have enough personal space and privacy?',         a1:'Fully enough',       a3:'Partly enough',   a5:'None, suffocating'},
-  {id:'q11', dim:'social', cat:'Social',      q:'How are coordination with and support from ground control?', a1:'Full support',   a3:'Partial',         a5:'Disconnected, no support'},
-  {id:'q12', dim:'iso',    cat:'Isolation',   q:'How does missing Earth affect you?',                     a1:'It motivates me',    a3:'Manageable',      a5:'It stops me from focusing'}
+  {id:'q01', dim:'mood',   cat:'Mood',        q:'How are your energy and motivation?',                        a1:'Very low',            a3:'Medium',         a5:'Very high',        rev:true},
+  {id:'q02', dim:'mood',   cat:'Stress',      q:'How often are you irritable or impatient?',                  a1:'Never',               a3:'Sometimes',      a5:'Constantly'},
+  {id:'q03', dim:'mood',   cat:'Stress',      q:'How strong is your anxiety or sense of emergency pressure?', a1:'None',                a3:'Sometimes',      a5:'Intense'},
+  {id:'q04', dim:'mood',   cat:'Mood',        q:'How emotionally exhausted or withdrawn do you feel?',        a1:'Not at all',          a3:'Partly',         a5:'Completely'},
+  {id:'q05', dim:'mood',   cat:'Motivation',  q:'How meaningful do your tasks and experiments feel?',         a1:'Meaningless, empty',  a3:'Medium',         a5:'Very meaningful',  rev:true},
+  {id:'q06', dim:'phys',   cat:'Sleep',       q:'How good are your sleep quality and feeling of rest?',       a1:'Very poor',           a3:'Medium',         a5:'Very good',        rev:true},
+  {id:'q07', dim:'phys',   cat:'Cognitive',   q:'How often are you distracted or forgetful?',                 a1:'Never',               a3:'Rarely',         a5:'Constantly'},
+  {id:'q08', dim:'phys',   cat:'Environment', q:'How much do the noise and light of the habitat bother you?', a1:'Not at all',          a3:'Moderately',     a5:'Unbearably'},
+  {id:'q09', dim:'social', cat:'Social',      q:'How good are communication and harmony within the crew?',    a1:'Serious conflict',    a3:'Tense at times', a5:'Very harmonious',  rev:true},
+  {id:'q10', dim:'social', cat:'Social',      q:'How much personal space and privacy do you have?',           a1:'None, suffocating',   a3:'Partly enough',  a5:'Fully enough',     rev:true},
+  {id:'q11', dim:'social', cat:'Social',      q:'How good are coordination with and support from ground control?', a1:'Disconnected, no support', a3:'Partial', a5:'Full support', rev:true},
+  {id:'q12', dim:'iso',    cat:'Isolation',   q:'How much does missing Earth weigh on you?',                  a1:'Not at all, it motivates me', a3:'Manageable', a5:'It stops me from focusing'}
 ];
 var SURVEY_DIMS = {mood:['Mood and stress',25], phys:['Physical and cognitive',15], social:['Social and crew',15], iso:['Isolation',5]};
 var SURVEY_FLAGS = {q02:'constant irritability', q03:'intense anxiety', q09:'serious crew conflict'};
@@ -851,16 +852,16 @@ var SURVEY_LEVELS = [
   {name:'Red',    state:'High risk, critical',         action:'ALERT: mission control and the flight psychologist are notified.', next:'A mandatory one-to-one session is scheduled.'}
 ];
 function scoreSurvey(ans){
-  var dims={mood:0, phys:0, social:0, iso:0}, total=0, valid=true, missing=[];
+  var dims={mood:0, phys:0, social:0, iso:0}, total=0, valid=true, missing=[], risk={};
   SURVEY.forEach(function(s,i){
     var a=ans?ans[s.id]:undefined;
     if(!(a===1||a===2||a===3||a===4||a===5)){ valid=false; missing.push(i+1); return; }
     var v=s.rev ? 6-a : a;
-    dims[s.dim]+=v; total+=v;
+    dims[s.dim]+=v; total+=v; risk[s.id]=v;
   });
   if(!valid) return {valid:false, missing:missing};
   var byScore=total<=25 ? 0 : (total<=40 ? 1 : 2);
-  var flags=Object.keys(SURVEY_FLAGS).filter(function(id){ return ans[id]===5; });
+  var flags=Object.keys(SURVEY_FLAGS).filter(function(id){ return risk[id]===5; });
   return {valid:true, dims:dims, total:total, byScore:byScore, level:flags.length ? 2 : byScore, flags:flags};
 }
 function surveyText(r){
