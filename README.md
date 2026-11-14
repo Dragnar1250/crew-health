@@ -6,7 +6,7 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 
 ## What it does
 
-The page is split into tabs: Overview, Report, Check-in, Live, Analysis, Performance, Body map, Trends, Radiation, Morale, Med kit and Sources. An EN / TR button in the header switches the whole interface between English and Turkish; the choice is remembered on the device. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
+The page is split into tabs: Overview, Report, Check-in, Live, Analysis, Performance, Body map, Trends, Radiation, Morale, Med kit and Sources. An EN / TR button in the header switches the whole interface between English and Turkish; the choice is remembered on the device. Arrow buttons on both sides of the tab bar, a Previous / Next pager at the bottom of every tab and Alt + Left / Right move between tabs. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
 
 
 - **Body map:** a clickable astronaut figure. Each region shows its status by color and symbol.
@@ -14,6 +14,7 @@ The page is split into tabs: Overview, Report, Check-in, Live, Analysis, Perform
 - **Crew profile:** age, height, body mass and sex. The profile sets the personal fluid target (32 mL per kg of body mass, at least 2.5 L for men and 2.1 L for women), the daily energy need (NASA equation), the body mass index, the estimated maximum heart rate (220 minus age) and the exercise heart rate zones. A table shows which readings the profile changes and which it does not: NASA's career radiation limit, for example, is the same for every age and sex.
 - **Water tracker:** quick buttons (+100, +250, +500 mL or any amount) with a progress bar against the personal target, a pace mark spread over the waking hours of the light plan, a log with undo, and a chart of the last 7 days. The total is filled in as the fluid intake of the next check-in.
 - **General health report and score:** a score from 0 to 100 with grades A to E, built from the body systems score (45%), performance risk (20%), the 7-day routine for sleep, exercise and fluid (20%), morale (10%) and the unused share of the career radiation limit (5%). It is capped at 69 while a reading needs action and at 49 while an extreme situation is detected. The report lists the profile, every body system, 7-day averages against targets, findings and recommended next steps, and can be copied as text.
+- **PDF export:** daily (latest check-in), weekly (last 7) or monthly (last 30) report in 2 to 3 A4 pages: the general health score and its parts, a summary, score trend and body-system heat map, every reading with its average, minimum–maximum, reference and days in range, the analysis (combined check, extreme situations, problems across readings, causes), performance, sleep, hydration and reaction-time charts, radiation, morale, medical kit, goals and recommended next steps. The PDF is built inside the page, with no library and no internet connection, in the language in use; it embeds a subset of DejaVu Sans so Turkish letters print correctly.
 - **Mind and performance:** daily mood (1 to 5), stress level (0 to 10), reaction time and attention lapses from the reaction test, plus fluid intake and back pain.
 - **More health data:** breathing rate, and six self-rated symptoms from 0 (none) to 3 (severe): cough, shortness of breath, headache, nausea, dizziness and blurred vision. The check-in also asks whether there was a spacewalk or surface excursion that day.
 - **Health analysis (Analysis tab):**
@@ -64,6 +65,7 @@ Clinical reference ranges: [American Heart Association, blood pressure](https://
 
 ## Tools and other resources
 
+- [DejaVu Sans](https://dejavu-fonts.github.io/) font subset (Bitstream Vera license), embedded for the PDF report.
 - [IBM Plex Sans and IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Sans) fonts (SIL Open Font License), loaded from Google Fonts.
 - Claude by Anthropic: AI assistance for writing the code.
 
