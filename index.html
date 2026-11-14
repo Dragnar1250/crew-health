@@ -320,7 +320,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .pdfbtn{white-space:nowrap}
 .tabpanel .head .label{display:none}
 .envline{margin:2px 0 0;font-size:13px;color:var(--muted)}
-.envline b{font-weight:500;color:var(--ink)} .envline .nw{white-space:nowrap}
+.envline b{font-weight:500;color:var(--ink)} .envline .nw{white-space:nowrap} @media (max-width:420px){ .envline .nw{white-space:normal} }
 .tabpanel > section + section, .tabpanel + .tabpanel.joined{margin-top:16px}
 .hero{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px 24px;align-items:start}
 @media (max-width:760px){ .hero{grid-template-columns:minmax(0,1fr)} }
@@ -382,12 +382,12 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
 .mref{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px;min-height:15px}
 .mref i{width:7px;height:7px;border-radius:50%;background:var(--s);flex:0 0 auto}
 .mfield.st1 .mref, .mfield.st2 .mref{color:var(--s);font-weight:500}
-.chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
-.chips label{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.2}
-.chips label b{font-size:17px;color:var(--ink);font-family:var(--mono)}
-.chips input, .segs input{position:absolute;opacity:0;pointer-events:none}
-.chips label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, var(--surface));color:var(--ink)}
-.chips label:has(input:focus-visible), .segs label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.moodchips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.moodchips label{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.2}
+.moodchips label b{font-size:17px;color:var(--ink);font-family:var(--mono)}
+.moodchips input, .segs input{position:absolute;opacity:0;pointer-events:none}
+.moodchips label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, var(--surface));color:var(--ink)}
+.moodchips label:has(input:focus-visible), .segs label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
 .symlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:8px 22px}
 @media (max-width:560px){ .symlist{grid-template-columns:minmax(0,1fr)} }
 .symrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);flex-wrap:wrap}
@@ -610,7 +610,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       <span class="small muted" id="dataTag"></span>
     </div>
     <form id="checkin" novalidate>
-      <div class="ckhead"><p>The values from your last check-in are filled in. Change what you measured today.</p><span class="ckstatus" id="ckStatus" aria-live="polite"></span></div>
+      <div class="ckhead"><p id="ckIntro">The values from your last check-in are filled in. Change what you measured today.</p><span class="ckstatus" id="ckStatus" aria-live="polite"></span></div>
       <div class="fields" id="fields"></div>
       <div class="ckcard full" style="margin-top:14px">
         <h3>Today</h3>
@@ -2575,7 +2575,7 @@ function buildReport(o){
   /* body systems */
   h2('Body systems');
   var rs=regionScores(days, env);
-  table([{h:'System', w:142}, {h:'Score', w:38, align:'right'}, {h:'Status', w:106}, {h:n>1 ? 'Days in range' : 'Readings outside the range', w:n>1 ? 62 : 229}].concat(n>1 ? [{h:'Readings outside the range', w:167}] : []),
+  table([{h:'System', w:134}, {h:'Score', w:38, align:'right'}, {h:'Status', w:114}, {h:n>1 ? 'Days in range' : 'Readings outside the range', w:n>1 ? 62 : 229}].concat(n>1 ? [{h:'Readings outside the range', w:167}] : []),
     rs.map(function(x){
       var off=REGIONS[x.id].ids.filter(function(id){ return statusOf(id, d[id], env)>0; }).map(function(id){ return IND[id].scale ? t(IND[id].label)+' '+t(SYM_WORD[d[id]]) : t(IND[id].label)+' '+num(d[id], IND[id].step<1 ? 1 : 0)+' '+t(IND[id].unit); }).join(', ') || t('None');
       var inr=rows.filter(function(r){ return regionStatus(x.id, r, env)===0; }).length;
@@ -2589,7 +2589,7 @@ function buildReport(o){
   if(!offIds.length) para(n>1 ? 'Every reading stayed in its normal range on every day.' : 'Every reading is in its normal range.');
   var rd=function(id, v){ return IND[id].scale ? t(SYM_WORD[Math.round(v)]) : num(v, IND[id].step<1 || id==='rad' ? (id==='rad' ? 2 : 1) : 0); };
   if(offIds.length) table(n>1 ? [{h:'Reading', w:160}, {h:'Latest', w:90}, {h:'Average', w:70, align:'right'}, {h:'Normal range', w:120}, {h:'Days in range', w:75, align:'right'}]
-            : [{h:'Reading', w:150}, {h:'Value', w:80}, {h:'Normal range', w:105}, {h:'Status', w:106}, {h:'Your usual', w:74, align:'right'}],
+            : [{h:'Reading', w:150}, {h:'Value', w:80}, {h:'Normal range', w:97}, {h:'Status', w:114}, {h:'Your usual', w:74, align:'right'}],
     offIds.map(function(id){
       var I=IND[id], st=statusOf(id, d[id], env), vals=rows.map(function(r){ return +r[id]; }), unit=I.scale ? '' : ' '+t(I.unit);
       var ref=I.scale ? t('none')+'–'+t('mild') : t(rangeText(id, env))+unit;
@@ -2645,7 +2645,7 @@ function buildReport(o){
   var pdose=rows.reduce(function(a,r){ return a+(+r.rad||0); },0);
   var ki=kitIssues(o.kit||[], o.nowMs), uses=(o.log||[]).filter(function(x){ return x.day!==null && x.day>=first.day && x.day<=d.day; });
   var wg=weeklyGoals(days, env), dstreak=dailyStreak(days, env);
-  table([{h:'Area', w:100}, {h:'Status', w:106}, {h:'Result', w:CW-206}], [
+  table([{h:'Area', w:96}, {h:'Status', w:116}, {h:'Result', w:CW-212}], [
     [t('Radiation'), {s:stLabel(dz.level), st:dz.level}, t('Dose in this period')+' '+num(pdose, 2)+' mSv · '+t('Career radiation dose')+': '+num(dz.total)+' / 600 mSv ('+num(dz.pct)+'%)'+(dz.daysLeft!==null ? ' · '+t('At your recent rate of '+num(dz.rate, 2)+' mSv per day, the limit is about '+dz.daysLeft+' days away') : '')],
     [t('Morale'), {s:stLabel(LAST_SURVEY ? LAST_SURVEY.level : 0), st:LAST_SURVEY ? LAST_SURVEY.level : 0}, LAST_SURVEY ? t('Morale survey')+': '+t(SURVEY_LEVELS[LAST_SURVEY.level].name)+' · '+t('index '+LAST_SURVEY.total+' of 60')+' · '+t(SURVEY_LEVELS[LAST_SURVEY.level].state) : t('Morale survey')+': '+t('not completed yet')],
     [t('Medical kit'), {s:stLabel(ki.reduce(function(a,x){ return Math.max(a, x.s.level); },0)), st:ki.reduce(function(a,x){ return Math.max(a, x.s.level); },0)},
@@ -2654,7 +2654,7 @@ function buildReport(o){
     (function(){ var lm=dayMacros(d), mrows=lm ? macroStatus(lm, true) : null, bad=mrows ? mrows.filter(function(x){ return x.st; }) : [];
       var wk=rows.filter(function(x){ return x.kcal!==undefined; });
       return [t('Nutrition'), {s:stLabel(bad.length ? 1 : 0), st:bad.length ? 1 : 0}, lm ? (n>1 && wk.length>1 ? t('average')+' '+Math.round(avgOf(wk.map(function(x){ return x.kcal; })))+' kcal · ' : '')+
-        t('Energy')+' '+lm.kcal+' kcal · '+t('Protein')+' '+num(lm.p)+' g · '+t('Carbohydrate')+' '+mrows[2].share+'% · '+t('Fat')+' '+mrows[3].share+'% · '+t('Fiber')+' '+num(lm.fi)+' g'+(bad.length ? ' · '+bad.map(function(x){ return t(x.msg); }).join(', ') : '') : t('No nutrition saved with a check-in yet')]; })(),
+        t('Energy')+' '+lm.kcal+' kcal · '+t('Protein')+' '+num(lm.p, lm.p%1 ? 1 : 0)+' g · '+t('Carbohydrate')+' '+mrows[2].share+'% · '+t('Fat')+' '+mrows[3].share+'% · '+t('Fiber')+' '+num(lm.fi, lm.fi%1 ? 1 : 0)+' g'+(bad.length ? ' · '+bad.map(function(x){ return t(x.msg); }).join(', ') : '') : t('No nutrition saved with a check-in yet')]; })(),
     (function(){ var lop=(o.log||[]).some(function(x){ return x.day!==null && d.day-x.day<=2 && /loperamide/i.test((x.id||'')+' '+(x.name||'')); });
       var ga=gutAssess(days, null, {loperamide:lop}); return [t('Digestion'), {s:stLabel(ga.level), st:ga.level}, ga.ready ? t(ga.title)+(ga.reasons.length ? ' · '+ga.reasons.map(t).join(', ') : '')+(d.bristol!==undefined ? ' · Bristol '+(d.bristol||'–')+', '+t(d.bm+' bowel movements')+'' : '') : t('No digestion data yet')]; })(),
     [t('Goals'), {s:stLabel(dstreak>0 ? 0 : 1), st:dstreak>0 ? 0 : 1}, t('Daily streak')+' '+dstreak+' · '+t('Best daily streak')+' '+bestStreak(days, env)+' · '+t('Mission week '+wg.week)+': '+wg.goals.filter(function(g){ return g.done; }).length+' / '+wg.goals.length]
@@ -2764,7 +2764,7 @@ if(typeof document!=='undefined'){ (function(){
   function ckField(id, d){
     var I=IND[id];
     if(id==='mood') return '<div class="mfield" style="grid-column:1 / -1"><span class="small" style="font-size:12.5px;font-weight:500" id="lbl_mood">Mood</span><input type="hidden" id="f_mood" value="'+d.mood+'">'+
-      '<div class="chips" role="radiogroup" aria-labelledby="lbl_mood">'+MOOD_WORDS.map(function(t,i){ return '<label><input type="radio" name="seg_mood" value="'+(i+1)+'"'+(d.mood===i+1?' checked':'')+'><b>'+(i+1)+'</b>'+t+'</label>'; }).join('')+'</div></div>';
+      '<div class="moodchips" role="radiogroup" aria-labelledby="lbl_mood">'+MOOD_WORDS.map(function(t,i){ return '<label><input type="radio" name="seg_mood" value="'+(i+1)+'"'+(d.mood===i+1?' checked':'')+'><b>'+(i+1)+'</b>'+t+'</label>'; }).join('')+'</div></div>';
     var unit=I.unit==='breaths/min' ? '/min' : I.unit;
     return '<div class="mfield" data-ck="'+id+'"><label for="f_'+id+'">'+I.label+'</label><div class="minput"><input id="f_'+id+'" type="number" inputmode="decimal" required min="'+I.min+'" max="'+I.max+'" step="'+I.step+'" value="'+d[id]+'"><span class="unit">'+unit+'</span></div><span class="mref" id="r_'+id+'"></span></div>';
   }
@@ -2789,6 +2789,7 @@ if(typeof document!=='undefined'){ (function(){
   }
   function renderForm(){
     var d=latest()||sample(state.env)[0];
+    $('ckIntro').textContent=latest() ? 'The values from your last check-in are filled in. Change what you measured today.' : 'Example values are filled in. Replace them with what you measured today.';
     $('fields').innerHTML=CK_GROUPS.map(function(g){
       return '<section class="ckcard"><h3>'+g.t+(g.rt ? ' <button class="btn linkbtn" type="button" data-goto="rt">Run the reaction test</button>' : '')+'</h3><p class="hint">'+g.h+'</p><div class="mgrid">'+g.ids.map(function(id){ return ckField(id, d); }).join('')+'</div></section>';
     }).join('')+'<section class="ckcard full"><h3>Symptoms in the last 24 hours</h3><p class="hint">Choose the worst moment of the day.</p><div class="symlist">'+
@@ -3117,10 +3118,12 @@ if(typeof document!=='undefined'){ (function(){
     $('waterOf').textContent='of your '+ft+' L target';
     $('waterFill').style.width=pct.toFixed(0)+'%'; $('waterBar').setAttribute('aria-valuenow', pct.toFixed(0));
     var now=new Date(), nm=now.getHours()*60+now.getMinutes(), wkm=toMin($('lpWake').value), slm=toMin($('lpSleep').value);
-    var pace=(wkm!==null && slm!==null) ? waterPace(ft, nm, wkm, slm) : null, mark=$('waterPaceMark');
+    var asleep=wkm!==null && slm!==null && ((nm-wkm+1440)%1440)>=(((slm-wkm)+1440)%1440 || 1440);
+    var pace=(wkm!==null && slm!==null && !asleep) ? waterPace(ft, nm, wkm, slm) : null, mark=$('waterPaceMark');
     if(pace!==null){ mark.hidden=false; mark.style.left='calc('+Math.min(100, pace/ft*100).toFixed(0)+'% - 1px)'; } else mark.hidden=true;
     var left=Math.max(0, ft-l), msg;
     if(l>=ft) msg='Target reached. Keep sipping with meals and exercise.';
+    else if(asleep) msg='It is your planned sleep time. '+left.toFixed(1)+' L of today\'s target was not logged.';
     else if(pace!==null && l+0.25<pace) msg='Behind pace: about '+pace+' L would be on pace by '+fmtMin(nm)+'. Drink about '+Math.min(500, Math.ceil((pace-l)*1000/50)*50)+' mL now. '+left.toFixed(1)+' L to go today.';
     else msg=(pace!==null ? 'On pace. ' : '')+left.toFixed(1)+' L to go today.';
     $('waterMsg').textContent=msg;
@@ -3378,7 +3381,8 @@ if(typeof document!=='undefined'){ (function(){
   /* ===== Performance tab ===== */
   var PERF_WORD=['Low','Elevated','High'];
   function renderPerf(){
-    var pr=perfRisk(state.days); if(!pr) return;
+    var pr=perfRisk(state.days);
+    if(!pr){ $('perfPill').innerHTML=''; $('perfGauge').innerHTML='<p class="small muted">Log a check-in to see your performance risk.</p>'; $('perfWarn').innerHTML=''; $('perfFactors').innerHTML=''; $('perfActions').innerHTML=''; return; }
     $('perfPill').innerHTML='<span class="pill st'+pr.level+'">'+SYMBOL[pr.level]+' '+PERF_WORD[pr.level]+' risk</span>';
     var hs=pr.history, sw=220, shh=46, mx=Math.max(60, Math.max.apply(null, hs.map(function(x){ return x.score; })));
     var pts=hs.map(function(x,i){ return [(hs.length<2 ? sw/2 : i*(sw-12)/(hs.length-1)+6), shh-4-x.score/mx*(shh-10)]; });
@@ -3587,11 +3591,6 @@ if(typeof document!=='undefined'){ (function(){
   $('tabNext').addEventListener('click', function(){ stepTab(1); });
   $('pagerPrev').addEventListener('click', function(){ stepTab(-1); window.scrollTo(0, $('tabbar').getBoundingClientRect().top+window.scrollY); });
   $('pagerNext').addEventListener('click', function(){ stepTab(1); window.scrollTo(0, $('tabbar').getBoundingClientRect().top+window.scrollY); });
-  /* Alt + arrow keys move between tabs from anywhere on the page */
-  document.addEventListener('keydown', function(ev){
-    if(!ev.altKey || ev.ctrlKey || ev.metaKey || (ev.key!=='ArrowLeft' && ev.key!=='ArrowRight')) return;
-    ev.preventDefault(); stepTab(ev.key==='ArrowLeft' ? -1 : 1, true);
-  });
 
   /* ===== PDF export ===== */
   var PERIOD='week';
@@ -3843,6 +3842,7 @@ if(typeof document!=='undefined'){ (function(){
 /*I18N*/
 var TR_EXACT = {
 "# / # L": "# / # L",
+"# L of today's target was not logged": "Bugünkü hedeften # L kaydedilmedi",
 "# L to go today": "Bugün # L kaldı",
 "# NASA Space Apps Challenge": "# NASA Space Apps Challenge",
 "# Sv = # mSv = # rem": "# Sv = # mSv = # rem",
@@ -4398,6 +4398,7 @@ var TR_EXACT = {
 "Every reading stayed in its normal range on every day": "Her ölçüm her gün normal aralığında kaldı",
 "Everything is in stock and in date": "Her şey stokta ve süresi geçerli",
 "Example data removed": "Örnek veriler kaldırıldı",
+"Example values are filled in": "Örnek değerler dolduruldu",
 "Exercise": "Egzersiz",
 "Exercise # min in total": "Toplam # dk egzersiz",
 "Exercise # min or more": "# dk veya daha fazla egzersiz",
@@ -4637,6 +4638,7 @@ var TR_EXACT = {
 "It is saved with this check-in": "Bu kayıtla birlikte kaydedilir",
 "It is used only for the fluid and energy equations": "Yalnızca sıvı ve enerji denklemlerinde kullanılır",
 "It is written in the language you are using": "Kullandığınız dilde yazılır",
+"It is your planned sleep time": "Planlanan uyku saatiniz",
 "It lasts about # seconds": "Yaklaşık # saniye sürer",
 "It shows how well your breathing removes carbon dioxide": "Solunumunuzun karbondioksiti ne kadar iyi attığını gösterir",
 "It stops me from focusing": "Odaklanmamı engelliyor",
@@ -4687,6 +4689,7 @@ var TR_EXACT = {
 "Log a check-in so I can read your day": "Gününüzü okuyabilmem için bir kayıt girin",
 "Log a check-in to build the report": "Raporu oluşturmak için bir kayıt girin",
 "Log a check-in to get your general health score": "Genel sağlık puanınızı almak için bir kayıt girin",
+"Log a check-in to see your performance risk": "Performans riskinizi görmek için bir kayıt girin",
 "Log a check-in to start": "Başlamak için bir kayıt girin",
 "Log a use": "Kullanım kaydet",
 "Log any vomiting in the use log of the medical kit if you take medicine for it": "Bunun için ilaç alırsanız kusmayı tıbbi çantanın kullanım kaydına yazın",
@@ -5114,6 +5117,7 @@ var TR_EXACT = {
 "Removed": "Kaldırıldı",
 "Repeat the reaction test after rest": "Dinlendikten sonra reaksiyon testini tekrarlayın",
 "Repeat the reaction test later today": "Reaksiyon testini bugün daha sonra tekrarlayın",
+"Replace them with what you measured today": "Bunları bugün ölçtüklerinizle değiştirin",
 "Report": "Rapor",
 "Report and PDF": "Rapor ve PDF",
 "Report any change": "Her değişikliği bildirin",
