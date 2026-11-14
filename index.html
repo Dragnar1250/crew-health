@@ -174,6 +174,25 @@ footer{font-size:12px;color:var(--muted)}
 .dose i{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--muted)}
 .doseticks{position:relative;height:18px;margin-top:4px}
 .doseticks span{position:absolute;top:0;transform:translateX(-50%)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top, 0px);z-index:16;background:var(--bg)}
+.tabbar{position:sticky;top:env(safe-area-inset-top, 0px);z-index:15;background:var(--bg);padding-block:6px;margin-block:-6px}
+.tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.tabs::-webkit-scrollbar{display:none}
+.tabs [role=tab]{flex:1 0 auto;font:inherit;font-size:14px;font-weight:500;color:var(--muted);background:none;border:0;border-radius:8px;padding:8px 14px;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.tabs [role=tab]:hover{color:var(--ink)}
+.tabs [role=tab][aria-selected="true"]{background:var(--accent);color:var(--surface)}
+.tabs [role=tab]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tdot{font-size:11px;line-height:1;color:var(--s)}
+.tdot.due{color:var(--accent)}
+.tabs [role=tab][aria-selected="true"] .tdot{color:var(--surface)}
+.tabpanel{display:flex;flex-direction:column;gap:16px;min-width:0}
+.tabpanel:focus{outline:none}
+.confirm{margin-top:12px;border:1px solid var(--crit);background:var(--crit-soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.btn.danger{background:var(--crit);border-color:var(--crit);color:var(--surface)}
+.tablewrap{overflow-x:auto}
+.htable{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
+.htable th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.htable td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
 </style>
 
 </head>
@@ -196,6 +215,19 @@ footer{font-size:12px;color:var(--muted)}
   <section id="banner" class="banner st0" aria-live="polite"></section>
   <p id="notice" class="small muted" aria-live="polite" hidden></p>
 
+  <nav class="tabbar" id="tabbar" aria-label="Sections">
+    <div class="tabs" role="tablist" id="tabs">
+      <button type="button" role="tab" id="t-overview" data-tab="overview" aria-controls="tab-overview" aria-selected="true" tabindex="0">Overview<span class="tdot" id="d-overview" hidden></span></button>
+      <button type="button" role="tab" id="t-checkin" data-tab="checkin" aria-controls="tab-checkin" aria-selected="false" tabindex="-1">Check-in<span class="tdot" id="d-checkin" hidden></span></button>
+      <button type="button" role="tab" id="t-body" data-tab="body" aria-controls="tab-body" aria-selected="false" tabindex="-1">Body map<span class="tdot" id="d-body" hidden></span></button>
+      <button type="button" role="tab" id="t-trends" data-tab="trends" aria-controls="tab-trends" aria-selected="false" tabindex="-1">Trends<span class="tdot" id="d-trends" hidden></span></button>
+      <button type="button" role="tab" id="t-radiation" data-tab="radiation" aria-controls="tab-radiation" aria-selected="false" tabindex="-1">Radiation<span class="tdot" id="d-radiation" hidden></span></button>
+      <button type="button" role="tab" id="t-morale" data-tab="morale" aria-controls="tab-morale" aria-selected="false" tabindex="-1">Morale<span class="tdot" id="d-morale" hidden></span></button>
+      <button type="button" role="tab" id="t-sources" data-tab="sources" aria-controls="tab-sources" aria-selected="false" tabindex="-1">Sources<span class="tdot" id="d-sources" hidden></span></button>
+    </div>
+  </nav>
+
+  <section class="tabpanel" id="tab-overview" role="tabpanel" aria-labelledby="t-overview">
   <section class="panel goalsp" aria-labelledby="goalsTitle">
     <div class="head">
       <div>
@@ -228,17 +260,15 @@ footer{font-size:12px;color:var(--muted)}
     </div>
     <ul class="insights" id="insights"></ul>
     <p class="small muted" id="learned"></p>
+    <div class="actions" style="margin-top:12px">
+      <button class="btn" type="button" data-goto="checkin">Log today's check-in</button>
+      <button class="btn" type="button" data-goto="body">Open the body map</button>
+      <button class="btn" type="button" data-open-survey>Take the morale survey</button>
+    </div>
+  </section>
   </section>
 
-  <div class="grid">
-    <section class="panel figure" aria-label="Body map">
-      <p class="label">Body map · select a region</p>
-      <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
-      <div class="chips" id="chips"></div>
-    </section>
-    <section class="panel detail" id="detail" aria-live="polite"></section>
-  </div>
-
+  <section class="tabpanel" id="tab-checkin" role="tabpanel" aria-labelledby="t-checkin" hidden>
   <section class="panel">
     <div class="head">
       <h2>Log today's check-in</h2>
@@ -254,23 +284,20 @@ footer{font-size:12px;color:var(--muted)}
       </div>
     </form>
   </section>
-
-  <section class="panel">
-    <div class="head">
-      <div>
-        <p class="label">Behavioral health · team-designed index</p>
-        <h2>Weekly morale survey</h2>
-      </div>
-      <span class="small muted" id="surveyTag"></span>
-    </div>
-    <div id="surveyResult" aria-live="polite"></div>
-    <div class="formfoot" style="margin-top:0">
-      <button class="btn primary" type="button" data-open-survey>Start the morale survey</button>
-      <span class="small" id="surveyDone" aria-live="polite"></span>
-    </div>
   </section>
 
+  <section class="tabpanel" id="tab-body" role="tabpanel" aria-labelledby="t-body" hidden>
+  <div class="grid">
+    <section class="panel figure" aria-label="Body map">
+      <p class="label">Body map · select a region</p>
+      <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
+      <div class="chips" id="chips"></div>
+    </section>
+    <section class="panel detail" id="detail" aria-live="polite"></section>
+  </div>
+  </section>
 
+  <section class="tabpanel" id="tab-trends" role="tabpanel" aria-labelledby="t-trends" hidden>
   <section class="panel">
     <div class="head">
       <h2>Trend over the mission</h2>
@@ -282,7 +309,9 @@ footer{font-size:12px;color:var(--muted)}
     <div class="chartbox"><svg id="chart" viewBox="0 0 640 230" role="img" aria-label="Trend chart"></svg></div>
     <p class="small muted" id="chartNote"></p>
   </section>
+  </section>
 
+  <section class="tabpanel" id="tab-radiation" role="tabpanel" aria-labelledby="t-radiation" hidden>
   <section class="panel" id="dosePanel">
     <div class="head">
       <div>
@@ -309,7 +338,39 @@ footer{font-size:12px;color:var(--muted)}
     </form>
     <p class="small muted">Warning steps: 300 mSv (half of the limit) to watch, 480 mSv (80%) to act, 600 mSv limit reached.</p>
   </section>
+  </section>
 
+  <section class="tabpanel" id="tab-morale" role="tabpanel" aria-labelledby="t-morale" hidden>
+  <section class="panel">
+    <div class="head">
+      <div>
+        <p class="label">Behavioral health · team-designed index</p>
+        <h2>Weekly morale survey</h2>
+      </div>
+      <span class="small muted" id="surveyTag"></span>
+    </div>
+    <div id="surveyResult" aria-live="polite"></div>
+    <div class="formfoot" style="margin-top:0">
+      <button class="btn primary" type="button" data-open-survey>Start the morale survey</button>
+      <button class="btn" type="button" id="surveyResetBtn">Reset survey history</button>
+      <span class="small" id="surveyDone" aria-live="polite"></span>
+    </div>
+    <div class="confirm" id="surveyConfirm" hidden>
+      <p><strong>Delete all <span id="surveyCount"></span> from this device?</strong> Your goals and the assistant will no longer see them. This cannot be undone.</p>
+      <div class="actions">
+        <button class="btn danger" type="button" id="surveyResetYes">Delete results</button>
+        <button class="btn" type="button" id="surveyResetNo">Cancel</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="head"><h2>Survey history</h2><span class="small muted">Newest first</span></div>
+    <div id="surveyHistory"></div>
+  </section>
+  </section>
+
+  <section class="tabpanel" id="tab-sources" role="tabpanel" aria-labelledby="t-sources" hidden>
   <section class="panel">
     <div class="head"><h2>Sources and limits of this prototype</h2></div>
     <ul class="small">
@@ -328,6 +389,7 @@ footer{font-size:12px;color:var(--muted)}
       <li>The weekly morale survey and its General Psychological Risk Index were designed by the team. It is not a validated clinical instrument, and its thresholds are a first proposal.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
+  </section>
   </section>
 
   <footer>Code generated with AI assistance (Claude, Anthropic); concept, design decisions and review by team Kuasar Selçuklu. No NASA branding is used.</footer>
@@ -358,6 +420,7 @@ footer{font-size:12px;color:var(--muted)}
         </div>
         <div class="formfoot">
           <button class="btn primary" type="submit">Submit survey</button>
+          <button class="btn" type="button" id="surveyClear">Clear answers</button>
           <button class="btn" type="button" data-close-survey>Close</button>
           <span class="small" id="surveyMsg" aria-live="polite"></span>
         </div>
@@ -1399,12 +1462,51 @@ if(typeof document!=='undefined'){ (function(){
       met===dg.length ? 'Every daily goal is done today.' :
       (ds===0 && best>0 ? 'Your streak restarts today. Your best run was '+best+' day'+(best===1?'':'s')+'.' : (dg.length-met)+' daily goal'+(dg.length-met===1?'':'s')+' left today.');
   }
-  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderInsights(); }
+  var TABS=['overview','checkin','body','trends','radiation','morale','sources'];
+  function showTab(name, focus){
+    if(TABS.indexOf(name)<0) name='overview';
+    TABS.forEach(function(t){
+      var on=t===name, b=$('t-'+t);
+      $('tab-'+t).hidden=!on; b.setAttribute('aria-selected', String(on)); b.tabIndex=on?0:-1;
+    });
+    var bar=$('tabbar'), y=bar.getBoundingClientRect().top+window.scrollY;
+    if(window.scrollY>y) window.scrollTo(0, y);
+    var tb=$('t-'+name); if(tb.scrollIntoView) tb.scrollIntoView({block:'nearest', inline:'nearest'});
+    if(focus) tb.focus();
+  }
+  function goTab(name, focus){
+    try{ if(location.hash!=='#'+name) history.pushState(null, '', '#'+name); }
+    catch(e){ try{ location.hash=name; }catch(e2){} }
+    showTab(name, focus);
+  }
+  window.addEventListener('hashchange', function(){ showTab(location.hash.slice(1)); });
+  window.addEventListener('popstate', function(){ showTab(location.hash.slice(1)); });
+  $('tabs').addEventListener('click', function(ev){ var b=ev.target.closest('[data-tab]'); if(b) goTab(b.dataset.tab); });
+  $('tabs').addEventListener('keydown', function(ev){
+    var i=TABS.indexOf(document.activeElement && document.activeElement.dataset ? document.activeElement.dataset.tab : ''); if(i<0) return;
+    var j = ev.key==='ArrowRight' ? (i+1)%TABS.length : ev.key==='ArrowLeft' ? (i-1+TABS.length)%TABS.length : ev.key==='Home' ? 0 : ev.key==='End' ? TABS.length-1 : -1;
+    if(j<0) return; ev.preventDefault(); goTab(TABS[j], true);
+  });
+  function dot(id, st, label){
+    var e=$('d-'+id); if(!st){ e.hidden=true; return; }
+    e.hidden=false; e.className='tdot '+(st==='due'?'due':'st'+st); e.textContent=st==='due'?'●':SYMBOL[st];
+    e.setAttribute('title', label); e.setAttribute('aria-label', label);
+  }
+  function renderTabDots(){
+    var d=latest(), env=state.env;
+    var rw=d ? Math.max.apply(null, ORDER.map(function(id){ return statusOf(id,d[id],env); })) : 0;
+    dot('body', rw, rw===2?'A reading needs action':'A reading to watch');
+    var dz=doseStatus(state.days).level; dot('radiation', dz, dz===2?'Dose needs action':'Dose to watch');
+    var sv=LAST_SURVEY ? LAST_SURVEY.level : 0, due=!weeklyGoals(state.days, env).goals[4].done;
+    if(sv) dot('morale', sv, sv===2?'Morale needs attention':'Morale to watch'); else dot('morale', due?'due':0, 'Survey due this week');
+  }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderInsights(); renderTabDots(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
   document.addEventListener('click', function(ev){
     var os=ev.target.closest('[data-open-survey]'); if(os){ openSurvey(os); return; }
+    var gt=ev.target.closest('[data-goto]'); if(gt){ goTab(gt.dataset.goto); return; }
     var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q],[data-open-chat]'); if(!t) return;
     if(t.hasAttribute('data-open-chat')){ openChat(true); return; }
     if(t.dataset.q){ ask(t.dataset.q); return; }
@@ -1438,7 +1540,7 @@ if(typeof document!=='undefined'){ (function(){
     });
     if(bad){ $('formMsg').textContent='Check the highlighted value: it is missing or outside what the instrument can read.'; bad.focus(); return; }
     state.days.push(day); save(); notice(''); render();
-    $('formMsg').textContent='Saved as mission day '+day.day+'.';
+    $('formMsg').innerHTML='Saved as mission day '+day.day+'. <button class="btn linkbtn" type="button" data-goto="overview">See today\'s overview</button>';
   });
   $('clearEx').addEventListener('click', function(){
     state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
@@ -1536,11 +1638,43 @@ if(typeof document!=='undefined'){ (function(){
     var d=latest(); r.day=d?d.day:null; r.ans=ans;
     r.q13=$('sv_q13').value.trim(); r.q14=$('sv_q14').value.trim(); r.hasNotes=!!(r.q13||r.q14);
     surveys.push(r); try{ localStorage.setItem(SKEY, JSON.stringify(surveys)); }catch(e){}
-    setSurvey(r); setSurveyDays(surveys.map(function(x){ return x.day; })); $('surveyForm').reset(); surveyProgress();
-    renderSurveyResult(); renderInsights(); renderGoals();
+    $('surveyForm').reset(); surveyProgress(); $('surveyConfirm').hidden=true;
+    afterSurveyChange();
     $('surveyMsg').textContent=''; closeSurvey();
     $('surveyDone').textContent='Survey saved. Your result is shown above.';
     $('surveyResult').scrollIntoView({block:'nearest'});
+  });
+  function renderSurveyHistory(){
+    $('surveyResetBtn').hidden=!surveys.length;
+    if(!surveys.length){ $('surveyHistory').innerHTML='<p class="small muted">No surveys yet. Completed surveys appear here with their risk index.</p>'; return; }
+    $('surveyHistory').innerHTML='<div class="tablewrap"><table class="htable"><thead><tr><th scope="col">#</th><th scope="col">Mission day</th>'+
+      '<th scope="col">Risk index</th><th scope="col">Level</th>'+
+      Object.keys(SURVEY_DIMS).map(function(k){ return '<th scope="col">'+SURVEY_DIMS[k][0]+'</th>'; }).join('')+'<th scope="col">Red flags</th></tr></thead><tbody>'+
+      surveys.map(function(r,i){ return {r:r,i:i}; }).reverse().map(function(x){
+        var r=x.r;
+        return '<tr><td class="num">'+(x.i+1)+'</td><td class="num">'+(r.day||'–')+'</td><td class="num">'+r.total+' / 60</td><td>'+pill(r.level).replace(WORD[r.level], SURVEY_LEVELS[r.level].name)+'</td>'+
+          Object.keys(SURVEY_DIMS).map(function(k){ return '<td class="num">'+r.dims[k]+' / '+SURVEY_DIMS[k][1]+'</td>'; }).join('')+
+          '<td>'+(r.flags.length ? r.flags.map(function(id){ return SURVEY_FLAGS[id]; }).join(', ') : '–')+'</td></tr>'; }).join('')+
+      '</tbody></table></div>';
+  }
+  function afterSurveyChange(){
+    setSurvey(surveys[surveys.length-1]); setSurveyDays(surveys.map(function(x){ return x.day; }));
+    renderSurveyResult(); renderSurveyHistory(); renderInsights(); renderGoals(); renderTabDots();
+  }
+  $('surveyResetBtn').addEventListener('click', function(){
+    $('surveyCount').textContent=surveys.length+' survey result'+(surveys.length===1?'':'s');
+    $('surveyConfirm').hidden=false; $('surveyResetNo').focus();
+  });
+  $('surveyResetNo').addEventListener('click', function(){ $('surveyConfirm').hidden=true; $('surveyResetBtn').focus(); });
+  $('surveyResetYes').addEventListener('click', function(){
+    surveys=[]; try{ localStorage.setItem(SKEY, '[]'); }catch(e){}
+    $('surveyConfirm').hidden=true; afterSurveyChange();
+    $('surveyDone').textContent='Survey history deleted. You can start a new survey any time.';
+    document.querySelector('#tab-morale [data-open-survey]').focus();
+  });
+  $('surveyClear').addEventListener('click', function(){
+    $('surveyForm').reset(); surveyProgress(); $('surveyMsg').textContent='Answers cleared.';
+    var first=$('surveyModal').querySelector('input[type=radio]'); if(first) first.focus();
   });
   var surveyOpener=null;
   function surveyProgress(){
@@ -1571,7 +1705,7 @@ if(typeof document!=='undefined'){ (function(){
     if(ev.shiftKey && document.activeElement===a){ ev.preventDefault(); z.focus(); }
     else if(!ev.shiftKey && document.activeElement===z){ ev.preventDefault(); a.focus(); }
   });
-  renderSurvey(); renderSurveyResult(); surveyProgress();
+  renderSurvey(); renderSurveyResult(); renderSurveyHistory(); surveyProgress();
 
   var NKEY='kuasar-crew-notes-v1', notes=[];
   try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
@@ -1604,6 +1738,7 @@ if(typeof document!=='undefined'){ (function(){
   $('forgetNotes').addEventListener('click', function(){ notes=[]; saveNotes(); noteCount(); say('All crew notes were removed.','bot'); });
   noteCount();
   render();
+  showTab(location.hash.slice(1));
   say(answer('summary', state.days, state.env),'bot');
 })(); }
 </script>
