@@ -334,6 +334,30 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 details.how{margin-top:10px;font-size:13px;color:var(--muted)} details.how summary{cursor:pointer;color:var(--accent);font-weight:500} details.how p{margin:6px 0 0}
 details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;color:var(--accent);font-weight:500;padding:4px 0}
 .ztxt{font-size:12px;font-weight:600;color:var(--s,var(--muted));white-space:nowrap}
+.subtabs{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px}
+.subtabs button{font:inherit;font-size:14px;font-weight:500;padding:7px 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.subtabs button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.subtabs button:not([aria-pressed="true"]):hover{border-color:var(--accent);color:var(--accent)}
+.subtabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.subtabs .sdot{width:7px;height:7px;border-radius:50%;background:var(--s)}
+[data-sub][hidden]{display:none!important}
+.tabpanel > [data-sub]{margin-top:0!important;margin-bottom:16px} .tabpanel.joined{margin-top:0!important}
+.macros{display:grid;gap:10px}
+.mrow{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,2fr) minmax(0,1.3fr);gap:10px;align-items:center;font-size:14px}
+@media (max-width:560px){ .mrow{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .mrow .mbar{grid-column:1 / -1;order:3} }
+.mrow b{font-weight:600} .mrow small{display:block;color:var(--muted);font-size:12px}
+.mbar{position:relative;height:10px;border-radius:99px;background:var(--line);overflow:hidden} .mbar i{position:absolute;top:0;bottom:0;left:0;border-radius:99px;background:var(--s,var(--accent))}
+.mbar u{position:absolute;top:0;bottom:0;background:var(--ok-soft,rgba(24,115,74,.18));border-left:2px solid var(--ok);border-right:2px solid var(--ok);opacity:.7}
+.mval{text-align:right;font-family:var(--mono);font-size:13px} .mval em{display:block;font-style:normal;font-family:var(--sans,inherit);font-size:12px;color:var(--s,var(--muted))}
+.ffields{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;align-items:end}
+.ffields .wide{grid-column:span 2} @media (max-width:560px){ .ffields .wide{grid-column:1 / -1} }
+.flog{list-style:none;margin:12px 0 0;padding:0} .flog li{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:7px 0;border-top:1px solid var(--line);font-size:14px;flex-wrap:wrap}
+.flog .num{font-size:12px;color:var(--muted)}
+.bristol{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:6px}
+.bristol label{display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);border-radius:10px;padding:8px 4px;font-size:12px;text-align:center;cursor:pointer;background:var(--bg)}
+.bristol input{margin:0} .bristol label:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.bristol b{font-size:16px} @media (max-width:560px){ .bristol{grid-template-columns:repeat(4,minmax(0,1fr))} }
+.gutstrip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px} .gutstrip span{display:inline-flex;flex-direction:column;align-items:center;min-width:38px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--bg)} .gutstrip b{font-size:15px;color:var(--s,var(--ink))}
 .tipgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .tip{border:1px solid var(--s);border-left-width:4px;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .tip h3{font-size:14px;color:var(--s)}
@@ -426,33 +450,6 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div class="qtiles" id="heroTiles"></div>
   </section>
 
-  <section class="panel" aria-labelledby="waterTitle">
-    <div class="head">
-      <div>
-        <p class="label">Hydration · water tracker</p>
-        <h2 id="waterTitle">Water today</h2>
-      </div>
-      <p class="small muted" id="waterNote"></p>
-    </div>
-    <div class="water">
-      <div>
-        <div class="wnum"><b class="num" id="waterTotal">0.0</b><span id="waterOf"></span></div>
-        <div class="wbar" id="waterBar" role="progressbar" aria-labelledby="waterTitle" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="waterFill" style="width:0%"></i><em id="waterPaceMark" hidden></em></div>
-        <p class="small" id="waterMsg" aria-live="polite"></p>
-        <div class="actions">
-          <button class="btn" type="button" data-water="100">+100 mL</button>
-          <button class="btn" type="button" data-water="250">+250 mL</button>
-          <button class="btn" type="button" data-water="500">+500 mL</button>
-          <form class="wform" id="waterForm" novalidate><label class="small muted" for="waterCustom">Other amount (mL)</label><input id="waterCustom" type="number" inputmode="numeric" min="10" max="2000" step="10"><button class="btn" type="submit">Add</button></form>
-          <button class="btn quiet" type="button" id="waterUndo">Undo last</button>
-        </div>
-        <ul class="wlog" id="waterLog" aria-label="Drinks logged today"></ul>
-        <details class="how"><summary>How the water tracker works</summary><p>Count drinks and the water you add to food. The total is filled in as the fluid intake of your next check-in, and the list is cleared when you save it.</p></details>
-      </div>
-      <figure><div id="waterWeek"></div><figcaption class="small muted">Fluid intake in your last 7 check-ins against your target</figcaption></figure>
-    </div>
-  </section>
-
   <section class="panel goalsp" aria-labelledby="goalsTitle">
     <div class="head">
       <div>
@@ -490,7 +487,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-report" role="tabpanel" aria-labelledby="t-report" hidden>
-  <section class="panel" aria-labelledby="exportTitle">
+  <section data-sub="report:report" class="panel" aria-labelledby="exportTitle">
     <div class="head">
       <div>
         <p class="label">Export · PDF report</p>
@@ -509,7 +506,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     </div>
   </section>
 
-  <section class="panel">
+  <section data-sub="report:report" class="panel">
     <div class="head">
       <div>
         <p class="label">General health report · team-designed score</p>
@@ -526,7 +523,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <details class="how"><summary>How the score is calculated</summary><p>The general health score runs from 0 to 100. It combines the body systems score (45%), the performance risk (20%), the routine of the last 7 days for sleep, exercise and fluid (20%), morale (10%) and the share of the career radiation limit still unused (5%). It is capped at 69 while a reading needs action and at 49 while an extreme situation is detected. The score and its weights are the team's own proposal, not a clinical index.</p></details>
   </section>
 
-  <section class="panel" aria-labelledby="profileTitle">
+  <section data-sub="report:profile" class="panel" aria-labelledby="profileTitle">
     <div class="head">
       <div>
         <p class="label">Crew profile · personal targets</p>
@@ -556,7 +553,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-checkin" role="tabpanel" aria-labelledby="t-checkin" hidden>
-  <section class="panel">
+  <section data-sub="checkin:log" class="panel">
     <div class="head">
       <h2>Log today's check-in</h2>
       <span class="small muted" id="dataTag"></span>
@@ -564,6 +561,8 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <form id="checkin" novalidate>
       <div class="fields" id="fields"></div>
       <p class="small muted" id="waterHint" hidden></p>
+      <p class="small muted" id="foodHint" hidden></p>
+      <p class="small muted" id="gutHint" hidden></p>
       <label class="check" for="useSupplies"><input type="checkbox" id="useSupplies" checked> Count the test supplies this check-in uses: 1 glucose test strip, 2 lancets and 1 blood analyzer cartridge</label>
       <div class="formfoot">
         <button class="btn primary" type="submit">Save check-in</button>
@@ -573,10 +572,82 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       </div>
     </form>
   </section>
+
+  <section class="panel" data-sub="checkin:water" aria-labelledby="waterTitle">
+    <div class="head">
+      <div>
+        <p class="label">Hydration · water tracker</p>
+        <h2 id="waterTitle">Water today</h2>
+      </div>
+      <p class="small muted" id="waterNote"></p>
+    </div>
+    <div class="water">
+      <div>
+        <div class="wnum"><b class="num" id="waterTotal">0.0</b><span id="waterOf"></span></div>
+        <div class="wbar" id="waterBar" role="progressbar" aria-labelledby="waterTitle" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="waterFill" style="width:0%"></i><em id="waterPaceMark" hidden></em></div>
+        <p class="small" id="waterMsg" aria-live="polite"></p>
+        <div class="actions">
+          <button class="btn" type="button" data-water="100">+100 mL</button>
+          <button class="btn" type="button" data-water="250">+250 mL</button>
+          <button class="btn" type="button" data-water="500">+500 mL</button>
+          <form class="wform" id="waterForm" novalidate><label class="small muted" for="waterCustom">Other amount (mL)</label><input id="waterCustom" type="number" inputmode="numeric" min="10" max="2000" step="10"><button class="btn" type="submit">Add</button></form>
+          <button class="btn quiet" type="button" id="waterUndo">Undo last</button>
+        </div>
+        <ul class="wlog" id="waterLog" aria-label="Drinks logged today"></ul>
+        <details class="how"><summary>How the water tracker works</summary><p>Count drinks and the water you add to food. The total is filled in as the fluid intake of your next check-in, and the list is cleared when you save it.</p></details>
+      </div>
+      <figure><div id="waterWeek"></div><figcaption class="small muted">Fluid intake in your last 7 check-ins against your target</figcaption></figure>
+    </div>
   </section>
 
-  <section class="tabpanel" id="tab-body" role="tabpanel" aria-labelledby="t-body" hidden>
-  <section class="panel">
+  <section class="panel" data-sub="checkin:food" aria-labelledby="foodTitle">
+    <div class="head">
+      <div><h2 id="foodTitle">Nutrition today</h2></div>
+      <span id="foodPill"></span>
+    </div>
+    <div class="macros" id="macroBars"></div>
+    <p class="small muted" id="macroNote" style="margin:8px 0 0"></p>
+    <h3 style="margin:18px 0 8px">Add food</h3>
+    <form id="foodForm" novalidate>
+      <div class="ffields">
+        <div class="field wide"><label for="fdName">Food (optional)</label><input id="fdName" type="text" maxlength="40" placeholder="For example: chicken with rice"></div>
+        <div class="field"><label for="fdP">Protein (g)</label><input id="fdP" type="number" inputmode="decimal" min="0" max="300" step="0.5"></div>
+        <div class="field"><label for="fdC">Carbohydrate (g)</label><input id="fdC" type="number" inputmode="decimal" min="0" max="500" step="0.5"></div>
+        <div class="field"><label for="fdF">Fat (g)</label><input id="fdF" type="number" inputmode="decimal" min="0" max="300" step="0.5"></div>
+        <div class="field"><label for="fdFi">Fiber (g)</label><input id="fdFi" type="number" inputmode="decimal" min="0" max="100" step="0.5"></div>
+      </div>
+      <div class="formfoot"><button class="btn primary" type="submit">Add</button><span class="small" id="foodMsg" aria-live="polite"></span></div>
+    </form>
+    <ul class="flog" id="foodLog" aria-label="Food logged today"></ul>
+    <details class="how"><summary>How the targets are set</summary><p>Read the grams from the food package label. Energy is worked out as 4 kcal per gram of protein and carbohydrate and 9 kcal per gram of fat. Targets follow NASA's nutrition requirements for exploration missions (JSC-67378): protein 1.2 to 1.8 g per kg of body mass, carbohydrate 45% to 65% and fat 20% to 35% of energy, fiber 38 g a day for men and 25 g for women, and the energy need from the crew profile. The day's totals are added to your next check-in, and the list is cleared when you save it.</p></details>
+    <div class="rsec"><h3>Last 7 check-ins</h3><div class="tablewrap"><table class="rtable" id="foodWeek"></table></div></div>
+  </section>
+
+  <section class="panel" data-sub="checkin:gut" aria-labelledby="gutTitle">
+    <div class="head">
+      <div><h2 id="gutTitle">Digestion</h2></div>
+      <span id="gutPill"></span>
+    </div>
+    <div id="gutResult"></div>
+    <h3 style="margin:18px 0 8px">Today</h3>
+    <form id="gutForm" novalidate>
+      <fieldset style="border:0;margin:0;padding:0"><legend class="small" style="font-weight:500">Stool form (Bristol stool scale) of the last bowel movement</legend>
+        <div class="bristol" id="bristolPick"></div>
+      </fieldset>
+      <div class="ffields" style="margin-top:12px">
+        <div class="field"><label for="gBm">Bowel movements today</label><input id="gBm" type="number" inputmode="numeric" min="0" max="10" step="1"></div>
+        <div class="field"><label for="gBloat">Bloating</label><select id="gBloat"><option value="0">None</option><option value="1">Mild</option><option value="2">Moderate</option><option value="3">Severe</option></select></div>
+        <div class="field"><label for="gPain">Abdominal pain</label><select id="gPain"><option value="0">None</option><option value="1">Mild</option><option value="2">Moderate</option><option value="3">Severe</option></select></div>
+      </div>
+      <div class="formfoot"><button class="btn primary" type="submit">Save for today</button><button class="btn" type="button" id="gutClear">Clear</button><span class="small" id="gutMsg" aria-live="polite"></span></div>
+    </form>
+    <div class="rsec"><h3>Last 7 days</h3><div class="gutstrip" id="gutStrip"></div></div>
+    <details class="how"><summary>What this screen can and cannot tell</summary><p>This is a screen of digestive signs, not a measurement of the gut microbiome: no instrument on board measures the gut flora. Gut bacteria do change in spaceflight (NASA Twins Study), and fiber, fluid, exercise, antibiotics and anti-diarrhea medicines all affect them, so the screen uses these together with the stool form and symptoms. Bristol types 1 to 2 point to constipation, 3 to 4 are healthy and 5 to 7 point to diarrhoea or urgency (Continence Foundation of Australia). Fewer than three bowel movements a week counts as constipation (NIDDK).</p></details>
+  </section>
+  </section>
+
+<section class="tabpanel" id="tab-body" role="tabpanel" aria-labelledby="t-body" hidden>
+  <section data-sub="health:map" class="panel">
     <div class="head">
       <div>
         <p class="label">Targeted advice</p>
@@ -587,7 +658,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div class="tipgrid" id="tipsOverview"></div>
   </section>
 
-  <div class="grid">
+  <div data-sub="health:map" class="grid">
     <section class="panel figure" aria-label="Body map">
       <p class="label">Body map · select a region</p>
       <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
@@ -598,7 +669,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-analysis" role="tabpanel" aria-labelledby="t-analysis" hidden>
-  <section class="panel">
+  <section data-sub="health:analysis" class="panel">
     <div class="head">
       <div>
         <p class="label">Multivariate check · all readings at once</p>
@@ -609,7 +680,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div id="anCombined"></div>
   </section>
 
-  <section class="panel">
+  <section data-sub="health:analysis" class="panel">
     <div class="head">
       <div>
         <h2>Problems found across several readings</h2>
@@ -620,7 +691,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div id="anFindings"></div>
   </section>
 
-  <section class="panel">
+  <section data-sub="health:analysis" class="panel">
     <div class="head">
       <div>
         <h2>Why is a reading off?</h2>
@@ -631,7 +702,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div id="anWhy"></div>
   </section>
 
-  <section class="panel">
+  <section data-sub="health:checks" class="panel">
     <div class="head">
       <div>
         <h2>Extreme situation checks</h2>
@@ -644,7 +715,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-perf" role="tabpanel" aria-labelledby="t-perf" hidden>
-  <section class="panel">
+  <section data-sub="perf:risk" class="panel">
     <div class="head">
       <div>
         <p class="label">Early warning · sleep, stress, isolation, reaction test</p>
@@ -665,7 +736,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <details class="how"><summary>How the risk is calculated</summary><p>The score adds points for sleep debt, short sleep, stress, low mood, isolation, slower reactions, attention lapses, high CO2 and low fluid intake. The forecast continues the trend of the last 3 days. The weights are the team's own proposal, built on NASA's risk of performance decrements from sleep loss and circadian desynchronization.</p></details>
   </section>
 
-  <section class="panel">
+  <section data-sub="perf:rt" class="panel">
     <div class="head">
       <div>
         <p class="label">Cognitive check · based on the ISS Reaction Self Test</p>
@@ -678,7 +749,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div id="rtResult" aria-live="polite"></div>
   </section>
 
-  <div class="two">
+  <div data-sub="perf:light" class="two">
     <section class="panel">
       <div class="head"><div><p class="label">Circadian rhythm</p><h2>Light plan for today</h2></div></div>
       <div class="fields">
@@ -695,7 +766,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-live" role="tabpanel" aria-labelledby="t-live" hidden>
-  <section class="panel">
+  <section data-sub="perf:live" class="panel">
     <div class="head">
       <div>
         <p class="label">Wearable sensors · simulation mode</p>
@@ -720,7 +791,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       <span class="small" id="liveMsg" aria-live="polite"></span>
     </div>
   </section>
-  <div class="two">
+  <div data-sub="perf:live" class="two">
     <section class="panel">
       <div class="head"><h2>Sensor alerts</h2><span class="small muted">Newest first</span></div>
       <ul class="alerts" id="liveAlerts"></ul>
@@ -733,7 +804,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-trends" role="tabpanel" aria-labelledby="t-trends" hidden>
-  <section class="panel">
+  <section data-sub="trends:charts" class="panel">
     <div class="head">
       <div>
         <p class="label">At a glance</p>
@@ -747,7 +818,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     </div>
   </section>
 
-  <section class="panel">
+  <section data-sub="trends:charts" class="panel">
     <div class="head">
       <h2>Trend over the mission</h2>
       <div class="field" style="flex:0 1 240px">
@@ -761,7 +832,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-radiation" role="tabpanel" aria-labelledby="t-radiation" hidden>
-  <section class="panel" id="dosePanel">
+  <section data-sub="trends:radiation" class="panel" id="dosePanel">
     <div class="head">
       <div>
         <p class="label">Space radiation · career limit 600 mSv</p>
@@ -949,6 +1020,13 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       <li><a href="https://www.hprc-online.org/physical-fitness/training-performance/how-train-using-heart-rate-zones">Human Performance Resource Center, heart rate zones (CDC figures)</a>: estimated maximum heart rate of 220 minus age, moderate exercise at 64% to 76% and vigorous exercise at 77% to 93% of it.</li>
       <li><a href="https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight">World Health Organization, body mass index</a>: below 18.5 underweight, 18.5 to 24.9 normal weight, 25 or more overweight, 30 or more obesity.</li>
       <li>NASA's career radiation limit is the same for every age and sex (NASA OCHMO Radiation Protection technical brief).</li>
+    </ul>
+    <h3>Nutrition and digestion</h3>
+    <ul class="small srclist">
+      <li>NASA JSC-67378 (above): protein 1.2 to 1.8 g per kg of body mass, carbohydrate 45% to 65% and fat 20% to 35% of energy, fiber 38 g a day for men and 25 g for women.</li>
+      <li><a href="https://www.continence.org.au/about-incontinence/bowel-incontinence/bristol-stool-chart/">Continence Foundation of Australia, Bristol stool chart</a>: types 1 to 2 constipation, 3 to 4 healthy, 5 to 7 diarrhoea or urgency.</li>
+      <li><a href="https://www.niddk.nih.gov/health-information/digestive-diseases/constipation/definition-facts">NIDDK, Definition and Facts for Constipation</a>: fewer than three bowel movements a week.</li>
+      <li><a href="https://www.physoc.org/magazine-articles/the-nasa-twins-studies/">The Physiological Society, The NASA Twins Studies</a>: gut microbiome changes in spaceflight were modest and faded after return. The digestion screen does not measure the microbiome.</li>
     </ul>
     <h3>PDF report</h3>
     <ul class="small srclist">
@@ -1166,6 +1244,71 @@ function energyNeed(p){
   return Math.round(e/10)*10;
 }
 function hrZones(p){ var m=220-p.age; return {max:m, moderate:[Math.round(m*0.64), Math.round(m*0.76)], vigorous:[Math.round(m*0.77), Math.round(m*0.93)]}; }
+/* ===== Nutrition: NASA JSC-67378 ===== */
+function macroKcal(p, c, f){ return Math.round(4*(+p||0)+4*(+c||0)+9*(+f||0)); }
+function macroSum(list){
+  var t={p:0, c:0, f:0, fi:0}; (list||[]).forEach(function(x){ t.p+=+x.p||0; t.c+=+x.c||0; t.f+=+x.f||0; t.fi+=+x.fi||0; });
+  ['p','c','f','fi'].forEach(function(k){ t[k]=Math.round(t[k]*10)/10; }); t.kcal=macroKcal(t.p, t.c, t.f); return t;
+}
+function macroTargets(p){
+  if(p===undefined) p=PROFILE;
+  return {energy:p ? energyNeed(p) : null, protein:p ? [Math.round(1.2*p.weight), Math.round(1.8*p.weight)] : null, carbPct:[45,65], fatPct:[20,35], fiber:p ? (p.sex==='m' ? 38 : 25) : null};
+}
+/* status of a finished day's intake; t = totals {p,c,f,fi,kcal}. In-progress days use final=false (no "low" flags). */
+function macroStatus(t, final, p){
+  var T=macroTargets(p), out=[], k=t.kcal||0;
+  var pct=function(g, per){ return k ? Math.round(g*per/k*100) : 0; };
+  out.push({id:'energy', label:'Energy', v:k, unit:'kcal', target:T.energy ? T.energy+' kcal' : 'Needs your profile',
+    st:T.energy && final && k<0.85*T.energy ? 1 : 0, pct:T.energy ? k/T.energy*100 : null, msg:T.energy && final && k<0.85*T.energy ? 'Below your energy need' : ''});
+  out.push({id:'protein', label:'Protein', v:t.p, unit:'g', target:T.protein ? T.protein[0]+'–'+T.protein[1]+' g' : 'Needs your profile',
+    st:T.protein && final && t.p<T.protein[0] ? 1 : 0, pct:T.protein ? t.p/T.protein[1]*100 : null, band:T.protein ? [T.protein[0]/T.protein[1]*100, 100] : null, msg:T.protein && final && t.p<T.protein[0] ? 'Below the protein target' : (T.protein && t.p>T.protein[1] ? 'Above the range' : '')});
+  var cp=pct(t.c,4), fp=pct(t.f,9);
+  out.push({id:'carb', label:'Carbohydrate', v:t.c, unit:'g', share:cp, target:'45–65% of energy', st:k && final && (cp<45 || cp>65) ? 1 : 0, pct:cp, band:[45,65], msg:k && final ? (cp<45 ? 'Low share of energy' : (cp>65 ? 'High share of energy' : '')) : ''});
+  out.push({id:'fat', label:'Fat', v:t.f, unit:'g', share:fp, target:'20–35% of energy', st:k && final && (fp<20 || fp>35) ? 1 : 0, pct:fp, band:[20,35], msg:k && final ? (fp<20 ? 'Low share of energy' : (fp>35 ? 'High share of energy' : '')) : ''});
+  out.push({id:'fiber', label:'Fiber', v:t.fi, unit:'g', target:T.fiber ? T.fiber+' g' : 'Needs your profile', st:T.fiber && final && t.fi<T.fiber ? 1 : 0, pct:T.fiber ? t.fi/T.fiber*100 : null, msg:T.fiber && final && t.fi<T.fiber ? 'Below the fiber target' : ''});
+  return out;
+}
+function dayMacros(d){ return d && d.kcal!==undefined ? {p:d.prot, c:d.carb, f:d.fat, fi:d.fib, kcal:d.kcal} : null; }
+/* ===== Digestion screen (not a microbiome measurement) =====
+   Bristol 1-2 constipation, 3-4 healthy, 5-7 diarrhoea or urgency (Continence Foundation of Australia);
+   fewer than three bowel movements a week is constipation (NIDDK). */
+var BRISTOL=['','Separate hard lumps','Lumpy and sausage-like','Sausage with cracks','Smooth and soft sausage','Soft blobs with clear edges','Mushy, ragged edges','Entirely liquid'];
+function bristolLevel(b){ return !b ? null : (b<=2 ? 'hard' : (b<=4 ? 'ok' : 'loose')); }
+function gutAssess(days, today, o){
+  o=o||{}; var all=days.filter(function(d){ return d.bristol!==undefined || d.bm!==undefined; }).slice(), rec=today ? all.concat([today]) : all;
+  var d=rec[rec.length-1], last=days[days.length-1]||{}, reasons=[], steps=[], level=0, title='Digestion looks normal';
+  if(!d) return {level:0, title:'No digestion data yet', reasons:[], steps:['Log your stool form and bowel movements on the Digestion tab'], factors:[], ready:false};
+  var push=function(a){ a.forEach(function(x){ if(steps.indexOf(x)<0) steps.push(x); }); };
+  var loose=rec.slice(-2).filter(function(x){ return x.bristol>=6; }).length, lastLoose=d.bristol>=6, fever=last.temp>=38;
+  var week=rec.slice(-7), bmWeek=week.reduce(function(a,x){ return a+(+x.bm||0); },0), noBm3=rec.length>=3 && rec.slice(-3).every(function(x){ return +x.bm===0; });
+  var ft=fluidTarget(), fib=macroTargets().fiber, lastMac=dayMacros(last);
+  var factors=[];
+  if(lastMac && fib && lastMac.fi<fib) factors.push({t:'Fiber '+lastMac.fi+' g, below the '+fib+' g target', st:1});
+  if(last.fluid!==undefined && last.fluid<ft) factors.push({t:'Fluid intake '+last.fluid+' L, below the '+ft+' L target', st:1});
+  if(last.ex!==undefined && last.ex<30) factors.push({t:'Little exercise ('+last.ex+' min)', st:1});
+  if(o.loperamide) factors.push({t:'Anti-diarrhea medicine logged in the last 3 days', st:1});
+  if(o.antibiotic) factors.push({t:'Antibiotic logged in the last 7 days', st:1});
+  if(lastLoose){
+    level=(loose>=2 || fever || d.gpain>=3) ? 2 : 1; title=fever ? 'Diarrhea with fever: possible gut infection' : (loose>=2 ? 'Diarrhea on two days in a row' : 'Loose stool (diarrhea)');
+    reasons.push('Bristol type '+d.bristol+' ('+BRISTOL[d.bristol].toLowerCase()+')'); if(fever) reasons.push('temperature '+last.temp+' °C'); if(o.antibiotic) reasons.push('antibiotic logged in the last 7 days');
+    push(['Drink water with electrolytes now', 'Wash hands and clean shared surfaces', 'Take anti-diarrhea medicine only as the procedure directs']);
+    if(level===2) push(['Tell the crew medical officer today']);
+  } else if(d.bristol===5){
+    level=1; title='Soft stool'; reasons.push('Bristol type 5 ('+BRISTOL[5].toLowerCase()+')'); push(['Drink enough fluid', 'Add fiber, for example from fruit, vegetables or whole grains']);
+  } else if((d.bristol>=1 && d.bristol<=2) || noBm3 || (week.length>=7 && bmWeek<3)){
+    level=d.gpain>=3 ? 2 : 1; title='Signs of constipation';
+    if(d.bristol>=1 && d.bristol<=2) reasons.push('Bristol type '+d.bristol+' ('+BRISTOL[d.bristol].toLowerCase()+')');
+    if(noBm3) reasons.push('no bowel movement on the last 3 days');
+    if(week.length>=7 && bmWeek<3) reasons.push(bmWeek+' bowel movements in the last 7 days');
+    if(o.loperamide) reasons.push('anti-diarrhea medicine can cause constipation');
+    push(['Drink to your fluid target', 'Eat more fiber', 'Keep up your daily exercise']);
+  }
+  if(d.bloat>=2){ if(!level) title='Bloating'; level=Math.max(level,1); reasons.push('bloating '+['none','mild','moderate','severe'][d.bloat]); push(['Eat slowly and choose smaller meals', 'Note which foods came before it']); }
+  if(d.gpain>=3){ level=2; if(title==='Digestion looks normal' || title==='Bloating') title='Severe abdominal pain'; reasons.push('severe abdominal pain'); push(['Contact the flight surgeon now about the abdominal pain']); }
+  else if(d.gpain===2){ level=Math.max(level,1); if(title==='Digestion looks normal') title='Abdominal pain'; reasons.push('moderate abdominal pain'); push(['Measure your temperature and note where the pain is']); }
+  if(!level){ push(['Keep your fiber, fluid and exercise routine']); }
+  return {level:level, title:title, reasons:reasons, steps:steps, factors:factors, ready:true, bmWeek:bmWeek, days:week.length};
+}
 /* ===== Water tracker ===== */
 function waterTotal(entries){ return (entries||[]).reduce(function(a,x){ return a+(+x.ml||0); }, 0); }
 /* litres that would be on pace by now when the target is spread evenly over the waking hours */
@@ -1201,6 +1344,10 @@ function sample(env){
       rr:13+(i*7)%5, cough:0, breath:0, head:0, nausea:0, dizzy:0, vision:0, back:0, eva:0,
       stress:2+(i%3), rt:255+((i*37)%60), lapses:(i%6===0)?1:0, fluid:+(2.6+((i*3)%7)/10).toFixed(1)});
   }
+  days.forEach(function(x, i){
+    x.prot=95+((i*13)%30); x.carb=320+((i*29)%80); x.fat=80+((i*11)%25); x.fib=24+((i*7)%14); x.kcal=macroKcal(x.prot, x.carb, x.fat);
+    x.bm=(i%4===0) ? 2 : 1; x.bristol=[4,3,4,4,5,4,3][i%7]; x.bloat=0; x.gpain=0;
+  });
   var last=days[13]; last.sleep=5.6; last.hr=104; last.stress=5; last.rt=330;
   return days;
 }
@@ -2438,7 +2585,7 @@ function buildReport(o){
   }
 
   /* ---------- radiation, morale, medical kit, goals ---------- */
-  h2('Radiation, morale, medical kit and goals');
+  h2('Radiation, morale, nutrition, digestion and goals');
   var pdose=rows.reduce(function(a,r){ return a+(+r.rad||0); },0);
   var ki=kitIssues(o.kit||[], o.nowMs), uses=(o.log||[]).filter(function(x){ return x.day!==null && x.day>=first.day && x.day<=d.day; });
   var wg=weeklyGoals(days, env), dstreak=dailyStreak(days, env);
@@ -2448,6 +2595,12 @@ function buildReport(o){
     [t('Medical kit'), {s:stLabel(ki.reduce(function(a,x){ return Math.max(a, x.s.level); },0)), st:ki.reduce(function(a,x){ return Math.max(a, x.s.level); },0)},
       (ki.length ? ki.slice(0,4).map(function(x){ return t(x.it.name)+' ('+x.s.flags.map(function(f){ return t(f.t); }).join(', ')+')'; }).join('; ')+(ki.length>4 ? '; '+t('and '+(ki.length-4)+' more') : '') : t('Everything is in stock and in date'))+
       ' · '+t('Use log')+': '+uses.length],
+    (function(){ var lm=dayMacros(d), mrows=lm ? macroStatus(lm, true) : null, bad=mrows ? mrows.filter(function(x){ return x.st; }) : [];
+      var wk=rows.filter(function(x){ return x.kcal!==undefined; });
+      return [t('Nutrition'), {s:stLabel(bad.length ? 1 : 0), st:bad.length ? 1 : 0}, lm ? (n>1 && wk.length>1 ? t('average')+' '+Math.round(avgOf(wk.map(function(x){ return x.kcal; })))+' kcal · ' : '')+
+        t('Energy')+' '+lm.kcal+' kcal · '+t('Protein')+' '+num(lm.p)+' g · '+t('Carbohydrate')+' '+mrows[2].share+'% · '+t('Fat')+' '+mrows[3].share+'% · '+t('Fiber')+' '+num(lm.fi)+' g'+(bad.length ? ' · '+bad.map(function(x){ return t(x.msg); }).join(', ') : '') : t('No nutrition saved with a check-in yet')]; })(),
+    (function(){ var lop=(o.log||[]).some(function(x){ return x.day!==null && d.day-x.day<=2 && /loperamide/i.test((x.id||'')+' '+(x.name||'')); });
+      var ga=gutAssess(days, null, {loperamide:lop}); return [t('Digestion'), {s:stLabel(ga.level), st:ga.level}, ga.ready ? t(ga.title)+(ga.reasons.length ? ' · '+ga.reasons.map(t).join(', ') : '')+(d.bristol!==undefined ? ' · Bristol '+(d.bristol||'–')+', '+t(d.bm+' bowel movements')+'' : '') : t('No digestion data yet')]; })(),
     [t('Goals'), {s:stLabel(dstreak>0 ? 0 : 1), st:dstreak>0 ? 0 : 1}, t('Daily streak')+' '+dstreak+' · '+t('Best daily streak')+' '+bestStreak(days, env)+' · '+t('Mission week '+wg.week)+': '+wg.goals.filter(function(g){ return g.done; }).length+' / '+wg.goals.length]
   ]);
 
@@ -2462,7 +2615,7 @@ function buildReport(o){
 }
 /*PDFLIB-END*/
 
-if(typeof module!=='undefined') module.exports={PDF_FONTS:PDF_FONTS,buildReport:buildReport,PdfDoc:PdfDoc,REPORT_PERIODS:REPORT_PERIODS,validProfile:validProfile,setProfile:setProfile,bmiOf:bmiOf,bmiClass:bmiClass,fluidTarget:fluidTarget,energyNeed:energyNeed,hrZones:hrZones,waterTotal:waterTotal,waterPace:waterPace,healthScore:healthScore,healthGrade:healthGrade,weekRoutine:weekRoutine,perfFactors:perfFactors,tipsFor:tipsFor,fmtDate:fmtDate,KIT_USES:KIT_USES,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,INFO:INFO,insights:insights,baseline:baseline,learnedText:learnedText,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak,analyze:analyze,combined:combined,findings:findings,whyAll:whyAll,whyFor:whyFor,ctxOf:ctxOf,scenarioChecks:scenarioChecks,simDay:simDay,RULES:RULES,SCENARIOS:SCENARIOS,WHY:WHY,phi:phi,chiTail:chiTail,zOf:zOf,SYM_WORD:SYM_WORD,perfRisk:perfRisk,perfFactors:perfFactors,perfScore:perfScore,perfLevel:perfLevel,tipsFor:tipsFor,regionScores:regionScores,heatmap:heatmap,sleepStages:sleepStages,lightPlan:lightPlan,lightAt:lightAt,toMin:toMin,fmtMin:fmtMin,hygieneTips:hygieneTips,REGION_TIPS:REGION_TIPS,LIGHT_MODES:LIGHT_MODES,PERF_ACTIONS:PERF_ACTIONS};
+if(typeof module!=='undefined') module.exports={macroKcal:macroKcal,macroSum:macroSum,macroTargets:macroTargets,macroStatus:macroStatus,dayMacros:dayMacros,gutAssess:gutAssess,BRISTOL:BRISTOL,bristolLevel:bristolLevel,PDF_FONTS:PDF_FONTS,buildReport:buildReport,PdfDoc:PdfDoc,REPORT_PERIODS:REPORT_PERIODS,validProfile:validProfile,setProfile:setProfile,bmiOf:bmiOf,bmiClass:bmiClass,fluidTarget:fluidTarget,energyNeed:energyNeed,hrZones:hrZones,waterTotal:waterTotal,waterPace:waterPace,healthScore:healthScore,healthGrade:healthGrade,weekRoutine:weekRoutine,perfFactors:perfFactors,tipsFor:tipsFor,fmtDate:fmtDate,KIT_USES:KIT_USES,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,INFO:INFO,insights:insights,baseline:baseline,learnedText:learnedText,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak,analyze:analyze,combined:combined,findings:findings,whyAll:whyAll,whyFor:whyFor,ctxOf:ctxOf,scenarioChecks:scenarioChecks,simDay:simDay,RULES:RULES,SCENARIOS:SCENARIOS,WHY:WHY,phi:phi,chiTail:chiTail,zOf:zOf,SYM_WORD:SYM_WORD,perfRisk:perfRisk,perfFactors:perfFactors,perfScore:perfScore,perfLevel:perfLevel,tipsFor:tipsFor,regionScores:regionScores,heatmap:heatmap,sleepStages:sleepStages,lightPlan:lightPlan,lightAt:lightAt,toMin:toMin,fmtMin:fmtMin,hygieneTips:hygieneTips,REGION_TIPS:REGION_TIPS,LIGHT_MODES:LIGHT_MODES,PERF_ACTIONS:PERF_ACTIONS};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v5';
@@ -2918,6 +3071,116 @@ if(typeof document!=='undefined'){ (function(){
   $('waterUndo').addEventListener('click', function(){ water.pop(); saveWater(); renderWater(); var f=$('f_fluid'); if(f && water.length) f.value=waterL(); });
   setInterval(renderWater, 60000);
 
+  /* ===== Sub-tabs inside a tab ===== */
+  var SUBS={checkin:[['log','Measurements'],['water','Water'],['food','Nutrition'],['gut','Digestion']],
+            health:[['map','Body map'],['analysis','Analysis'],['checks','Emergency checks']],
+            perf:[['risk','Risk'],['rt','Reaction test'],['light','Light and sleep'],['live','Live sensors']],
+            trends:[['charts','Charts'],['radiation','Radiation']],
+            report:[['report','Report and PDF'],['profile','Profile']]};
+  var SUBNAME={body:['health','map'], analysis:['health','analysis'], checks:['health','checks'], live:['perf','live'], radiation:['trends','radiation'],
+               water:['checkin','water'], food:['checkin','food'], gut:['checkin','gut'], profile:['report','profile'], rt:['perf','rt'], light:['perf','light']};
+  var SUBCUR={}, SUBDOT={};
+  function initSubs(){ Object.keys(SUBS).forEach(function(g){
+    var first=$('tab-'+GROUPS[g][0]), nav=document.createElement('div');
+    nav.className='subtabs'; nav.setAttribute('role','group'); nav.setAttribute('aria-label','Sections'); nav.dataset.group=g;
+    nav.innerHTML=SUBS[g].map(function(x){ return '<button type="button" data-subtab="'+x[0]+'" aria-pressed="false">'+x[1]+'<span class="sdot" hidden></span></button>'; }).join('');
+    first.insertBefore(nav, first.firstChild);
+    nav.addEventListener('click', function(ev){ var b=ev.target.closest('[data-subtab]'); if(b) showSub(g, b.dataset.subtab, true); });
+    SUBCUR[g]=SUBS[g][0][0];
+  }); Object.keys(SUBS).forEach(function(g){ showSub(g, SUBCUR[g]); }); }
+  function showSub(g, id, user){
+    if(!SUBS[g]) return; SUBCUR[g]=id;
+    [].forEach.call(document.querySelectorAll('[data-sub^="'+g+':"]'), function(el){ el.hidden=el.getAttribute('data-sub')!==g+':'+id; });
+    [].forEach.call(document.querySelectorAll('.subtabs[data-group="'+g+'"] [data-subtab]'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.subtab===id)); });
+    if(g==='perf' && id==='live') drawLive();
+    if(user){ var nav=document.querySelector('.subtabs[data-group="'+g+'"]'); if(nav && nav.getBoundingClientRect().top<0) nav.scrollIntoView({block:'start'}); }
+  }
+  /* a dot on a sub-tab: worst status of what it shows */
+  function subDot(g, id, st){
+    SUBDOT[g+':'+id]=st;
+    var b=document.querySelector('.subtabs[data-group="'+g+'"] [data-subtab="'+id+'"] .sdot'); if(!b) return;
+    b.hidden=!st; b.className='sdot st'+(st===2?2:1);
+  }
+
+  /* ===== Nutrition ===== */
+  var FKEY='kuasar-crew-food-v1', food=[];
+  try{ var fk=JSON.parse(localStorage.getItem(FKEY)||'null'); if(Array.isArray(fk)) food=fk.filter(function(x){ return x && typeof x.t==='string' && [x.p,x.c,x.f,x.fi].every(function(v){ return typeof v==='number' && v>=0 && v<=500; }); }); }catch(e){}
+  function saveFood(){ try{ localStorage.setItem(FKEY, JSON.stringify(food)); }catch(e){} }
+  function renderFood(){
+    var tot=macroSum(food), last=latest(), lastMac=dayMacros(last), showing=food.length ? tot : (lastMac || tot), final=!food.length && !!lastMac;
+    var rows=macroStatus(showing, final);
+    $('foodPill').innerHTML=food.length ? '<span class="pill st0">'+SYMBOL[0]+' Logging today</span>' : (lastMac ? '<span class="pill st0">Day '+last.day+' totals</span>' : '');
+    $('macroBars').innerHTML=rows.map(function(r){
+      var st=r.st, bar=r.pct===null ? '<span class="mbar"></span>' : '<span class="mbar st'+st+'">'+(r.band ? '<u style="left:'+Math.min(100,r.band[0])+'%;width:'+Math.max(0,Math.min(100,r.band[1])-Math.min(100,r.band[0]))+'%"></u>' : '')+'<i style="width:'+Math.min(100, r.pct).toFixed(0)+'%"></i></span>';
+      var val=r.id==='energy' ? r.v+' kcal' : r.v+' g'+(r.share!==undefined ? ' · '+r.share+'%' : '');
+      return '<div class="mrow st'+st+'"><span><b>'+r.label+'</b><small>'+r.target+'</small></span>'+bar+'<span class="mval">'+val+(r.msg ? '<em>'+r.msg+'</em>' : '')+'</span></div>';
+    }).join('');
+    $('macroNote').textContent=food.length ? 'Totals so far today. They are added to your next check-in.' : (lastMac ? 'Totals of mission day '+last.day+'. Add food to start today.' : 'Nothing logged yet. Add food from the package labels.');
+    $('foodLog').innerHTML=food.length ? food.map(function(x,i){ return '<li><span>'+esc(x.n||'Food')+' <span class="num">'+x.t+' · '+macroKcal(x.p,x.c,x.f)+' kcal · P '+x.p+' · C '+x.c+' · F '+x.f+' · Fi '+x.fi+'</span></span><span class="actions" style="margin:0"><button class="btn quiet" type="button" data-food-again="'+i+'">Add again</button><button class="btn quiet" type="button" data-food-del="'+i+'">Remove</button></span></li>'; }).join('') : '';
+    var wk=state.days.slice(-7).filter(function(d){ return d.kcal!==undefined; }), T=macroTargets();
+    $('foodWeek').innerHTML=wk.length ? '<thead><tr><th scope="col">Day</th><th scope="col">Energy</th><th scope="col">Protein</th><th scope="col">Carbohydrate</th><th scope="col">Fat</th><th scope="col">Fiber</th></tr></thead><tbody>'+
+      wk.map(function(d){ var st=macroStatus(dayMacros(d), true), cell=function(i, txt){ return '<td class="num'+(st[i].st ? ' st1" style="color:var(--s)' : '')+'">'+txt+'</td>'; };
+        return '<tr><td class="num">'+d.day+'</td>'+cell(0, d.kcal+' kcal')+cell(1, d.prot+' g')+cell(2, d.carb+' g · '+st[2].share+'%')+cell(3, d.fat+' g · '+st[3].share+'%')+cell(4, d.fib+' g')+'</tr>'; }).join('')+'</tbody>'
+      : '<tbody><tr><td class="small muted">No nutrition saved with a check-in yet.</td></tr></tbody>';
+    var bad=lastMac ? macroStatus(lastMac, true).filter(function(r){ return r.st; }).length : 0; subDot('checkin','food', bad ? 1 : 0);
+    var hint=$('foodHint'); if(hint){ hint.hidden=!food.length; hint.textContent='Nutrition: '+tot.kcal+' kcal, '+tot.p+' g protein logged today. It is saved with this check-in.'; }
+  }
+  $('foodForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var v=function(id){ var x=$(id).value.trim(); return x==='' ? 0 : parseFloat(x); };
+    var it={n:$('fdName').value.trim().slice(0,40), p:v('fdP'), c:v('fdC'), f:v('fdF'), fi:v('fdFi')};
+    var bad=[['fdP',it.p,300],['fdC',it.c,500],['fdF',it.f,300],['fdFi',it.fi,100]].filter(function(x){ return !(x[1]>=0 && x[1]<=x[2]); })[0];
+    if(bad){ $('foodMsg').textContent='Enter grams from 0 to '+bad[2]+'.'; $(bad[0]).focus(); return; }
+    if(!(it.p+it.c+it.f+it.fi>0)){ $('foodMsg').textContent='Enter the grams of at least one nutrient.'; $('fdP').focus(); return; }
+    var n=new Date(); it.t=fmtMin(n.getHours()*60+n.getMinutes()); food.push(it); saveFood();
+    ['fdName','fdP','fdC','fdF','fdFi'].forEach(function(id){ $(id).value=''; });
+    $('foodMsg').textContent='Added '+macroKcal(it.p,it.c,it.f)+' kcal.'; renderFood();
+  });
+  $('foodLog').addEventListener('click', function(ev){
+    var a=ev.target.closest('[data-food-again]'), d=ev.target.closest('[data-food-del]');
+    if(a){ var x=food[+a.dataset.foodAgain], n=new Date(); food.push({n:x.n, p:x.p, c:x.c, f:x.f, fi:x.fi, t:fmtMin(n.getHours()*60+n.getMinutes())}); saveFood(); $('foodMsg').textContent='Added '+macroKcal(x.p,x.c,x.f)+' kcal.'; renderFood(); }
+    if(d){ food.splice(+d.dataset.foodDel, 1); saveFood(); $('foodMsg').textContent='Removed.'; renderFood(); }
+  });
+
+  /* ===== Digestion ===== */
+  var GKEY='kuasar-crew-gut-v1', gut=null;
+  try{ var gk=JSON.parse(localStorage.getItem(GKEY)||'null'); if(gk && gk.bm>=0 && gk.bm<=10 && gk.bristol>=0 && gk.bristol<=7) gut=gk; }catch(e){}
+  $('bristolPick').innerHTML='<label><input type="radio" name="bristol" value="0"><b>–</b>None today</label>'+[1,2,3,4,5,6,7].map(function(b){ return '<label title="'+BRISTOL[b]+'"><input type="radio" name="bristol" value="'+b+'"><b>'+b+'</b>'+BRISTOL[b]+'</label>'; }).join('');
+  function medsRecent(days){
+    var dd=latest() ? latest().day : 0, lop=false, ab=false;
+    (kitState.log||[]).forEach(function(x){ var k=(x.id||'')+' '+(x.name||'').toLowerCase(); if(x.day!==null && dd-x.day<=2 && /loperamide/.test(k)) lop=true; var it=kitState.kit.filter(function(i){ return i.id===x.id; })[0];
+      if(x.day!==null && dd-x.day<=6 && (/antibiotic|amoxicillin|ciprofloxacin|azithromycin|doxycycline/.test(k) || (it && /antibiotic|infection/i.test(it.use||'')))) ab=true; });
+    return {loperamide:lop, antibiotic:ab};
+  }
+  function renderGut(){
+    var a=gutAssess(state.days, gut, medsRecent());
+    $('gutPill').innerHTML=a.ready ? '<span class="pill st'+a.level+'">'+SYMBOL[a.level]+' '+['In range','Watch','Act now'][a.level]+'</span>' : '';
+    $('gutResult').innerHTML='<div class="fcard st'+a.level+'"><h3>'+SYMBOL[a.level]+' '+a.title+'</h3>'+(a.reasons.length ? '<p class="small"><strong>Because:</strong> '+a.reasons.map(esc).join(', ')+'.</p>' : '')+
+      (a.factors.length ? '<p class="small"><strong>What can affect your gut today:</strong> '+a.factors.map(function(x){ return esc(x.t); }).join('; ')+'.</p>' : (a.ready ? '<p class="small">Fiber, fluid, exercise and medicines show nothing that would upset digestion today.</p>' : ''))+
+      '<ol class="small" style="margin:6px 0 0;padding-left:20px">'+a.steps.map(function(x){ return '<li>'+esc(x)+'.</li>'; }).join('')+'</ol></div>'+
+      (gut ? '<p class="small muted" style="margin:8px 0 0">Saved for today: Bristol '+(gut.bristol||'–')+', '+gut.bm+' bowel movement'+(gut.bm===1?'':'s')+'. It is added to your next check-in.</p>' : '');
+    var rec=state.days.filter(function(d){ return d.bristol!==undefined; }).slice(-7).map(function(d){ return {lbl:'Day '+d.day, b:d.bristol, bm:d.bm}; });
+    if(gut) rec.push({lbl:'Today', b:gut.bristol, bm:gut.bm});
+    $('gutStrip').innerHTML=rec.length ? rec.slice(-7).map(function(x){ var lv=bristolLevel(x.b), st=lv===null ? 0 : (lv==='ok' ? 0 : 1); return '<span class="st'+st+'" title="'+(x.b ? BRISTOL[x.b] : 'No bowel movement')+'">'+x.lbl+'<b>'+(x.b||'–')+'</b>'+x.bm+'×</span>'; }).join('') : '<span>No data</span>';
+    subDot('checkin','gut', a.ready ? a.level : 0);
+    var hint=$('gutHint'); if(hint){ hint.hidden=!gut; hint.textContent='Digestion: Bristol '+(gut ? (gut.bristol||'–') : '')+'. It is saved with this check-in.'; }
+  }
+  function fillGutForm(){
+    [].forEach.call(document.querySelectorAll('input[name="bristol"]'), function(r){ r.checked=!!gut && +r.value===gut.bristol; });
+    $('gBm').value=gut ? gut.bm : ''; $('gBloat').value=gut ? gut.bloat : 0; $('gPain').value=gut ? gut.gpain : 0;
+  }
+  $('gutForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var r=document.querySelector('input[name="bristol"]:checked'), bm=$('gBm').value.trim()==='' ? NaN : parseFloat($('gBm').value);
+    if(!r){ $('gutMsg').textContent='Choose the stool form, or "None today".'; document.querySelector('input[name="bristol"]').focus(); return; }
+    if(!(bm>=0 && bm<=10 && Math.floor(bm)===bm)){ $('gutMsg').textContent='Enter the number of bowel movements today, from 0 to 10.'; $('gBm').focus(); return; }
+    if(+r.value===0 && bm>0){ $('gutMsg').textContent='You chose "None today", so the number of bowel movements should be 0.'; $('gBm').focus(); return; }
+    if(+r.value>0 && bm===0){ $('gutMsg').textContent='Enter at least 1 bowel movement for the stool form you chose.'; $('gBm').focus(); return; }
+    gut={bristol:+r.value, bm:bm, bloat:+$('gBloat').value, gpain:+$('gPain').value}; try{ localStorage.setItem(GKEY, JSON.stringify(gut)); }catch(e){}
+    $('gutMsg').textContent='Saved for today.'; renderGut();
+  });
+  $('gutClear').addEventListener('click', function(){ gut=null; try{ localStorage.removeItem(GKEY); }catch(e){} fillGutForm(); $('gutMsg').textContent='Cleared.'; renderGut(); });
+
   /* ===== General health report ===== */
   function rbar(pct, st){ return '<span class="rbar st'+st+'"><i style="width:'+Math.max(2, Math.min(100, pct))+'%"></i></span>'; }
   function partLevel(v){ return v>=70 ? 0 : (v>=40 ? 1 : 2); }
@@ -2951,6 +3214,8 @@ if(typeof document!=='undefined'){ (function(){
     if(pr) f.push([Math.max(pr.level, pr.warn?1:0), 'Performance risk '+pr.score+' of 100'+(pr.warn ? ' · early warning: tomorrow about '+pr.next : '')]);
     f.push([dz.level, 'Career radiation dose: '+dz.total.toFixed(1)+' of 600 mSv ('+dz.pct.toFixed(1)+'%)']);
     f.push(LAST_SURVEY ? [LAST_SURVEY.level, 'Morale survey: '+SURVEY_LEVELS[LAST_SURVEY.level].name+' · index '+LAST_SURVEY.total+' of 60'] : [0, 'Morale survey: not completed yet']);
+    var lm=dayMacros(d); if(lm){ var ms=macroStatus(lm, true).filter(function(x){ return x.st; }); f.push([ms.length ? 1 : 0, ms.length ? 'Nutrition: '+ms.map(function(x){ return x.label.toLowerCase()+' ('+x.msg.toLowerCase()+')'; }).join(', ') : 'Nutrition: every target met on mission day '+d.day]); }
+    var ga=gutAssess(days, null, medsRecent()); if(ga.ready) f.push([ga.level, 'Digestion: '+ga.title]);
     var ki=kitIssues(kitState.kit, Date.now()); f.push([ki.reduce(function(a,x){ return Math.max(a, x.s.level); },0), ki.length ? 'Medical kit: '+ki.length+' item'+(ki.length===1?'':'s')+' need attention' : 'Medical kit: everything is in stock and in date']);
     f.sort(function(a,b){ return b[0]-a[0]; });
     h+='<div class="rsec"><h3>Findings</h3><ul class="rlist">'+f.map(function(x){ return '<li>'+pill(x[0])+' '+esc(x[1])+'</li>'; }).join('')+'</ul></div>';
@@ -2983,8 +3248,8 @@ if(typeof document!=='undefined'){ (function(){
     var tiles=[
       {go:'health', st:worst, k:'Readings', v:flagged.length ? flagged.length+' to check' : 'All in range', e:flagged.length ? flagged.slice(0,2).map(function(id){ return IND[id].label; }).join(', ') : ''},
       {go:'checkin', st:statusOf('sleep', d.sleep, env), k:'Sleep last night', v:d.sleep+' h', e:d.sleep<7 ? 'Below 7 h' : (d.sleep>9 ? 'Above 9 h' : '')},
-      wl>0 ? {go:'overview', st:wl>=ft ? 0 : 1, k:'Water today', v:wl.toFixed(1)+' / '+ft+' L', e:wl>=ft ? 'Target reached' : 'Keep drinking'}
-           : {go:'overview', st:statusOf('fluid', d.fluid, env), k:'Water, last check-in', v:d.fluid+' / '+ft+' L', e:d.fluid>=ft ? '' : 'Below target'},
+      wl>0 ? {go:'water', st:wl>=ft ? 0 : 1, k:'Water today', v:wl.toFixed(1)+' / '+ft+' L', e:wl>=ft ? 'Target reached' : 'Keep drinking'}
+           : {go:'water', st:statusOf('fluid', d.fluid, env), k:'Water, last check-in', v:d.fluid+' / '+ft+' L', e:d.fluid>=ft ? '' : 'Below target'},
       {go:'perf', st:pr ? Math.max(pr.level, pr.warn ? 1 : 0) : 0, k:'Performance risk', v:pr ? pr.score+' / 100' : '–', e:pr && pr.warn ? 'Rising' : ''}
     ];
     $('heroTiles').innerHTML=tiles.map(function(x){ return '<button type="button" class="qtile st'+x.st+'" data-goto="'+x.go+'"><span>'+x.k+'</span><b>'+x.v+'</b>'+(x.e ? '<em>'+esc(x.e)+'</em>' : '')+'</button>'; }).join('');
@@ -3204,7 +3469,8 @@ if(typeof document!=='undefined'){ (function(){
   var GROUP_OF={}; Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn){ GROUP_OF[pn]=g; }); });
   Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn, i){ var el=$('tab-'+pn); el.setAttribute('aria-labelledby', 't-'+g); if(i) el.classList.add('joined'); }); $('t-'+g).setAttribute('aria-controls', GROUPS[g].map(function(pn){ return 'tab-'+pn; }).join(' ')); });
   function showTab(name, focus){
-    var g=GROUPS[name] ? name : (GROUP_OF[name] || 'overview'), part=GROUP_OF[name] && GROUP_OF[name]!==name ? name : null;
+    var sn=typeof SUBNAME!=='undefined' ? SUBNAME[name] : null;
+    var g=GROUPS[name] ? name : (sn ? sn[0] : (GROUP_OF[name] || 'overview')), part=null;
     TABS.forEach(function(t){
       var on=t===g, b=$('t-'+t);
       GROUPS[t].forEach(function(pn){ $('tab-'+pn).hidden=!on; }); b.setAttribute('aria-selected', String(on)); b.tabIndex=on?0:-1;
@@ -3216,7 +3482,7 @@ if(typeof document!=='undefined'){ (function(){
     if(focus) tb.focus();
     if(name==='perf'){ if(!LIVE.on && !LIVE.started){ LIVE.started=true; liveStart(); } drawLive(); }
     renderTabNav();
-    if(part && part!==GROUPS[g][0]){ var pe=$('tab-'+part); if(pe.scrollIntoView) pe.scrollIntoView({block:'start'}); }
+    if(sn) showSub(sn[0], sn[1]);
   }
   var TAB_NAMES={overview:'Today', checkin:'Check-in', health:'Health', perf:'Performance', trends:'Trends', morale:'Morale', medkit:'Med kit', report:'Report', sources:'Sources'};
   function curTab(){ var c=TABS.filter(function(t){ return $('t-'+t).getAttribute('aria-selected')==='true'; })[0]; return c || 'overview'; }
@@ -3288,6 +3554,8 @@ if(typeof document!=='undefined'){ (function(){
   var DOTS={};
   function dot(id, st, label){
     DOTS[id]={st:st, label:label};
+    var SD={body:['health','map'], analysis:['health','analysis'], live:['perf','live'], perf:['perf','risk'], radiation:['trends','radiation']}[id];
+    if(SD && typeof subDot==='function') subDot(SD[0], SD[1], st==='due' ? 0 : st);
     var g=GROUP_OF[id]||id, best=null;
     GROUPS[g].forEach(function(pn){ var x=DOTS[pn]; if(!x || !x.st) return; var r=x.st==='due' ? 0.5 : x.st; if(!best || r>best.r) best={r:r, st:x.st, label:x.label}; });
     st=best ? best.st : 0; label=best ? best.label : '';
@@ -3308,7 +3576,7 @@ if(typeof document!=='undefined'){ (function(){
     var sv=LAST_SURVEY ? LAST_SURVEY.level : 0, due=!weeklyGoals(state.days, env).goals[4].done;
     if(sv) dot('morale', sv, sv===2?'Morale needs attention':'Morale to watch'); else dot('morale', due?'due':0, 'Survey due this week');
   }
-  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderKit(); renderInsights(); renderGlance(); renderTips(); renderPerf(); renderHypno(); renderProfile(); renderWater(); renderReport(); renderHero(); renderTabDots(); }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderKit(); renderInsights(); renderGlance(); renderTips(); renderPerf(); renderHypno(); renderProfile(); renderWater(); renderFood(); renderGut(); renderReport(); renderHero(); renderTabDots(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
@@ -3349,8 +3617,10 @@ if(typeof document!=='undefined'){ (function(){
     });
     if(bad){ $('formMsg').textContent='Check the highlighted value: it is missing or outside what the instrument can read.'; bad.focus(); return; }
     day.eva=$('f_eva').checked ? 1 : 0;
+    if(food.length){ var mt=macroSum(food); day.prot=mt.p; day.carb=mt.c; day.fat=mt.f; day.fib=mt.fi; day.kcal=mt.kcal; }
+    if(gut){ day.bristol=gut.bristol; day.bm=gut.bm; day.bloat=gut.bloat; day.gpain=gut.gpain; }
     state.days.push(day); save(); notice('');
-    water=[]; saveWater();
+    water=[]; saveWater(); food=[]; saveFood(); gut=null; try{ localStorage.removeItem(GKEY); }catch(e){} fillGutForm();
     var sup='';
     if($('useSupplies').checked){
       var cr=consumeCheckin(kitState.kit);
@@ -3480,7 +3750,7 @@ if(typeof document!=='undefined'){ (function(){
     $('learned').textContent=learnedText(state.days);
     renderAnalysis(a);
   }
-  fillProfileForm(); render();
+  initSubs(); fillProfileForm(); fillGutForm(); render();
   showTab(location.hash.slice(1));
 /*I18N*/
 var TR_EXACT = {
@@ -3492,6 +3762,9 @@ var TR_EXACT = {
 "# ampoule left": "# ampul kaldı",
 "# ampoules": "# ampul",
 "# ampoules left": "# ampul kaldı",
+"# bowel movement": "# dışkılama",
+"# bowel movements": "# dışkılama",
+"# bowel movements in the last # days": "son #2 günde #1 dışkılama",
 "# capsule": "# kapsül",
 "# capsule left": "# kapsül kaldı",
 "# capsules": "# kapsül",
@@ -3594,6 +3867,7 @@ var TR_EXACT = {
 "#) and # mSv per day during the cruise to Mars (Zeitlin et al": "#) ve Mars yolculuğunda günde # mSv (Zeitlin ve ark",
 "#-hour light plan": "#-saatlik ışık planı",
 "#/# goals": "#/# hedef",
+"#–#% of energy": "enerjinin %#–#'i",
 "% here is the share of the hemoglobin in your blood that is carrying oxygen": "Buradaki %, kanınızdaki hemoglobinin oksijen taşıyan payıdır",
 "(NASA-STD# [V# #])": "(NASA-STD# [V# #])",
 "(Notifications are simulated in this prototype.)": "(Bildirimler bu prototipte simüle edilir.)",
@@ -3643,10 +3917,12 @@ var TR_EXACT = {
 "A virus or bacteria passed between crewmates in the closed cabin": "Kapalı kabinde mürettebat arasında geçen bir virüs ya da bakteri",
 "A warm cabin or heavy exercise without enough cooling": "Sıcak kabin ya da yeterli soğutma olmadan ağır egzersiz",
 "ALERT": "ALARM",
+"Abdominal pain": "Karın ağrısı",
 "About # s one way": "Tek yön yaklaşık # sn",
 "About the light settings": "Işık ayarları hakkında",
 "Above # h": "# sa üstünde",
 "Above the # mmHg limit": "# mmHg sınırının üstünde",
+"Above the range": "Aralığın üstünde",
 "Above usual": "Olağandan yüksek",
 "Acetaminophen # mg tablets": "Parasetamol # mg tablet",
 "Act now": "Hemen müdahale et",
@@ -3655,13 +3931,19 @@ var TR_EXACT = {
 "Acute radiation sickness (high dose with nausea)": "Akut radyasyon hastalığı (bulantıyla birlikte yüksek doz)",
 "Add": "Ekle",
 "Add # minutes on the treadmill or cycle": "Koşu bandı ya da bisiklette # dakika ekleyin",
+"Add again": "Tekrar ekle",
 "Add clothing layers and take a warm drink": "Kat kat giyinin ve sıcak bir içecek alın",
 "Add clothing layers and use a sleeping bag": "Kat kat giyinin ve uyku tulumu kullanın",
+"Add fiber, for example from fruit, vegetables or whole grains": "Lif ekleyin, örneğin meyve, sebze ya da tam tahıllardan",
+"Add food": "Yiyecek ekle",
+"Add food from the package labels": "Paket etiketlerinden yiyecek ekleyin",
+"Add food to start today": "Bugüne başlamak için yiyecek ekleyin",
 "Add one with the form below": "Aşağıdaki formla bir tane ekleyin",
 "Add the water you put into rehydratable food": "Kurutulmuş yiyeceklere kattığınız suyu da ekleyin",
 "Add up drinks and the water used to rehydrate food": "İçecekleri ve yiyecekleri sulandırmak için kullanılan suyu toplayın",
 "Add up resistance and cardio minutes from the exercise devices": "Egzersiz cihazlarındaki direnç ve kardiyo dakikalarını toplayın",
 "Add up the session times from the exercise device logs": "Egzersiz cihazı kayıtlarındaki seans sürelerini toplayın",
+"Added # kcal": "# kcal eklendi",
 "Adults need # to # hours": "Yetişkinlerin # ile # saate ihtiyacı vardır",
 "After a spacewalk": "Uzay yürüyüşünden sonra",
 "After an excursion": "Bir geziden sonra",
@@ -3688,6 +3970,8 @@ var TR_EXACT = {
 "Answer # short questions to get your General Psychological Risk Index (# to #)": "Genel Psikolojik Risk Endeksinizi (#2 ile #3 arası) almak için #1 kısa soruyu yanıtlayın",
 "Answer all # questions": "# sorunun hepsini yanıtlayın",
 "Answers cleared": "Yanıtlar temizlendi",
+"Anti-diarrhea medicine logged in the last # days": "Son # günde ishal ilacı kaydı var",
+"Antibiotic logged in the last # days": "Son # günde antibiyotik kaydı var",
 "Anxiety": "Kaygı",
 "Area": "Alan",
 "Ask a crewmate to double-check critical steps": "Kritik adımları bir mürettebat arkadaşınıza kontrol ettirin",
@@ -3721,8 +4005,12 @@ var TR_EXACT = {
 "Below # mg/dL (# mmol/L) is low blood sugar, and below # mg/dL (# mmol/L) is clinically significant low blood sugar (American Diabetes Association)": "# mg/dL (# mmol/L) altı düşük kan şekeri, # mg/dL (# mmol/L) altı klinik olarak anlamlı düşük kan şekeridir (Amerikan Diyabet Derneği)",
 "Below # mmHg is normal, # to # is stage # high blood pressure, and above # is a crisis (American Heart Association)": "# mmHg altı normal, # ile # arası evre # yüksek tansiyon, # üstü krizdir (Amerikan Kalp Derneği)",
 "Below target": "Hedefin altında",
+"Below the fiber target": "Lif hedefinin altında",
+"Below the protein target": "Protein hedefinin altında",
 "Below usual": "Olağandan düşük",
+"Below your energy need": "Enerji ihtiyacınızın altında",
 "Best daily streak": "En iyi günlük seri",
+"Bloating": "Şişkinlik",
 "Blocked Nose": "Burun tıkanıklığı",
 "Blocked nose": "Burun tıkanıklığı",
 "Blood analyzer cartridges": "Kan analizörü kartuşları",
@@ -3759,6 +4047,7 @@ var TR_EXACT = {
 "Body temperature over the last # seconds": "Son # saniyedeki vücut ısısı",
 "Bone and muscle loss speeds up without daily loading": "Günlük yüklenme olmadan kemik ve kas kaybı hızlanır",
 "Bones, muscles and back": "Kemikler, kaslar ve bel",
+"Bowel movements today": "Bugünkü dışkılama sayısı",
 "Box breathing for # minutes": "# dakika kutu nefesi",
 "Brain": "Beyin",
 "Brain and behavior": "Beyin ve davranış",
@@ -3773,6 +4062,15 @@ var TR_EXACT = {
 "Breathlessness, dizziness or headache after an excursion": "Geziden sonra nefes darlığı, baş dönmesi ya da baş ağrısı",
 "Breaths per minute": "Dakikadaki nefes sayısı",
 "Bright, blue-rich light after waking raises alertness and keeps your body clock in step": "Uyandıktan sonra parlak, mavi ağırlıklı ışık uyanıklığı artırır ve vücut saatinizi düzende tutar",
+"Bristol type # (entirely liquid)": "Bristol tip # (tamamen sıvı)",
+"Bristol type # (lumpy and sausage-like)": "Bristol tip # (topaklı, sosis biçimli)",
+"Bristol type # (mushy, ragged edges)": "Bristol tip # (lapa gibi, kenarları düzensiz)",
+"Bristol type # (sausage with cracks)": "Bristol tip # (çatlaklı sosis)",
+"Bristol type # (separate hard lumps)": "Bristol tip # (ayrı sert topaklar)",
+"Bristol type # (smooth and soft sausage)": "Bristol tip # (düzgün ve yumuşak sosis)",
+"Bristol type # (soft blobs with clear edges)": "Bristol tip # (kenarları belirgin yumuşak parçalar)",
+"Bristol types # to # point to constipation, # to # are healthy and # to # point to diarrhoea or urgency (Continence Foundation of Australia)": "Bristol tip #–# kabızlığa işaret eder, #–# sağlıklıdır, #–# ishal ya da sıkışmaya işaret eder (Continence Foundation of Australia)",
+"C #": "K #",
 "CDC, Definitions of Signs, Symptoms, and Conditions of Ill Travelers": "CDC, Definitions of Signs, Symptoms, and Conditions of Ill Travelers",
 "CO# above the limit": "CO# sınırın üstünde",
 "CO# is high": "CO# yüksek",
@@ -3789,6 +4087,8 @@ var TR_EXACT = {
 "Cancel": "İptal",
 "Capped at # because a reading needs action": "Bir ölçüm müdahale gerektirdiği için # ile sınırlandı",
 "Capped at # because an extreme situation is detected": "Aşırı durum tespit edildiği için # ile sınırlandı",
+"Carbohydrate": "Karbonhidrat",
+"Carbohydrate (g)": "Karbonhidrat (g)",
 "Carbon dioxide build-up": "Karbondioksit birikimi",
 "Carbon dioxide in the sleep station": "Uyku istasyonunda karbondioksit",
 "Cardiac emergency": "Kardiyak acil durum",
@@ -3800,6 +4100,7 @@ var TR_EXACT = {
 "Catching up after a short night": "Kısa bir gecenin ardından telafi",
 "Cerebrospinal fluid pressure cannot be measured directly in flight, so the optic nerve sheath is scanned by ultrasound instead": "Beyin omurilik sıvısı basıncı uçuşta doğrudan ölçülemez, bu yüzden optik sinir kılıfı ultrasonla taranır",
 "Cerebrospinal fluid pressure is not measured directly": "Beyin omurilik sıvısı basıncı doğrudan ölçülmez",
+"Charts": "Grafikler",
 "Check in every day": "Her gün kayıt girin",
 "Check that the sleep station fan is running": "Uyku istasyonu fanının çalıştığını kontrol edin",
 "Check the CO# removal system and the fans": "CO# giderme sistemini ve fanları kontrol edin",
@@ -3823,6 +4124,7 @@ var TR_EXACT = {
 "Choose female or male": "Kadın ya da erkek seçin",
 "Choose the number that fits the whole day so far, not one moment": "Tek bir anı değil, günün şu ana kadarki tamamını yansıtan sayıyı seçin",
 "Choose the number that fits the worst part of the day": "Günün en kötü anına uyan sayıyı seçin",
+"Choose the stool form, or \"None today\"": "Dışkı biçimini ya da \"Bugün yok\" seçeneğini seçin",
 "Circadian rhythm": "Sirkadiyen ritim",
 "Classification of Hypoglycemia (Diabetes Care": "Classification of Hypoglycemia (Diabetes Care",
 "Classification of Hypoglycemia (Diabetes Care, #)": "Classification of Hypoglycemia (Diabetes Care, #)",
@@ -3830,6 +4132,7 @@ var TR_EXACT = {
 "Clear": "Temizle",
 "Clear answers": "Yanıtları temizle",
 "Clear profile": "Profili temizle",
+"Cleared": "Temizlendi",
 "Clinical reference ranges": "Klinik referans aralıkları",
 "Clip the pulse oximeter on a warm finger and wait for a steady reading": "Nabız oksimetresini ılık bir parmağa takın ve sabit bir değer bekleyin",
 "Close": "Kapat",
@@ -3852,6 +4155,8 @@ var TR_EXACT = {
 "Contact the flight surgeon at once if it rises above #/# mmHg or you have chest pain": "#/# mmHg üstüne çıkarsa ya da göğüs ağrınız olursa hemen uçuş hekimine başvurun",
 "Contact the flight surgeon if blood oxygen falls below #% or temperature reaches # °C": "Kan oksijeni %# altına düşerse ya da ateş # °C'ye ulaşırsa uçuş hekimine başvurun",
 "Contact the flight surgeon immediately": "Hemen uçuş hekimine başvurun",
+"Contact the flight surgeon now about the abdominal pain": "Karın ağrısı için hemen uçuş hekimine başvurun",
+"Continence Foundation of Australia, Bristol stool chart": "Continence Foundation of Australia, Bristol dışkı skalası",
 "Convenience Med": "Kolaylık İlaçları",
 "Convenience Med pack": "Kolaylık İlaçları paketi",
 "Cool down": "Serinleyin",
@@ -3880,7 +4185,9 @@ var TR_EXACT = {
 "Daily self-assessment for astronauts": "Astronotlar için günlük öz değerlendirme",
 "Daily streak": "Günlük seri",
 "Darker skin can make some sensors read falsely high, so compare with your own usual value as well": "Koyu ten bazı sensörlerin yanlışlıkla yüksek okumasına yol açabilir, bu yüzden kendi olağan değerinizle de karşılaştırın",
+"Day": "Gün",
 "Day #": "Gün #",
+"Day # totals": "Gün # toplamları",
 "Days in range": "Aralıktaki gün",
 "Days on target": "Hedefteki gün",
 "Decompression sickness": "Dekompresyon hastalığı",
@@ -3899,8 +4206,14 @@ var TR_EXACT = {
 "Diagnostic": "Tanı",
 "Diagnostic pack": "Tanı paketi",
 "Diarrhea": "İshal",
+"Diarrhea on two days in a row": "Art arda iki gün ishal",
+"Diarrhea with fever: possible gut infection": "Ateşle birlikte ishal: olası bağırsak enfeksiyonu",
 "Diastolic blood pressure": "Diyastolik tansiyon",
 "Diastolic is the lower number": "Diyastolik alttaki sayıdır",
+"Digestion": "Sindirim",
+"Digestion looks normal": "Sindirim normal görünüyor",
+"Digestion: Bristol": "Sindirim: Bristol",
+"Digestion: Bristol #": "Sindirim: Bristol #",
 "Dim light with less blue helps your body get ready for sleep": "Daha az mavili loş ışık vücudunuzun uykuya hazırlanmasına yardım eder",
 "Disconnected": "Bağlantı kesildi",
 "Divide by # to get mmol/L": "mmol/L'ye çevirmek için # sayısına bölün",
@@ -3922,11 +4235,13 @@ var TR_EXACT = {
 "Drink a glass of water": "Bir bardak su için",
 "Drink about # mL now": "Şimdi yaklaşık # mL için",
 "Drink about # mL now and keep a drink bag in sight": "Şimdi yaklaşık # mL için ve içecek torbasını göz önünde tutun",
+"Drink enough fluid": "Yeterli sıvı için",
 "Drink fluids and eat something if you have not eaten": "Sıvı alın ve yemediyseniz bir şeyler yiyin",
 "Drink fluids and recheck in # minutes": "Sıvı alın ve # dakika sonra yeniden ölçün",
 "Drink fluids and rest": "Sıvı alın ve dinlenin",
 "Drink fluids, add salt to your next meal and avoid standing up fast": "Sıvı alın, sonraki öğününüze tuz ekleyin ve hızlı ayağa kalkmaktan kaçının",
 "Drink more on exercise days and after excursions": "Egzersiz günlerinde ve gezilerden sonra daha çok için",
+"Drink to your fluid target": "Sıvı hedefinize kadar için",
 "Drink warm fluids": "Sıcak sıvılar için",
 "Drink water": "Su için",
 "Drink water with electrolytes": "Elektrolitli su için",
@@ -3948,26 +4263,36 @@ var TR_EXACT = {
 "Early warning: the risk has been rising and may reach low by tomorrow (about #)": "Erken uyarı: risk yarına kadar yaklaşık # olabilir",
 "Eat # g of fast carbohydrate and recheck in # minutes": "# g hızlı karbonhidrat yiyin ve # dakika sonra yeniden ölçün",
 "Eat # g of fast carbohydrate now": "Şimdi # g hızlı karbonhidrat yiyin",
+"Eat more fiber": "Daha fazla lif yiyin",
+"Eat slowly and choose smaller meals": "Yavaş yiyin ve daha küçük öğünler seçin",
 "Eat small, plain meals": "Küçük, sade öğünler yiyin",
 "Eating less than this for days leads to body mass loss": "Günlerce bundan az yemek kilo kaybına yol açar",
 "Elevated": "Yükselmiş",
 "Elevated risk": "Yükselmiş risk",
 "Emergency Medical": "Acil Tıbbi",
 "Emergency Medical pack": "Acil Tıbbi paketi",
+"Emergency checks": "Acil durum kontrolleri",
 "End simulation": "Simülasyonu bitir",
+"Energy": "Enerji",
+"Energy is worked out as # kcal per gram of protein and carbohydrate and # kcal per gram of fat": "Enerji, protein ve karbonhidratın gramı başına # kcal, yağın gramı başına # kcal olarak hesaplanır",
 "Energy need": "Enerji ihtiyacı",
 "Enter # to change only the date": "Yalnızca tarihi değiştirmek için # girin",
 "Enter a whole number of # or more": "# veya daha büyük bir tam sayı girin",
 "Enter an amount from # to # mL": "# ile # mL arasında bir miktar girin",
 "Enter an item name of up to # characters": "En fazla # karakterlik bir kalem adı girin",
+"Enter at least # bowel movement for the stool form you chose": "Seçtiğiniz dışkı biçimi için en az # dışkılama girin",
 "Enter both times": "İki saati de girin",
+"Enter grams from # to #": "# ile # arasında gram girin",
 "Enter how many you add and the new expiry date, then press Save": "Kaç tane eklediğinizi ve yeni son kullanma tarihini girin, sonra Kaydet'e basın",
 "Enter how many you add, from # to #": "Kaç tane eklediğinizi girin, # ile # arası",
 "Enter the earlier career dose in mSv, from # to #": "Önceki kariyer dozunu mSv olarak girin, # ile # arası",
 "Enter the expiry date as a full date": "Son kullanma tarihini tam tarih olarak girin",
+"Enter the grams of at least one nutrient": "En az bir besin öğesinin gramını girin",
+"Enter the number of bowel movements today, from # to #": "Bugünkü dışkılama sayısını girin, # ile # arası",
 "Enter your age in years, from # to #": "Yaşınızı yıl olarak girin, # ile # arası",
 "Enter your body mass in kg, from # to #": "Kilonuzu kg olarak girin, # ile # arası",
 "Enter your height in cm, from # to #": "Boyunuzu cm olarak girin, # ile # arası",
+"Entirely liquid": "Tamamen sıvı",
 "Environment": "Ortam",
 "Estimated maximum heart rate": "Tahmini maksimum kalp hızı",
 "Event injected": "Olay eklendi",
@@ -4005,6 +4330,7 @@ var TR_EXACT = {
 "Eye ultrasound": "Göz ultrasonu",
 "Eyes": "Gözler",
 "Eyes and brain fluid pressure": "Gözler ve beyin sıvısı basıncı",
+"F #": "Y #",
 "Fair": "Orta",
 "Far above usual": "Olağandan çok yüksek",
 "Far below usual": "Olağandan çok düşük",
@@ -4014,6 +4340,8 @@ var TR_EXACT = {
 "Fast heart rate": "Hızlı kalp atışı",
 "Fast pulse": "Hızlı nabız",
 "Fast resting pulse": "Hızlı dinlenme nabzı",
+"Fat": "Yağ",
+"Fat (g)": "Yağ (g)",
 "Fatigue": "Yorgunluk",
 "Fatigue from sleep loss": "Uyku kaybından yorgunluk",
 "Female": "Kadın",
@@ -4021,6 +4349,12 @@ var TR_EXACT = {
 "Fever can be the first sign of infection far from any hospital": "Hastaneden çok uzaktayken ateş enfeksiyonun ilk işareti olabilir",
 "Fever can signal infection": "Ateş enfeksiyon işareti olabilir",
 "Fever of # °C or more with cough, fast breathing or a fast pulse": "Öksürük, hızlı solunum ya da hızlı nabızla birlikte # °C veya üstü ateş",
+"Fewer than three bowel movements a week counts as constipation (NIDDK)": "Haftada üçten az dışkılama kabızlık sayılır (NIDDK)",
+"Fi #": "L #",
+"Fiber": "Lif",
+"Fiber # g, below the # g target": "Lif # g, # g hedefinin altında",
+"Fiber (g)": "Lif (g)",
+"Fiber, fluid, exercise and medicines show nothing that would upset digestion today": "Lif, sıvı, egzersiz ve ilaçlar bugün sindirimi bozacak bir şey göstermiyor",
 "Fill in the rest and save": "Gerisini doldurup kaydedin",
 "Find the dark band of the optic nerve behind the eyeball": "Göz küresinin arkasındaki optik sinirin koyu bandını bulun",
 "Findings": "Bulgular",
@@ -4031,6 +4365,7 @@ var TR_EXACT = {
 "First measurements of the radiation dose on the lunar surface": "First measurements of the radiation dose on the lunar surface",
 "First step": "İlk adım",
 "Fluid intake": "Sıvı alımı",
+"Fluid intake # L, below the # L target": "Sıvı alımı # L, # L hedefinin altında",
 "Fluid intake (L)": "Sıvı alımı (L)",
 "Fluid intake below # L": "# L altında sıvı alımı",
 "Fluid intake in your last # check-ins against your target": "Son # kaydınızdaki sıvı alımı ve hedefiniz",
@@ -4043,6 +4378,9 @@ var TR_EXACT = {
 "Fluid shift toward the head in low gravity": "Düşük yerçekiminde sıvının başa doğru kayması",
 "Fluid target": "Sıvı hedefi",
 "Follow the guidance for each flagged reading, tell the crew medical officer and measure again later today": "İşaretli her ölçümün yönergesini izleyin, mürettebat sağlık görevlisine söyleyin ve bugün daha sonra yeniden ölçün",
+"Food": "Yiyecek",
+"Food (optional)": "Yiyecek (isteğe bağlı)",
+"Food logged today": "Bugün kaydedilen yiyecekler",
 "For allergy": "Alerji için",
 "For blocked nose": "Burun tıkanıklığı için",
 "For blood gas test": "Kan gazı testi için",
@@ -4050,6 +4388,7 @@ var TR_EXACT = {
 "For diarrhea": "İshal için",
 "For each reading outside its range or unusual for you, the possible causes are checked against your other readings, your excursions and the medicines in the use log": "Aralığı dışında ya da sizin için olağandışı her ölçümün olası nedenleri diğer ölçümleriniz, gezileriniz ve kullanım kaydındaki ilaçlarla karşılaştırılır",
 "For example": "Örneğin",
+"For example: chicken with rice": "Örneğin: pilavlı tavuk",
 "For eye ultrasound": "Göz ultrasonu için",
 "For finger-prick samples": "Parmak ucu örnekleri için",
 "For more than one at a time, or to note why": "Birden fazlası için ya da nedenini not etmek için",
@@ -4088,6 +4427,7 @@ var TR_EXACT = {
 "Green": "Yeşil",
 "Green (normal, stable)": "Yeşil (normal, stabil)",
 "Ground can answer within minutes": "Yer ekibi dakikalar içinde yanıt verebilir",
+"Gut bacteria do change in spaceflight (NASA Twins Study), and fiber, fluid, exercise, antibiotics and anti-diarrhea medicines all affect them, so the screen uses these together with the stool form and symptoms": "Bağırsak bakterileri uzay uçuşunda değişir (NASA İkizler Çalışması); lif, sıvı, egzersiz, antibiyotikler ve ishal ilaçları da onları etkiler, bu yüzden tarama bunları dışkı biçimi ve belirtilerle birlikte kullanır",
 "Half of the career radiation limit used": "Kariyer radyasyon sınırının yarısı kullanıldı",
 "Half of the limit is used": "Sınırın yarısı kullanıldı",
 "Hazard": "Tehlike",
@@ -4119,6 +4459,7 @@ var TR_EXACT = {
 "High pressure": "Yüksek basınç",
 "High risk": "Yüksek risk",
 "High risk, critical": "Yüksek risk, kritik",
+"High share of energy": "Enerjideki payı yüksek",
 "High stress": "Yüksek stres",
 "High sugar": "Yüksek şeker",
 "Higher background radiation in this environment": "Bu ortamda daha yüksek arka plan radyasyonu",
@@ -4145,6 +4486,7 @@ var TR_EXACT = {
 "How the medical kit works": "Tıbbi çanta nasıl çalışır",
 "How the risk is calculated": "Risk nasıl hesaplanır",
 "How the score is calculated": "Puan nasıl hesaplanır",
+"How the targets are set": "Hedefler nasıl belirlenir",
 "How the water tracker works": "Su takibi nasıl çalışır",
 "How this check works": "Bu kontrol nasıl çalışır",
 "How your profile changes the readings": "Profiliniz ölçümleri nasıl değiştirir",
@@ -4190,12 +4532,14 @@ var TR_EXACT = {
 "It falls by one beat for every year of age": "Her yaşla bir atım düşer",
 "It goes into the standard weekly report": "Standart haftalık rapora eklenir",
 "It has no physical unit, but the change from day to day is what matters": "Fiziksel birimi yoktur, önemli olan günden güne değişimdir",
+"It is added to your next check-in": "Sonraki kaydınıza eklenir",
 "It is already affecting your body": "Vücudunuzu şimdiden etkiliyor",
 "It is an indirect sign of fluid pressure around the brain": "Beyin çevresindeki sıvı basıncının dolaylı bir işaretidir",
 "It is capped at # while a reading needs action and at # while an extreme situation is detected": "Bir ölçüm müdahale gerektirirken # ile, aşırı durum tespit edilmişken # ile sınırlanır",
 "It is filled in as your fluid intake": "Sıvı alımınız olarak doldurulur",
 "It is not a medical device": "Tıbbi cihaz değildir",
 "It is not a validated clinical instrument, and its thresholds are a first proposal": "Doğrulanmış bir klinik ölçek değildir ve eşikleri ilk öneridir",
+"It is saved with this check-in": "Bu kayıtla birlikte kaydedilir",
 "It is used only for the fluid and energy equations": "Yalnızca sıvı ve enerji denklemlerinde kullanılır",
 "It is written in the language you are using": "Kullandığınız dilde yazılır",
 "It lasts about # seconds": "Yaklaşık # saniye sürer",
@@ -4215,7 +4559,9 @@ var TR_EXACT = {
 "Keep the same sleep and wake time every day, rest days included": "Dinlenme günleri dahil her gün aynı saatte yatıp kalkın",
 "Keep the sleep station dark": "Uyku istasyonunu karanlık tutun",
 "Keep tonight's bedtime fixed and start the pre-sleep light # hours before it": "Bu geceki yatış saatinizi sabit tutun ve uyku öncesi ışığı # saat önce başlatın",
+"Keep up your daily exercise": "Günlük egzersizinizi sürdürün",
 "Keep up your treadmill and cycle sessions, which relieve most cases": "Çoğu durumu rahatlatan koşu bandı ve bisiklet seanslarınızı sürdürün",
+"Keep your fiber, fluid and exercise routine": "Lif, sıvı ve egzersiz rutininizi sürdürün",
 "Keep your head still and look at a fixed point": "Başınızı sabit tutun ve sabit bir noktaya bakın",
 "Keep your personal dosimeter on your body all day": "Kişisel dozimetrenizi gün boyu üzerinizde taşıyın",
 "Keep your routine": "Rutininizi sürdürün",
@@ -4232,11 +4578,14 @@ var TR_EXACT = {
 "Less than # hours of sleep, or less than # hours two nights in a row": "# saatten az uyku ya da art arda iki gece # saatten az",
 "Level": "Seviye",
 "Light #": "Işık #",
+"Light and sleep": "Işık ve uyku",
 "Light plan for today": "Bugünün ışık planı",
 "Limit reached": "Sınıra ulaşıldı",
 "Litres of water a day, counting drinks and the water used to rehydrate food": "İçecekler ve yiyecekleri sulandırmak için kullanılan su dahil günlük litre su",
+"Little exercise (# min)": "Az egzersiz (# dk)",
 "Live": "Canlı",
 "Live averages added for heart rate, blood oxygen, temperature and breathing rate": "Kalp hızı, kan oksijeni, vücut ısısı ve solunum hızı için canlı ortalamalar eklendi",
+"Live sensors": "Canlı sensörler",
 "Live telemetry": "Canlı telemetri",
 "Live telemetry and sleep stages are simulated": "Canlı telemetri ve uyku evreleri simüle edilir",
 "Location": "Konum",
@@ -4258,12 +4607,15 @@ var TR_EXACT = {
 "Log use": "Kullanımı kaydet",
 "Log whether you measured before or after a meal": "Yemekten önce mi sonra mı ölçtüğünüzü kaydedin",
 "Log your dosimeter reading every hour": "Dozimetre değerinizi her saat kaydedin",
+"Log your stool form and bowel movements on the Digestion tab": "Dışkı biçiminizi ve dışkılama sayınızı Sindirim sekmesine kaydedin",
 "Logged": "Kaydedildi",
 "Logged by": "Kaydeden",
+"Logging today": "Bugün kaydediliyor",
 "Long or hard exercise": "Uzun ya da ağır egzersiz",
 "Long sleep": "Uzun uyku",
 "Look for smoke and cut power to the equipment": "Duman olup olmadığına bakın ve ekipmanın gücünü kesin",
 "Looks for": "Aradığı",
+"Loose stool (diarrhea)": "Yumuşak dışkı (ishal)",
 "Loperamide # mg capsules": "Loperamid # mg kapsül",
 "Loratadine # mg tablets": "Loratadin # mg tablet",
 "Losing water equal to #% of body weight already lowers concentration and physical performance": "Vücut ağırlığının yüzde # kadarı su kaybı bile konsantrasyonu ve fiziksel performansı düşürür",
@@ -4282,6 +4634,7 @@ var TR_EXACT = {
 "Low oxygen or pressure in the cabin": "Kabinde düşük oksijen ya da basınç",
 "Low pressure": "Düşük basınç",
 "Low risk": "Düşük risk",
+"Low share of energy": "Enerjideki payı düşük",
 "Low sugar": "Düşük şeker",
 "Low temperature": "Düşük ısı",
 "Lower CO# exposure": "CO# maruziyetini azalt",
@@ -4289,6 +4642,7 @@ var TR_EXACT = {
 "Lower is better": "Düşük olması daha iyi",
 "Lower your CO# exposure": "CO# maruziyetinizi azaltın",
 "Lowest–highest": "En düşük–en yüksek",
+"Lumpy and sausage-like": "Topaklı, sosis biçimli",
 "Lunar or Martian dust": "Ay ya da Mars tozu",
 "Lunar surface base": "Ay yüzeyi üssü",
 "Lung infection": "Akciğer enfeksiyonu",
@@ -4319,6 +4673,7 @@ var TR_EXACT = {
 "Measure the sheath width # mm behind the eyeball": "Kılıf genişliğini göz küresinin # mm arkasından ölçün",
 "Measure your blood oxygen and temperature, and check the cabin CO# level": "Kan oksijeninizi ve ateşinizi ölçün, kabin CO# düzeyini kontrol edin",
 "Measure your blood pressure and blood sugar when it happens": "Olduğu anda tansiyonunuzu ve kan şekerinizi ölçün",
+"Measure your temperature and note where the pain is": "Ateşinizi ölçün ve ağrının nerede olduğunu not edin",
 "Measured soon after a meal": "Yemekten kısa süre sonra ölçüldü",
 "Measurements": "Ölçümler",
 "Measuring right after a cold drink": "Soğuk içecekten hemen sonra ölçmek",
@@ -4343,6 +4698,7 @@ var TR_EXACT = {
 "Metabolism, digestion and core temperature": "Metabolizma, sindirim ve vücut iç ısısı",
 "Method": "Yöntem",
 "Microgravity": "Mikro yerçekimi",
+"Mild": "Hafif",
 "Milliseconds (ms) from the moment the light turns green until you tap": "Işığın yeşile döndüğü andan dokunuşunuza kadar geçen milisaniye (ms)",
 "Mind and performance": "Zihin ve performans",
 "Minor Treatment": "Küçük Tedavi",
@@ -4384,9 +4740,11 @@ var TR_EXACT = {
 "Move to the most shielded area and check for a solar particle event": "En korunaklı bölgeye geçin ve güneş parçacık olayı olup olmadığını kontrol edin",
 "Multivariate check": "Çok değişkenli kontrol",
 "Muscles": "Kaslar",
+"Mushy, ragged edges": "Lapa gibi, kenarları düzensiz",
 "NASA": "NASA",
 "NASA Human Research Program, # Hazards of Human Spaceflight": "NASA Human Research Program, # Hazards of Human Spaceflight",
 "NASA JPL, Curiosity RAD radiation measurements": "NASA JPL, Curiosity RAD radyasyon ölçümleri",
+"NASA JSC# (above): protein # to # g per kg of body mass, carbohydrate #% to #% and fat #% to #% of energy, fiber # g a day for men and # g for women": "NASA JSC# (yukarıda): vücut kütlesinin kg'ı başına # ile # g protein, enerjinin yüzde #–# kadarı karbonhidrat ve yüzde #–# kadarı yağ, erkeklerde günde # g, kadınlarda # g lif",
 "NASA JSC#, Nutritional Requirements for Exploration Missions": "NASA JSC#, Nutritional Requirements for Exploration Missions",
 "NASA OCHMO Radiation Protection technical brief": "NASA OCHMO Radiation Protection teknik özeti",
 "NASA OCHMO Sleep Accommodations technical brief": "NASA OCHMO Sleep Accommodations teknik özeti",
@@ -4403,6 +4761,7 @@ var TR_EXACT = {
 "NASA, The Human Body in Space": "NASA, The Human Body in Space",
 "NASA-STD# [V# #]": "NASA-STD# [V# #]",
 "NASA-STD# [V# #] requires tracking item locations and quantities; the ISS kit is split into packs and holds # medications; average expiration is # to # years while exploration missions are planned for # to # years; NASA tested a Dose Tracker app for logging medication use": "NASA-STD# [V# #] kalemlerin yerinin ve miktarının izlenmesini ister; ISS çantası paketlere ayrılır ve # ilaç içerir; ortalama raf ömrü # ile # yıldır, keşif görevleri ise # ile # yıl planlanır; NASA ilaç kullanımını kaydetmek için Dose Tracker uygulamasını test etti",
+"NIDDK, Definition and Facts for Constipation": "NIDDK, Definition and Facts for Constipation",
 "Name": "Ad",
 "Names from NASA's ISS medicine list": "Adlar NASA'nın ISS ilaç listesinden",
 "Nausea": "Bulantı",
@@ -4412,6 +4771,7 @@ var TR_EXACT = {
 "Needs height and body mass": "Boy ve kilo gerekli",
 "Needs the full profile": "Tam profil gerekli",
 "Needs your age": "Yaşınız gerekli",
+"Needs your profile": "Profiliniz gerekli",
 "Neutral": "Nötr",
 "Never": "Hiç",
 "New expiry date": "Yeni son kullanma tarihi",
@@ -4438,12 +4798,16 @@ var TR_EXACT = {
 "No NASA branding is used": "NASA markası kullanılmamıştır",
 "No alerts": "Uyarı yok",
 "No body region is flagged today, so there is no targeted advice": "Bugün işaretli vücut bölgesi yok, bu yüzden hedefli öneri yok",
+"No bowel movement": "Dışkılama yok",
 "No check-in yet": "Henüz kayıt yok",
+"No data": "Veri yok",
+"No digestion data yet": "Henüz sindirim verisi yok",
 "No early warning": "Erken uyarı yok",
 "No emergency pattern found (# checks)": "Acil durum düzeni bulunmadı (# kontrol)",
 "No expiry date": "Son kullanma tarihi yok",
 "No further spacewalks or surface excursions, and spend as much time as possible in the most shielded area": "Başka uzay yürüyüşü ya da yüzey gezisi yok, olabildiğince çok zamanı en korunaklı bölgede geçirin",
 "No medicines in the kit": "Çantada ilaç yok",
+"No nutrition saved with a check-in yet": "Henüz bir kayıtla beslenme kaydedilmedi",
 "No problem shows up in two or more readings at once today": "Bugün iki ya da daha fazla ölçümde aynı anda görünen bir sorun yok",
 "No profile saved": "Kayıtlı profil yok",
 "No profile yet": "Henüz profil yok",
@@ -4455,6 +4819,7 @@ var TR_EXACT = {
 "Noise, light or a shifted schedule": "Gürültü, ışık ya da kaymış program",
 "Noise, light or carbon dioxide in the sleep station": "Uyku istasyonunda gürültü, ışık ya da karbondioksit",
 "None": "Yok",
+"None today": "Bugün yok",
 "Normal range": "Normal aralık",
 "Normal weight": "Normal kilo",
 "Normal working light for the day": "Gündüz için normal çalışma ışığı",
@@ -4470,12 +4835,18 @@ var TR_EXACT = {
 "Note whether it came when you moved quickly or stood up in gravity": "Hızlı hareket ettiğinizde ya da yerçekiminde ayağa kalktığınızda mı geldiğini not edin",
 "Note whether it is worse after sleep or after exercise": "Uykudan mı egzersizden mi sonra daha kötü olduğunu not edin",
 "Note whether it started with head movement, a meal or a medicine": "Baş hareketi, yemek ya da ilaçla mı başladığını not edin",
+"Note which foods came before it": "Öncesinde hangi yiyecekleri yediğinizi not edin",
 "Nothing is transmitted": "Hiçbir şey gönderilmez",
 "Nothing logged yet": "Henüz kayıt yok",
 "Nothing needs attention": "Dikkat gerektiren bir şey yok",
 "Nothing raises the risk today": "Bugün riski artıran bir şey yok",
 "Notify crew medical officer": "Mürettebat sağlık görevlisine haber ver",
 "Now (#:#)": "Şimdi (#:#)",
+"Nutrition": "Beslenme",
+"Nutrition and digestion": "Beslenme ve sindirim",
+"Nutrition today": "Bugünkü beslenme",
+"Nutrition: # kcal, # g protein logged today": "Beslenme: bugün # kcal, # g protein kaydedildi",
+"Nutrition: every target met on mission day #": "Beslenme: görev günü #: her hedef tutuldu",
 "Obesity": "Obezite",
 "On Earth natural background gives about # mSv a year, while a six-month ISS stay gives about # to # mSv (NASA)": "Dünya'da doğal arka plan yılda yaklaşık # mSv verirken altı aylık ISS kalışı yaklaşık # ile # mSv verir (NASA)",
 "On every question, # is the least and # is the most of what is asked": "Her soruda # sorulan şeyin en azı, # en fazlasıdır",
@@ -4510,6 +4881,7 @@ var TR_EXACT = {
 "Overview": "Genel bakış",
 "Overweight": "Fazla kilolu",
 "Oxygen drop": "Oksijen düşüşü",
+"P #": "P #",
 "PDF ready:": "PDF hazır:",
 "PDF report": "PDF raporu",
 "PaCO# # to # mmHg at sea level; ranges vary between labs": "Deniz seviyesinde PaCO# # ile # mmHg; aralıklar laboratuvara göre değişir",
@@ -4574,6 +4946,8 @@ var TR_EXACT = {
 "Promethazine # mg/mL injection": "Prometazin # mg/mL enjeksiyon",
 "Protect a full sleep window tonight and keep the same bedtime as the last few nights": "Bu gece tam bir uyku süresini koruyun ve son birkaç geceyle aynı saatte yatın",
 "Protect your free time and keep exercising": "Boş zamanınızı koruyun ve egzersize devam edin",
+"Protein": "Protein",
+"Protein (g)": "Protein (g)",
 "Pseudoephedrine # mg tablets": "Psödoefedrin # mg tablet",
 "Psychological crisis": "Psikolojik kriz",
 "Pull your knees to your chest and hold for # seconds, three times": "Dizlerinizi göğsünüze çekin ve # saniye tutun, üç kez",
@@ -4590,6 +4964,7 @@ var TR_EXACT = {
 "Radiation is not flushed out of the body": "Radyasyon vücuttan atılmaz",
 "Radiation reserve": "Radyasyon payı",
 "Radiation, morale, medical kit and goals": "Radyasyon, moral, tıbbi çanta ve hedefler",
+"Radiation, morale, nutrition, digestion and goals": "Radyasyon, moral, beslenme, sindirim ve hedefler",
 "Raised carbon dioxide causes headache and poor concentration": "Artan karbondioksit baş ağrısına ve dikkat dağınıklığına yol açar",
 "Raised pressure behind the eyes": "Göz arkasında artmış basınç",
 "Raised pressure behind the eyes (optic nerve sheath # mm)": "Göz arkasında artmış basınç (optik sinir kılıfı # mm)",
@@ -4611,6 +4986,7 @@ var TR_EXACT = {
 "Read the #-hour average from the cabin air monitor nearest to you": "Size en yakın kabin hava monitöründen #-saatlik ortalamayı okuyun",
 "Read the daily value at the same time each day": "Günlük değeri her gün aynı saatte okuyun",
 "Read the daily value from your personal dosimeter": "Günlük değeri kişisel dozimetrenizden okuyun",
+"Read the grams from the food package label": "Gramları yiyecek paketinin etiketinden okuyun",
 "Read the lower number from the same cuff measurement": "Aynı manşet ölçümünden alttaki sayıyı okuyun",
 "Read the meter after a few seconds": "Birkaç saniye sonra cihazı okuyun",
 "Read the second, lower number on the display": "Ekrandaki ikinci, alttaki sayıyı okuyun",
@@ -4640,6 +5016,7 @@ var TR_EXACT = {
 "Repeat the reaction test after rest": "Dinlendikten sonra reaksiyon testini tekrarlayın",
 "Repeat the reaction test later today": "Reaksiyon testini bugün daha sonra tekrarlayın",
 "Report": "Rapor",
+"Report and PDF": "Rapor ve PDF",
 "Report any change": "Her değişikliği bildirin",
 "Report as text": "Metin olarak rapor",
 "Report copied as text": "Rapor metin olarak kopyalandı",
@@ -4676,6 +5053,7 @@ var TR_EXACT = {
 "Result": "Sonuç",
 "Rising": "Yükseliyor",
 "Rising solar activity over several days": "Birkaç gün boyunca artan güneş etkinliği",
+"Risk": "Risk",
 "Risk index": "Risk endeksi",
 "Risk score # of #": "Risk puanı #/#",
 "Risk score over the last days": "Son günlerdeki risk puanı",
@@ -4690,13 +5068,19 @@ var TR_EXACT = {
 "Run the vision test, note any headache or blurred vision and repeat the scan": "Görme testini yapın, baş ağrısı ya da bulanık görmeyi not edin ve taramayı tekrarlayın",
 "Running": "Çalışıyor",
 "Salt or caffeine": "Tuz ya da kafein",
+"Sausage with cracks": "Çatlaklı sosis",
 "Save": "Kaydet",
 "Save check-in": "Kaydı kaydet",
 "Save earlier dose": "Önceki dozu kaydet",
+"Save for today": "Bugün için kaydet",
 "Save profile": "Profili kaydet",
 "Save the result to your check-in": "Sonucu kaydınıza ekle",
 "Saved": "Kaydedildi",
 "Saved as mission day #": "Görev günü # olarak kaydedildi",
+"Saved for today": "Bugün için kaydedildi",
+"Saved for today: Bristol #, # bowel movement": "Bugün için kaydedildi: Bristol #, # dışkılama",
+"Saved for today: Bristol #, # bowel movements": "Bugün için kaydedildi: Bristol #, # dışkılama",
+"Saved for today: Bristol –, # bowel movements": "Bugün için kaydedildi: Bristol –, # dışkılama",
 "Saved. It goes into the standard weekly report": "Kaydedildi. Standart haftalık rapora eklenir",
 "Saving is not available in this view": "Bu görünümde kaydetme kullanılamıyor",
 "Saving was cancelled": "Kaydetme iptal edildi",
@@ -4710,10 +5094,13 @@ var TR_EXACT = {
 "Select the text below and copy it": "Aşağıdaki metni seçip kopyalayın",
 "Send report to flight surgeon": "Raporu uçuş hekimine gönder",
 "Sensor alerts": "Sensör uyarıları",
+"Separate hard lumps": "Ayrı sert topaklar",
 "Serious conflict": "Ciddi çatışma",
 "Sets the fluid intake status, the daily goal, the water tracker and the scores": "Sıvı alımı durumunu, günlük hedefi, su takibini ve puanları belirler",
 "Several attention lapses": "Birkaç dikkat kaybı",
 "Several crew members or heavy exercise in one module": "Tek modülde birkaç mürettebat ya da ağır egzersiz",
+"Severe": "Şiddetli",
+"Severe abdominal pain": "Şiddetli karın ağrısı",
 "Severe cough with breathlessness and falling blood oxygen, without fever": "Ateş olmadan nefes darlığı ve düşen kan oksijeniyle birlikte şiddetli öksürük",
 "Severe low blood sugar": "Ciddi düşük kan şekeri",
 "Severe low blood sugar (glucose # mg/dL)": "Ciddi düşük kan şekeri (glukoz # mg/dL)",
@@ -4726,6 +5113,7 @@ var TR_EXACT = {
 "Show all # checks (none detected) and test them": "# kontrolün hepsini göster (hiçbiri tespit edilmedi) ve test et",
 "Signal delay": "Sinyal gecikmesi",
 "Signal delay to Earth": "Dünya'ya sinyal gecikmesi",
+"Signs of constipation": "Kabızlık belirtileri",
 "Signs of pressure behind the eyes": "Göz arkası basıncı belirtileri",
 "Simulated from the sleep length in your latest check-in": "Son kaydınızdaki uyku süresinden simüle edildi",
 "Simulated sensor readings arrive once a second, starting from your latest check-in": "Simüle edilmiş sensör değerleri son kaydınızdan başlayarak saniyede bir gelir",
@@ -4762,9 +5150,12 @@ var TR_EXACT = {
 "Slower reactions": "Yavaşlayan reaksiyonlar",
 "Slower thinking from fatigue or stress": "Yorgunluk ya da stresten yavaşlayan düşünme",
 "Smaller blood volume early in the mission": "Görevin başında azalan kan hacmi",
+"Smooth and soft sausage": "Düzgün ve yumuşak sosis",
 "So far": "Şu ana kadar",
 "Social": "Sosyal",
 "Social and crew": "Sosyal ve mürettebat",
+"Soft blobs with clear edges": "Kenarları belirgin yumuşak parçalar",
+"Soft stool": "Yumuşak dışkı",
 "Solar particle event": "Güneş parçacık olayı",
 "Solar particle event (dose #× expected)": "Güneş parçacık olayı (doz beklenenin #×)",
 "Something needs action": "Bir şey müdahale gerektiriyor",
@@ -4794,6 +5185,7 @@ var TR_EXACT = {
 "Staying alert": "Uyanık kalma",
 "Sterile gauze dressings": "Steril gazlı bez",
 "Still missing": "Hâlâ eksik",
+"Stool form (Bristol stool scale) of the last bowel movement": "Son dışkılamadaki dışkı biçimi (Bristol dışkı skalası)",
 "Stop activity and cool down at once": "Etkinliği bırakın ve hemen serinleyin",
 "Stop all activity and lie still": "Bütün etkinliği bırakın ve hareketsiz uzanın",
 "Stop all activity and tell the crew": "Bütün etkinliği bırakın ve mürettebata haber verin",
@@ -4832,6 +5224,7 @@ var TR_EXACT = {
 "Take a short break every hour": "Her saat kısa bir mola verin",
 "Take a short break or a #-minute nap before any critical task": "Her kritik görevden önce kısa bir mola verin ya da #-dakikalık şekerleme yapın",
 "Take a warm drink": "Sıcak bir içecek alın",
+"Take anti-diarrhea medicine only as the procedure directs": "İshal ilacını yalnızca prosedürün dediği gibi alın",
 "Take anti-nausea medicine only as the procedure directs": "Bulantı ilacını yalnızca prosedürün dediği gibi alın",
 "Take it now": "Şimdi yap",
 "Take the morale survey": "Moral anketini yapın",
@@ -4849,9 +5242,11 @@ var TR_EXACT = {
 "Target from your profile": "Hedef profilinizden",
 "Target reached": "Hedefe ulaşıldı",
 "Targeted advice": "Hedefli öneriler",
+"Targets follow NASA's nutrition requirements for exploration missions (JSC#): protein # to # g per kg of body mass, carbohydrate #% to #% and fat #% to #% of energy, fiber # g a day for men and # g for women, and the energy need from the crew profile": "Hedefler NASA'nın keşif görevleri için beslenme gereksinimlerini (JSC#) izler: vücut kütlesinin kg'ı başına # ile # g protein, enerjinin yüzde #–# kadarı karbonhidrat ve yüzde #–# kadarı yağ, erkeklerde günde # g, kadınlarda # g lif ve mürettebat profilinden enerji ihtiyacı",
 "Team Kuasar Selçuklu": "Kuasar Selçuklu Takımı",
 "Team decisions and limits": "Takım kararları ve sınırlar",
 "Tell the crew medical officer about any blood or coloured phlegm": "Kanlı ya da renkli balgamı mürettebat sağlık görevlisine söyleyin",
+"Tell the crew medical officer today": "Bugün mürettebat sağlık görevlisine söyleyin",
 "Tell the crew so they can watch for symptoms": "Belirtileri izleyebilmeleri için mürettebata haber verin",
 "Tell the flight surgeon": "Uçuş hekimine söyleyin",
 "Temperature below # °C": "# °C altında vücut ısısı",
@@ -4876,6 +5271,7 @@ var TR_EXACT = {
 "The ISS reaction test counts these as attention lapses (Jones et al": "ISS reaksiyon testi bunları dikkat kaybı sayar (Jones ve ark",
 "The ISS reaction test counts these as attention lapses (Jones et al., Sleep, #)": "ISS reaksiyon testi bunları dikkat kaybı sayar (Jones ve ark., Sleep, #)",
 "The PDF report is built inside the page, without a library or an internet connection": "PDF raporu sayfanın içinde, kütüphane ve internet bağlantısı olmadan oluşturulur",
+"The Physiological Society, The NASA Twins Studies": "The Physiological Society, The NASA Twins Studies",
 "The Radiation Challenge": "The Radiation Challenge",
 "The adult reference ranges of the sources apply to every crew member": "Kaynaklardaki yetişkin referans aralıkları her mürettebat için geçerlidir",
 "The analysis rules (which readings together point to a problem, the possible causes and the steps) and the extreme situation checks are the team's own first-response summaries": "Analiz kuralları (hangi ölçümlerin birlikte bir soruna işaret ettiği, olası nedenler ve adımlar) ile aşırı durum kontrolleri takımın kendi ilk müdahale özetleridir",
@@ -4888,7 +5284,9 @@ var TR_EXACT = {
 "The crew medical officer should check in with you today": "Mürettebat sağlık görevlisi bugün sizinle görüşmeli",
 "The daily report covers the latest check-in, the weekly one the last # and the monthly one the last #": "Günlük rapor son kaydı, haftalık rapor son # kaydı, aylık rapor son # kaydı kapsar",
 "The damage adds up, so the total dose is tracked": "Hasar birikir, bu yüzden toplam doz izlenir",
+"The day's totals are added to your next check-in, and the list is cleared when you save it": "Günün toplamları sonraki kaydınıza eklenir ve kaydı kaydettiğinizde liste temizlenir",
 "The delay grows as you travel": "Yol aldıkça gecikme artar",
+"The digestion screen does not measure the microbiome": "Sindirim taraması mikrobiyomu ölçmez",
 "The example kit was restored and the use log was cleared": "Örnek çanta geri yüklendi ve kullanım kaydı temizlendi",
 "The example medicines come from the formulary items it names": "Örnek ilaçlar orada adı geçen formüler kalemlerinden gelir",
 "The flight psychologist is informed automatically": "Uçuş psikoloğu otomatik olarak bilgilendirilir",
@@ -4944,6 +5342,7 @@ var TR_EXACT = {
 "There is no unit; the change from day to day matters most": "Birimi yoktur; en önemlisi günden güne değişimdir",
 "These are test readings for mission day #, not your real data, and they are not saved": "Bunlar görev günü # için test değerleridir, gerçek verileriniz değildir ve kaydedilmez",
 "These scales were chosen by the team": "Bu ölçekleri takım seçti",
+"They are added to your next check-in": "Sonraki kaydınıza eklenir",
 "They are not scored": "Puanlanmazlar",
 "They do not replace official flight rules and medical checklists": "Resmi uçuş kurallarının ve tıbbi kontrol listelerinin yerini tutmazlar",
 "Think about the last # hours": "Son # saati düşünün",
@@ -4951,6 +5350,7 @@ var TR_EXACT = {
 "Thirst is weaker in low gravity": "Düşük yerçekiminde susama hissi zayıftır",
 "This can raise pressure behind the eyes and change vision (spaceflight-associated neuro-ocular syndrome)": "Bu göz arkası basıncını artırıp görmeyi değiştirebilir (uzay uçuşu ilişkili nöro-oküler sendrom)",
 "This cannot be undone": "Bu geri alınamaz",
+"This is a screen of digestive signs, not a measurement of the gut microbiome: no instrument on board measures the gut flora": "Bu, bağırsak mikrobiyomunun ölçümü değil, sindirim belirtilerine dayalı bir taramadır: araçta bağırsak florasını ölçen bir cihaz yoktur",
 "This is a self-rating from # (very low) to # (very good)": "Bu # (çok düşük) ile # (çok iyi) arası bir öz değerlendirmedir",
 "This is an example kit": "Bu bir örnek çantadır",
 "This is not a medical device": "Bu bir tıbbi cihaz değildir",
@@ -4977,6 +5377,8 @@ var TR_EXACT = {
 "Took a medicine or used a supply": "İlaç mı aldınız ya da malzeme mi kullandınız",
 "Topical and Injectable Med": "Topikal ve Enjektabl İlaç",
 "Topical and Injectable Med pack": "Topikal ve Enjektabl İlaç paketi",
+"Totals of mission day #": "Görev günü # toplamları",
+"Totals so far today": "Bugün şu ana kadarki toplamlar",
 "Trend chart": "Eğilim grafiği",
 "Trend over the mission": "Görev boyunca eğilim",
 "Trends": "Eğilimler",
@@ -5026,8 +5428,10 @@ var TR_EXACT = {
 "Warm up": "Isının",
 "Warm your finger and measure again": "Parmağınızı ısıtıp yeniden ölçün",
 "Warning steps": "Uyarı basamakları",
+"Wash hands and clean shared surfaces": "Ellerinizi yıkayın ve ortak yüzeyleri temizleyin",
 "Watch": "İzle",
 "Watch for headache, confusion and fast breathing": "Baş ağrısı, bilinç bulanıklığı ve hızlı solunuma dikkat edin",
+"Water": "Su",
 "Water today": "Bugünkü su",
 "Water tracker: # L logged today": "Su takibi: bugün # L kaydedildi",
 "Water, last check-in": "Su, son kayıt",
@@ -5044,12 +5448,14 @@ var TR_EXACT = {
 "Weekly morale survey": "Haftalık moral anketi",
 "Weekly streak": "Haftalık seri",
 "Weight-bearing bones lose about #% to #% of their mineral density per month in space, and muscles weaken too": "Yük taşıyan kemikler uzayda ayda mineral yoğunluklarının yaklaşık yüzde # ile # kadarını kaybeder, kaslar da zayıflar",
+"What can affect your gut today": "Bugün bağırsağınızı ne etkileyebilir",
 "What happened": "Ne oldu",
 "What needs attention": "Dikkat gerektirenler",
 "What raises the risk today": "Bugün riski ne artırıyor",
 "What the data says": "Veriler ne diyor",
 "What the unit means and how to measure": "Birimin anlamı ve nasıl ölçülür",
 "What this means": "Bu ne anlama geliyor",
+"What this screen can and cannot tell": "Bu tarama neyi söyleyebilir, neyi söyleyemez",
 "What to do": "Ne yapmalı",
 "What to do for the flagged body regions": "İşaretli vücut bölgeleri için ne yapmalı",
 "What to do for this region": "Bu bölge için ne yapmalı",
@@ -5078,6 +5484,7 @@ var TR_EXACT = {
 "Yellow": "Sarı",
 "Yellow (moderate stress, attention)": "Sarı (orta stres, dikkat)",
 "You can start a new survey any time": "İstediğiniz zaman yeni bir anket başlatabilirsiniz",
+"You chose \"None today\", so the number of bowel movements should be #": "\"Bugün yok\" seçtiniz, bu yüzden dışkılama sayısı # olmalı",
 "You may be breathing too fast": "Çok hızlı nefes alıyor olabilirsiniz",
 "You slept more than # hours on # of the last # nights": "Son #3 gecenin #2 gecesinde #1 saatten fazla uyudunuz",
 "Your answers stay on this device until you submit": "Yanıtlarınız gönderene kadar bu cihazda kalır",
@@ -5113,6 +5520,8 @@ var TR_EXACT = {
 "and # more": "ve # tane daha",
 "and the morale survey is Red": "ve moral anketi Kırmızı",
 "and the morale survey is Yellow": "ve moral anketi Sarı",
+"anti-diarrhea medicine can cause constipation": "ishal ilacı kabızlık yapabilir",
+"antibiotic logged in the last # days": "son # günde antibiyotik kaydı var",
 "as reported by": "bildirene göre",
 "as the spine lengthens": "omurga uzarken",
 "asleep": "uykuda",
@@ -5126,6 +5535,10 @@ var TR_EXACT = {
 "based on the ISS Reaction Self Test": "ISS Reaction Self Test temel alınarak",
 "because it can come from pressure behind the eyes": "çünkü göz arkası basıncından kaynaklanabilir",
 "below # underweight, # to # normal weight, # or more overweight, # or more obesity": "# altı zayıf, # ile # arası normal kilo, # ve üstü fazla kilolu, # ve üstü obezite",
+"bloating mild": "hafif şişkinlik",
+"bloating moderate": "orta şişkinlik",
+"bloating none": "şişkinlik yok",
+"bloating severe": "şiddetli şişkinlik",
 "blocked nose": "burun tıkanıklığı",
 "blood CO# is still normal and no headache": "kan CO# hâlâ normal ve baş ağrısı yok",
 "blood carbon dioxide (pco#)": "kan karbondioksiti (pco#)",
@@ -5162,6 +5575,8 @@ var TR_EXACT = {
 "cabin limit of # mmHg as a #-hour average": "#2-saatlik ortalama olarak #1 mmHg kabin sınırı",
 "calm": "sakin",
 "cannot be checked": "kontrol edilemiyor",
+"carbohydrate (high share of energy)": "karbonhidrat (enerjideki payı yüksek)",
+"carbohydrate (low share of energy)": "karbonhidrat (enerjideki payı düşük)",
 "career limit # mSv": "kariyer sınırı # mSv",
 "chance of a day this unusual by normal day-to-day variation": "olağan günlük değişkenlikle bu kadar olağandışı bir gün görülme olasılığı",
 "check for smoke": "duman olup olmadığını kontrol edin",
@@ -5204,6 +5619,7 @@ var TR_EXACT = {
 "early warning": "erken uyarı",
 "eat # g of fast carbohydrate now": "şimdi # g hızlı karbonhidrat yiyin",
 "empty": "boş",
+"energy (below your energy need)": "enerji (enerji ihtiyacınızın altında)",
 "energy need from age, body mass, height and sex, and fluid intake of # mL per kg of body mass per day, with at least # L for men and # L for women": "yaş, kilo, boy ve cinsiyetten enerji ihtiyacı; vücut kütlesinin kg'ı başına günde # mL sıvı alımı, erkeklerde en az # L, kadınlarda en az # L",
 "estimated maximum heart rate of # minus age, moderate exercise at #% to #% and vigorous exercise at #% to #% of it": "tahmini maksimum kalp hızı # eksi yaş; orta tempolu egzersiz bunun yüzde #–#, yoğun egzersiz yüzde #–# aralığında",
 "even a mild one": "hafif olsa bile",
@@ -5231,9 +5647,13 @@ var TR_EXACT = {
 "fast pulse": "hızlı nabız",
 "fast pulse as well": "nabız da hızlı",
 "fast pulse with high blood pressure": "yüksek tansiyonla hızlı nabız",
+"fat (high share of energy)": "yağ (enerjideki payı yüksek)",
+"fat (low share of energy)": "yağ (enerjideki payı düşük)",
 "fever # °C": "ateş # °C",
 "fever is a measured # °F (# °C) or higher": "ateş, ölçülen # °F (# °C) ve üstüdür",
 "fever or cough": "ateş ya da öksürük",
+"fewer than three bowel movements a week": "haftada üçten az dışkılama",
+"fiber (below the fiber target)": "lif (lif hedefinin altında)",
 "finger-prick samples": "parmak ucu örnekleri",
 "first days of the mission (day #)": "görevin ilk günleri (gün #)",
 "fluid intake": "sıvı alımı",
@@ -5259,6 +5679,7 @@ var TR_EXACT = {
 "glucose # mg/dL": "glukoz # mg/dL",
 "glucose and blood gas samples": "glukoz ve kan gazı örnekleri",
 "glucose is not low": "glukoz düşük değil",
+"gut microbiome changes in spaceflight were modest and faded after return": "uzay uçuşundaki bağırsak mikrobiyomu değişiklikleri sınırlıydı ve dönüşten sonra kayboldu",
 "h": "sa",
 "h below # h": "sa, # sa altında",
 "h means hours of actual sleep, not the time spent in the sleep station": "sa, uyku istasyonunda geçen süreyi değil gerçek uyku saatini ifade eder",
@@ -5339,6 +5760,7 @@ var TR_EXACT = {
 "modafinil logged in the last day": "son bir günde modafinil kaydı var",
 "modafinil or pseudoephedrine logged in the last # days": "son # günde modafinil ya da psödoefedrin kaydı var",
 "moderate": "orta",
+"moderate abdominal pain": "orta karın ağrısı",
 "moderate or severe headache": "orta ya da şiddetli baş ağrısı",
 "mood": "ruh hali",
 "mood and morale look fine": "ruh hali ve moral iyi görünüyor",
@@ -5354,6 +5776,7 @@ var TR_EXACT = {
 "next to it": "yanındaki",
 "next to the item and enter how many you add and the new expiry date": "kalemin yanındaki düğmeye basın, kaç tane eklediğinizi ve yeni son kullanma tarihini girin",
 "no allergy medicine logged": "alerji ilacı kaydı yok",
+"no bowel movement on the last # days": "son # gündür dışkılama yok",
 "no cough and no fever": "öksürük ve ateş yok",
 "no cough, fast breathing or fast pulse": "öksürük, hızlı solunum ya da hızlı nabız yok",
 "no data": "veri yok",
@@ -5404,6 +5827,8 @@ var TR_EXACT = {
 "performance risk is rising": "performans riski yükseliyor",
 "personal baseline": "kişisel temel değer",
 "postpone safety-critical tasks or ask a crewmate to double-check them": "güvenlik açısından kritik görevleri erteleyin ya da bir mürettebat arkadaşınıza kontrol ettirin",
+"protein (above the range)": "protein (aralığın üstünde)",
+"protein (below the protein target)": "protein (protein hedefinin altında)",
 "pulse #": "nabız #",
 "pulse and blood pressure are not both high": "nabız ve tansiyon birlikte yüksek değil",
 "pulse is not fast": "nabız hızlı değil",
@@ -5430,6 +5855,7 @@ var TR_EXACT = {
 "serious crew conflict": "ciddi mürettebat çatışması",
 "several readings together": "birden fazla ölçüm birlikte",
 "severe": "şiddetli",
+"severe abdominal pain": "şiddetli karın ağrısı",
 "severe cough": "şiddetli öksürük",
 "severe cough, breathlessness, blood oxygen #%": "şiddetli öksürük, nefes darlığı, kan oksijeni %#",
 "short sleep": "kısa uyku",
@@ -5500,6 +5926,7 @@ var TR_EXACT = {
 "today's dose is #× the expected level": "bugünkü doz beklenen düzeyin #× katı",
 "tomorrow about #": "yarın yaklaşık #",
 "try sleeping with your legs slightly bent": "bacaklarınız hafifçe bükülü uyumayı deneyin",
+"types # to # constipation, # to # healthy, # to # diarrhoea or urgency": "tip #–# kabızlık, #–# sağlıklı, #–# ishal ya da sıkışma",
 "up to #% of astronauts report back pain, mostly in the first # days": "astronotların yüzde # kadarı çoğunlukla ilk # günde bel ağrısı bildirir",
 "use wet cloths and a fan": "ıslak bez ve fan kullanın",
 "usually in the first days in space": "genellikle uzaydaki ilk günlerde",
