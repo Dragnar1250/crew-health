@@ -6,14 +6,19 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 
 ## What it does
 
-The page is split into tabs: Overview, Check-in, Body map, Trends, Radiation, Morale, Med kit and Sources. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
+The page is split into tabs: Overview, Check-in, Analysis, Body map, Trends, Radiation, Morale, Med kit and Sources. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
 
 
 - **Body map:** a clickable astronaut figure. Each region shows its status by color and symbol.
 - **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise, cabin carbon dioxide and daily radiation dose.
+- **More health data:** breathing rate, and six self-rated symptoms from 0 (none) to 3 (severe): cough, shortness of breath, headache, nausea, dizziness and blurred vision. The check-in also asks whether there was a spacewalk or surface excursion that day.
+- **Health analysis (Analysis tab):**
+  - *Combined check:* every reading is compared with the crew member's own mean and spread, and the sum of squared distances is tested with a chi-square distribution, so several small changes on the same day are noticed together.
+  - *Problems across several readings:* 14 rules (for example infection, low oxygen, CO2 build-up, dehydration, radiation sickness, decompression sickness) fire only when at least two readings point the same way, and each lists possible causes and what to do.
+  - *Why is a reading off?* For every reading that is out of range or unusual, the possible causes are checked against the other readings, excursions, the environment, the morale survey and the medicine log, and marked as supported, ruled out or not checkable.
+  - *Extreme situation checks:* 14 checks (solar particle event, cabin pressure loss, CO2 removal failure, fire or toxic air, infectious illness, heat injury, hypothermia, severe low blood sugar, cardiac emergency, decompression sickness, acute radiation sickness, raised pressure behind the eyes, severe sleep deprivation, psychological crisis). Each has a Test button that loads simulated readings, so the whole tool can be seen reacting. Simulated readings are never saved.
 - **Guidance:** every reading shows its reference range, what its unit means, step-by-step measurement instructions, and what to do when it is out of range.
 - **Escalation:** tells the astronaut when to inform the crew medical officer and when to contact the flight surgeon, including the signal delay to Earth.
-- **Onboard assistant:** a rule-based helper that runs fully offline. It learns each astronaut's personal baseline from earlier check-ins, flags readings that are unusual for that person, interprets readings together (for example fever with a fast pulse), tolerates typos, and can be taught crew notes. It answers questions about the logged readings and gives understands a body part together with a symptom ("my heart aches"), finds the closest topic when no phrase matches, and gives first-response steps for 54 likely health and technical problems, such as headache, nausea, fire, cabin pressure loss and power loss.
 - **Weekly morale survey:** opens in its own window with a progress bar. 12 questions on a 1 to 5 scale give four sub-scores (mood and stress, physical and cognitive, social and crew, isolation) and a General Psychological Risk Index from 12 to 60. Green is 12 to 25, Yellow 26 to 40, Red 41 to 60. Constant irritability, intense anxiety or serious crew conflict set the level to Red whatever the total. Two open questions are logged but not scored. Past results are listed in a history table, answers can be cleared before submitting, and the whole survey history can be reset after an on-page confirmation. The index was designed by the team and is not a validated clinical instrument.
 - **Medical kit:** a "What needs attention" list at the top explains in plain sentences what is expired, running low or expiring soon, with a button to fix it. Medicines and supplies are listed separately with what each one is for, a stock bar against its minimum and a readable expiry date. "Took 1" or "Used 1" logs a use, and "Restock" opens the form already filled in. The kit tracks stock, minimum, pack and expiry date, following NASA-STD-3001 [V2 7059] inventory tracking. Items that are expired, out of stock, below their minimum or expiring within 30 days are flagged on the tab, in the overview and by the assistant. Every use is logged, and a check-in can count the test supplies it uses (1 glucose strip, 2 lancets, 1 analyzer cartridge). The example kit uses medicine names from NASA's pharmaceuticals brief; amounts and dates are invented, and the tool gives no medicine doses.
 - **Environments:** ISS, Moon base, Mars base and Mars transit, each with its own gravity, signal delay and expected radiation dose.
@@ -44,8 +49,6 @@ Clinical reference ranges: [American Heart Association, blood pressure](https://
 
 ## Tools and other resources
 
-- [WebLLM](https://github.com/mlc-ai/web-llm) 0.2.84 by MLC AI (Apache-2.0 license): runs the optional language model in the browser.
-- Llama 3.2 1B Instruct by Meta (Llama 3.2 Community License): the optional language model, downloaded only when the user asks for it. If it is not available, WebLLM's Qwen2.5 or SmolLM2 models are used instead.
 - [IBM Plex Sans and IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Sans) fonts (SIL Open Font License), loaded from Google Fonts.
 - Claude by Anthropic: AI assistance for writing the code.
 
@@ -57,10 +60,6 @@ The "Act now" thresholds and the dose warning steps are the team's own proposal;
 - Reports to the crew and to the ground are simulated. Nothing is transmitted.
 - The page opens with clearly labeled example data.
 - This is not a medical device.
-
-## Optional on-device AI model
-
-The assistant works without any AI model. On request ("Load AI model" in the assistant window) the page loads the open-source [WebLLM](https://github.com/mlc-ai/web-llm) library and an open language model (for example Llama 3.2 1B Instruct), downloads it once and runs it in the browser through WebGPU. No server or API key is used. The model receives the astronaut's logged readings, reference ranges, the assistant's insights and the matching procedure notes, and its answers are labeled in the chat. If the model is missing or fails, the rule-based answer is shown instead. It needs a recent Chrome or Edge on a computer with WebGPU.
 
 ## Use of AI
 

@@ -53,8 +53,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,.region:focus-visi
 .envfacts{display:flex;flex-wrap:wrap;gap:6px 24px;font-size:13px}
 .st0{--s:var(--ok);--s-soft:var(--ok-soft)} .st1{--s:var(--warn);--s-soft:var(--warn-soft)} .st2{--s:var(--crit);--s-soft:var(--crit-soft)}
 .banner{border:1px solid var(--s);background:var(--s-soft);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
-.banner .msg{flex:1 1 320px;min-width:0}
-.banner strong{color:var(--s);font-size:16px}
+.banner .banner strong{color:var(--s);font-size:16px}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
 .btn{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
 .btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
@@ -93,34 +92,17 @@ form .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr
 ul{margin:0;padding-left:18px}
 a{color:var(--accent)}
 footer{font-size:12px;color:var(--muted)}
-.chat{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding:2px}
 .msg{padding:8px 12px;border-radius:10px;max-width:88%;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
-.msg.me{align-self:flex-end;background:var(--accent);color:var(--surface)}
-.msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
-.quick{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
 .ask{display:flex;flex-wrap:wrap;gap:8px}
 .ask input{flex:1 1 220px;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 .assist{border-color:var(--accent)}
 .insights{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:8px}
 .insights li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-size:14px}
 .insights i{font-style:normal;font-weight:600;color:var(--s)}
-.fab{position:fixed;z-index:20;right:calc(16px + env(safe-area-inset-right, 0px));bottom:calc(16px + env(safe-area-inset-bottom, 0px));
-  font:inherit;font-weight:600;font-size:14px;color:var(--surface);background:var(--accent);border:0;border-radius:999px;padding:12px 18px;cursor:pointer;
-  box-shadow:0 6px 20px rgba(0,0,0,.28)}
-.drawer{position:fixed;z-index:21;right:calc(16px + env(safe-area-inset-right, 0px));bottom:calc(16px + env(safe-area-inset-bottom, 0px));
-  width:min(420px, calc(100% - 32px));max-height:min(660px, calc(100% - 32px));display:flex;flex-direction:column;gap:10px;
-  background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
-.drawer .chat{flex:1 1 auto;min-height:110px;max-height:none}
-.drawer .quick{margin:0;max-height:66px;overflow-y:auto;flex:0 0 auto}
-.teach summary{cursor:pointer;font-size:13px;color:var(--muted)}
-.teach form{margin-top:8px}
 .info{grid-column:1/-1;font-size:13px}
 .info summary{cursor:pointer;color:var(--accent);font-weight:500}
 .info p{margin-top:6px}
 .info ol{margin:6px 0 0;padding-left:20px}
-.airow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;border:1px dashed var(--line);border-radius:10px;padding:8px 10px}
-.airow span{flex:1 1 200px;min-width:0}
-.msg.ai::before{content:"AI model answer. Check it against your procedures.";display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
 .sq{border:0;border-top:1px solid var(--line);padding:12px 0;margin:0;min-width:0}
 .sq legend{float:left;width:100%;padding:0;margin-bottom:8px;font-weight:500}
 .scale{clear:both;display:flex;gap:8px}
@@ -252,6 +234,46 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   .attn li{grid-template-columns:auto minmax(0,1fr)}
   .attn .actions{grid-column:2}
 }
+.simbar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;border:2px dashed var(--accent);border-radius:12px;padding:10px 14px;background:var(--surface);font-size:14px}
+.fgroup{grid-column:1/-1;margin:6px 0 -4px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.fwide{grid-column:1/-1;margin-top:4px}
+.anstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-bottom:14px}
+.anstats>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);display:flex;flex-direction:column;gap:2px}
+.anstats b{font-size:24px;font-weight:500}
+.zlist{list-style:none;margin:0 0 12px;padding:0}
+.zlist li{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) minmax(80px,1.2fr) auto;gap:6px 14px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.zbar{display:block;height:8px;border-radius:999px;background:var(--line);overflow:hidden}
+.zbar span{display:block;height:100%;border-radius:999px;background:var(--warn)}
+.zbar.down span{background:var(--accent)}
+.fcard{border:1px solid var(--s);border-left-width:4px;border-radius:10px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
+.fcard h3{color:var(--s);font-size:15px}
+.fcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:8px 24px}
+.fcols h4{margin:0 0 4px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fcols ul,.fcols ol{margin:0;padding-left:18px;font-size:14px;display:flex;flex-direction:column;gap:3px}
+.wcard{border-top:1px solid var(--line);padding:12px 0}
+.wcard h3{font-size:15px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:4px}
+.causes{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
+.causes li{display:grid;grid-template-columns:22px minmax(0,1fr);gap:6px;font-size:14px}
+.causes i{font-style:normal;font-weight:700;text-align:center}
+.causes li.cn{color:var(--muted)}
+.causes li.cn>span{text-decoration:line-through;text-decoration-color:var(--line)}
+.cy,.causes li.cy i{color:var(--ok)}
+.cq,.causes li.cq i{color:var(--accent)}
+.cn,.causes li.cn i{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin-bottom:4px}
+.scenlist{list-style:none;margin:0;padding:0}
+.scen{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px 12px;align-items:start;padding:10px 0 10px 10px;border-top:1px solid var(--line)}
+.scen.st1{box-shadow:inset 3px 0 0 var(--warn)}
+.scen.st2{box-shadow:inset 3px 0 0 var(--crit)}
+.smain{display:flex;flex-direction:column;gap:2px;min-width:0}
+.smain ol{margin:4px 0 0;padding-left:18px}
+.scen .btn{padding:5px 12px;font-size:12px}
+@media (max-width:640px){
+  .zlist li{grid-template-columns:minmax(0,1fr) auto}
+  .zlist li .zbar{grid-column:1/-1}
+  .scen{grid-template-columns:minmax(0,1fr) auto}
+  .scen .smain{grid-column:1/-1}
+}
 </style>
 
 </head>
@@ -271,6 +293,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 
   <div class="panel envfacts" id="envFacts"></div>
 
+  <div class="simbar" id="simBar" role="status" hidden></div>
   <section id="banner" class="banner st0" aria-live="polite"></section>
   <p id="notice" class="small muted" aria-live="polite" hidden></p>
 
@@ -278,6 +301,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <div class="tabs" role="tablist" id="tabs">
       <button type="button" role="tab" id="t-overview" data-tab="overview" aria-controls="tab-overview" aria-selected="true" tabindex="0">Overview<span class="tdot" id="d-overview" hidden></span></button>
       <button type="button" role="tab" id="t-checkin" data-tab="checkin" aria-controls="tab-checkin" aria-selected="false" tabindex="-1">Check-in<span class="tdot" id="d-checkin" hidden></span></button>
+      <button type="button" role="tab" id="t-analysis" data-tab="analysis" aria-controls="tab-analysis" aria-selected="false" tabindex="-1">Analysis<span class="tdot" id="d-analysis" hidden></span></button>
       <button type="button" role="tab" id="t-body" data-tab="body" aria-controls="tab-body" aria-selected="false" tabindex="-1">Body map<span class="tdot" id="d-body" hidden></span></button>
       <button type="button" role="tab" id="t-trends" data-tab="trends" aria-controls="tab-trends" aria-selected="false" tabindex="-1">Trends<span class="tdot" id="d-trends" hidden></span></button>
       <button type="button" role="tab" id="t-radiation" data-tab="radiation" aria-controls="tab-radiation" aria-selected="false" tabindex="-1">Radiation<span class="tdot" id="d-radiation" hidden></span></button>
@@ -313,10 +337,10 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   <section class="panel assist">
     <div class="head">
       <div>
-        <p class="label">Onboard assistant · learns your baseline · works offline</p>
-        <h2>The assistant's reading of today</h2>
+        <p class="label">Health analysis · several readings together · personal baseline</p>
+        <h2>Today's analysis</h2>
       </div>
-      <button class="btn primary" type="button" data-open-chat>Ask the assistant</button>
+      <button class="btn primary" type="button" data-goto="analysis">Open the full analysis</button>
     </div>
     <ul class="insights" id="insights"></ul>
     <p class="small muted" id="learned"></p>
@@ -344,6 +368,52 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
         <span class="small" id="formMsg" aria-live="polite"></span>
       </div>
     </form>
+  </section>
+  </section>
+
+  <section class="tabpanel" id="tab-analysis" role="tabpanel" aria-labelledby="t-analysis" hidden>
+  <section class="panel">
+    <div class="head">
+      <div>
+        <p class="label">Multivariate check · all readings at once</p>
+        <h2>How far today is from your usual pattern</h2>
+      </div>
+      <span id="anLevel"></span>
+    </div>
+    <div id="anCombined"></div>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <div>
+        <h2>Problems found across several readings</h2>
+        <p class="small muted">A problem is shown only when at least two readings point the same way.</p>
+      </div>
+      <span class="small muted" id="anFindCount"></span>
+    </div>
+    <div id="anFindings"></div>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <div>
+        <h2>Why is a reading off?</h2>
+        <p class="small muted">For each reading outside its range or unusual for you, the possible causes are checked against your other readings, your excursions and the medicines in the use log.</p>
+      </div>
+    </div>
+    <p class="small legend"><span class="cy">✓ supported by your data</span><span class="cq">? cannot be checked from the data</span><span class="cn">✗ ruled out by your data</span></p>
+    <div id="anWhy"></div>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <div>
+        <h2>Extreme situation checks</h2>
+        <p class="small muted">Each check looks for the combination of readings that a serious event would cause. Press Test to load simulated readings and see how the whole tool reacts.</p>
+      </div>
+      <span class="small muted" id="anScenCount"></span>
+    </div>
+    <ul class="scenlist" id="anScen"></ul>
   </section>
   </section>
 
@@ -417,7 +487,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <span class="small" id="surveyDone" aria-live="polite"></span>
     </div>
     <div class="confirm" id="surveyConfirm" hidden>
-      <p><strong>Delete all <span id="surveyCount"></span> from this device?</strong> Your goals and the assistant will no longer see them. This cannot be undone.</p>
+      <p><strong>Delete all <span id="surveyCount"></span> from this device?</strong> Your goals and the analysis will no longer use them. This cannot be undone.</p>
       <div class="actions">
         <button class="btn danger" type="button" id="surveyResetYes">Delete results</button>
         <button class="btn" type="button" id="surveyResetNo">Cancel</button>
@@ -547,6 +617,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <li><a href="https://magazine.medlineplus.gov/pdf/Pulse_oximeters.PDF_.final_.011123.pdf">MedlinePlus Magazine, Pulse oximeters</a>: 95% to 100% for most healthy people, accuracy limits of finger sensors.</li>
       <li><a href="https://medlineplus.gov/ency/article/003855.htm">MedlinePlus, Blood gases</a>: PaCO2 38 to 42 mmHg at sea level; ranges vary between labs.</li>
       <li><a href="https://ada.silverchair.com/view-large/3051584">American Diabetes Association, Classification of Hypoglycemia (Diabetes Care, 2017)</a>: level 1 below 70 mg/dL, level 2 below 54 mg/dL.</li>
+      <li><a href="https://medlineplus.gov/ency/article/002341.htm">MedlinePlus, Vital signs</a>: a breathing rate of 12 to 18 breaths per minute for a healthy adult at rest.</li>
       <li><a href="https://www.cdc.gov/port-health/php/definitions-symptoms-reportable-illness/index.html">CDC, Definitions of Signs, Symptoms, and Conditions of Ill Travelers</a>: fever is a measured 100.4 °F (38 °C) or higher.</li>
     </ul>
     <h3>Team decisions and limits</h3>
@@ -556,8 +627,9 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <li>Cumulative dose warning steps at 300 mSv (half of the career limit) and 480 mSv (80%) were chosen by the team. The 600 mSv career limit is NASA's.</li>
       <li>The weekly morale survey and its General Psychological Risk Index were designed by the team. It is not a validated clinical instrument, and its thresholds are a first proposal.</li>
       <li>The medical kit is an example. Amounts, strengths and dates are invented for the demo, and the tool does not give medicine doses.</li>
-      <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
-      <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
+      <li>The analysis rules (which readings together point to a problem, the possible causes and the steps) and the extreme situation checks are the team's own first-response summaries. They do not replace official flight rules and medical checklists.</li>
+      <li>The combined check compares each reading with the crew member's own mean and spread and tests the sum of squared distances with a chi-square distribution. It treats the readings as independent, so it is a screening signal. A flight version would use the full correlation between readings.</li>
+      <li>Symptoms are self-rated from 0 (none) to 3 (severe). This scale was chosen by the team.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
@@ -600,54 +672,6 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 </div>
 
 <p class="toast" id="kitToast" role="status" aria-live="polite" hidden></p>
-<button class="fab" id="fab" type="button" aria-expanded="false" aria-controls="drawer">Ask the assistant</button>
-<aside class="drawer" id="drawer" aria-label="Onboard assistant" hidden>
-  <div class="head" style="margin:0">
-    <div>
-      <h2>Onboard assistant</h2>
-      <p class="small muted">Rule-based and offline. First-response summaries only. Official mission procedures come first.</p>
-    </div>
-    <button class="btn" type="button" id="closeChat" aria-label="Close assistant">Close</button>
-  </div>
-  <div class="airow">
-    <span class="small" id="aiStatus">AI model: not loaded. Answers come from the offline rule engine.</span>
-    <button class="btn" type="button" id="aiLoad" title="Downloads an open language model once (about 0.5 to 1 GB), then runs it on this device. Needs Chrome or Edge on a computer with WebGPU.">Load AI model</button>
-  </div>
-  <div class="chat" id="chat" aria-live="polite"></div>
-  <div class="quick">
-    <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
-    <button type="button" class="chip" data-q="Interpret my day">Interpret my day</button>
-    <button type="button" class="chip" data-q="How are my goals?">How are my goals?</button>
-    <button type="button" class="chip" data-q="How is my morale?">How is my morale?</button>
-    <button type="button" class="chip" data-q="Any expired or low medicines?">Any expired or low medicines?</button>
-    <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
-    <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
-    <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
-    <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
-    <button type="button" class="chip" data-q="What does mSv mean?">What does mSv mean?</button>
-    <button type="button" class="chip" data-q="I have a headache">I have a headache</button>
-    <button type="button" class="chip" data-q="There is smoke in the module">There is smoke in the module</button>
-    <button type="button" class="chip" data-q="We lost power">We lost power</button>
-    <button type="button" class="chip" data-q="What problems do you cover?">What problems do you cover?</button>
-  </div>
-  <form class="ask" id="askForm">
-    <label for="askInput" hidden>Ask a question</label>
-    <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading or a problem">
-    <button class="btn primary" type="submit">Ask</button>
-  </form>
-  <details class="teach">
-    <summary>Teach the assistant a crew note</summary>
-    <form class="ask" id="teachForm">
-      <label for="teachKey" hidden>Keyword</label>
-      <input id="teachKey" type="text" autocomplete="off" placeholder="Keyword, for example: medical kit">
-      <label for="teachAns" hidden>Answer</label>
-      <input id="teachAns" type="text" autocomplete="off" placeholder="Answer, for example: locker 4 in the lab module">
-      <button class="btn" type="submit">Save note</button>
-      <button class="btn" type="button" id="forgetNotes">Forget all notes</button>
-    </form>
-    <p class="small muted" id="teachMsg" aria-live="polite"></p>
-  </details>
-</aside>
 
 <script>
 /* SI/AI disclosure: this script was generated with AI assistance (Claude, Anthropic). */
@@ -690,6 +714,10 @@ var IND = {
          how:'Weekly eye ultrasound, guided by the onboard procedure. It is an indirect sign of fluid pressure around the brain. Compare it with your preflight value.',
          lo:'',
          hi:'Wider than the reference. Fluid pressure around the brain may be raised. Run the vision test, note any headache or blurred vision and repeat the scan.'},
+  rr:   {label:'Breathing rate', unit:'breaths/min', ok:[12,18], cau:[9,24], min:4, max:60, step:1,
+         how:'Count your breaths for 60 seconds at rest.',
+         lo:'Slow breathing. Check whether you are very sleepy or took a sleep medicine, and measure your blood oxygen.',
+         hi:'Fast breathing. Measure your blood oxygen and temperature, and check the cabin CO2 level.'},
   glu:  {label:'Blood glucose', unit:'mg/dL', ok:[70,140], cau:[54,199], min:20, max:500, step:1,
          how:'Use the finger-stick meter before a meal.',
          lo:'Low sugar. Eat 15 g of fast carbohydrate and recheck in 15 minutes.',
@@ -713,25 +741,43 @@ var IND = {
   rad:  {label:'Radiation dose today', unit:'mSv', min:0, max:1000, step:0.01,
          how:'Read the daily value from your personal dosimeter.',
          lo:'',
-         hi:'Dose above the expected level for this environment. Move to the most shielded area and check for a solar particle event.'}
+         hi:'Dose above the expected level for this environment. Move to the most shielded area and check for a solar particle event.'},
+  cough:{label:'Cough', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Cough of moderate strength or worse. Check your temperature and blood oxygen, wear a mask and clean shared surfaces.'},
+  breath:{label:'Shortness of breath', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Breathlessness. Stop and rest, measure your blood oxygen and check the cabin air readings.'},
+  head:{label:'Headache', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Headache. Check the cabin CO2 level, drink water and rest. Report it if it comes with blurred vision.'},
+  nausea:{label:'Nausea', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Nausea. Keep head movements slow, sip fluids, and take anti-nausea medicine only as the procedure directs.'},
+  dizzy:{label:'Dizziness', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Dizziness. Hold on to something stable, check your blood pressure and blood sugar, and drink fluids.'},
+  vision:{label:'Blurred vision', unit:'/ 3', scale:true, ok:[0,1], cau:[0,2], min:0, max:3, step:1,
+         how:'Rate it for the last 24 hours from 0 (none) to 3 (severe).', lo:'',
+         hi:'Vision change. Run the vision test and report it, because it can be a sign of pressure behind the eyes.'}
 };
 var REGIONS = {
-  brain:{title:'Brain and behavior', ids:['sleep','mood'], hazard:'Isolation and confinement',
+  brain:{title:'Brain and behavior', ids:['sleep','mood','head','dizzy'], hazard:'Isolation and confinement',
          why:'Isolation, workload and a disturbed day-night cycle reduce sleep and mood, which lowers attention and decision quality.'},
   heart:{title:'Heart and circulation', ids:['sys','dia','hr'], hazard:'Gravity fields',
          why:'Without normal gravity, body fluid shifts toward the head and the heart works differently. Blood pressure can drop sharply when gravity returns.'},
-  eyes: {title:'Eyes and brain fluid pressure', ids:['onsd'], hazard:'Gravity fields',
+  eyes: {title:'Eyes and brain fluid pressure', ids:['onsd','vision'], hazard:'Gravity fields',
          why:'In low gravity, blood and cerebrospinal fluid shift toward the head. This can raise pressure behind the eyes and change vision (spaceflight-associated neuro-ocular syndrome). Cerebrospinal fluid pressure cannot be measured directly in flight, so the optic nerve sheath is scanned by ultrasound instead.'},
-  lungs:{title:'Lungs and blood gases', ids:['spo2','pco2','cabin'], hazard:'Hostile closed environment',
+  lungs:{title:'Lungs and breathing', ids:['rr','spo2','pco2','cabin','cough','breath'], hazard:'Hostile closed environment',
          why:'Cabin air is recycled, and without convection exhaled carbon dioxide can collect around the head. Raised carbon dioxide causes headache and poor concentration.'},
-  core: {title:'Metabolism and core temperature', ids:['glu','temp'], hazard:'Hostile closed environment',
+  core: {title:'Metabolism, digestion and core temperature', ids:['glu','temp','nausea'], hazard:'Hostile closed environment',
          why:'A closed habitat changes immunity, appetite and nutrition. Fever can be the first sign of infection far from any hospital.'},
   limbs:{title:'Bones and muscles', ids:['ex'], hazard:'Gravity fields',
          why:'Weight-bearing bones lose about 1% to 1.5% of their mineral density per month in space, and muscles weaken too. Daily exercise is the main countermeasure.'},
   rad:  {title:'Whole-body radiation', ids:['rad'], hazard:'Space radiation',
          why:'Outside Earth\'s magnetic field the dose is higher. Radiation is not flushed out of the body. The damage adds up, so the total dose is tracked.'}
 };
-var ORDER = ['sys','dia','hr','spo2','pco2','cabin','glu','temp','sleep','mood','onsd','ex','rad'];
+var ORDER = ['sys','dia','hr','rr','spo2','pco2','cabin','glu','temp','sleep','mood','onsd','ex','rad','cough','breath','head','nausea','dizzy','vision'];
 var SYMBOL = ['●','▲','■'], WORD = ['In range','Watch','Act now'];
 
 function ranges(id, env){
@@ -761,7 +807,8 @@ function sample(env){
       sys:Math.round(108+r()*10), dia:Math.round(68+r()*10), hr:Math.round(58+r()*14),
       glu:Math.round(84+r()*30), temp:+(36.5+r()*0.6).toFixed(1), sleep:+(7+r()*1.3).toFixed(1),
       mood:3+Math.floor(r()*3), ex:Math.round(95+r()*50), rad:+(d*(0.8+r()*0.5)).toFixed(2),
-      spo2:97+Math.floor(r()*3), pco2:Math.round(38+r()*5), onsd:+(5.6+r()*0.6).toFixed(1), cabin:+(1.8+r()*1.0).toFixed(1)});
+      spo2:97+Math.floor(r()*3), pco2:Math.round(38+r()*5), onsd:+(5.6+r()*0.6).toFixed(1), cabin:+(1.8+r()*1.0).toFixed(1),
+      rr:13+(i*7)%5, cough:0, breath:0, head:0, nausea:0, dizzy:0, vision:0, eva:0});
   }
   var last=days[13]; last.sleep=5.6; last.hr=104;
   return days;
@@ -771,342 +818,6 @@ function regionStatus(key, day, env){
 }
 function streak(days, test){
   var n=0; for(var i=days.length-1;i>=0;i--){ if(test(days[i])) n++; else break; } return n;
-}
-/* Onboard assistant: keyword rules over the logged readings. No network, no language model. */
-var TERMS = {
-  sys:['blood pressure','bp','systolic'], dia:['blood pressure','bp','diastolic'],
-  hr:['heart rate','pulse','heartbeat','bpm'], spo2:['oxygen','spo2','o2','saturation'],
-  pco2:['carbon dioxide','co2','pco2'], cabin:['cabin co2','cabin carbon dioxide','cabin air','air quality'], glu:['glucose','sugar'],
-  temp:['temperature','fever','temp'], sleep:['sleep','slept','asleep'],
-  mood:['mood','sad','stress','stressed','lonely','anxious'],
-  onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid'],
-  ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar','cumulative','career limit']
-};
-function findIds(q){
-  return ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
-}
-function regionOf(id){ return Object.keys(REGIONS).filter(function(k){ return REGIONS[k].ids.indexOf(id)>=0; })[0]; }
-function trendText(id, days){
-  var w=days.slice(-7); if(w.length<2) return 'There are not enough check-ins for a trend yet.';
-  var a=w[0][id], b=w[w.length-1][id], rel=Math.abs(b-a)/(Math.abs(a)||1);
-  var dir=rel<0.03?'held steady':(b>a?'risen':'fallen');
-  return 'Over the last '+w.length+' check-ins it has '+dir+' (from '+a+' to '+b+' '+IND[id].unit+').';
-}
-/* Problem knowledge base: first-response summaries for likely health and technical problems.
-   k = search terms, t = title, s = severity (0 info, 1 caution, 2 emergency), c = related readings, a = steps. */
-/* "my heart aches", "pain in my chest": a body part near a symptom word, in either order. */
-var SYM='ache|aches|aching|ached|hurt|hurts|hurting|pain|pains|painful|sore|pressure|tight|tightness|burning|burns|cramp|cramps|throbbing|stinging|numb|numbness|tingling|stiff';
-function bs(parts){
-  return new RegExp('\\b('+parts+')s?\\b.{0,40}\\b('+SYM+')\\b|\\b('+SYM+')\\b.{0,40}\\b('+parts+')s?\\b');
-}
-var KB = [
-  {k:['throwing up','threw up','sick to my stomach','nausea','nauseous','vomit','vomiting','motion sickness','space sickness'], t:'Space motion sickness', s:1, c:['rad'], a:[
-    'This is common in the first 2 to 3 days in a new gravity level.',
-    'Keep head movements slow and keep a sickness bag within reach.',
-    'Sip fluids and take the anti-nausea medication from the medical kit as the procedure allows.',
-    'If nausea starts together with a high radiation dose, treat it as possible radiation sickness and report it.']},
-  {k:['headache','head hurts','migraine'], r:bs('head'), t:'Headache', s:1, c:['cabin','pco2','onsd','sleep'], a:[
-    'Check the cabin CO2 level and move to a well-ventilated place.',
-    'Drink water and rest.',
-    'Take a pain reliever from the medical kit as the procedure allows.',
-    'Report a headache that comes with blurred vision or lasts more than a day.']},
-  {k:['back pain','backache','back hurts'], r:bs('back'), t:'Back pain', s:0, c:['ex'], a:[
-    'The spine lengthens in low gravity, so back pain is common early in a mission.',
-    'Curl into a knees-to-chest position for a few minutes.',
-    'Keep up resistance exercise.',
-    'Report pain that spreads into a leg or comes with numbness.']},
-  {k:['congestion','congested','blocked nose','puffy','stuffy nose'], t:'Head congestion', s:0, c:[], a:[
-    'Fluid shifts toward the head in low gravity and causes a puffy face and a blocked nose.',
-    'It usually eases in the first weeks.',
-    'Drink enough water and use the decongestant from the medical kit as the procedure allows.']},
-  {k:['kidney','kidney stone','flank pain','pain when urinating'], r:bs('kidney|flank'), t:'Possible kidney stone', s:2, c:['temp'], a:[
-    'Bone loss raises calcium in urine, which raises the risk of stones.',
-    'Drink plenty of water.',
-    'Take pain relief from the medical kit as the procedure allows.',
-    'Contact the flight surgeon, especially with fever or blood in urine.']},
-  {k:['dehydrated','dehydration','thirsty','dark urine'], t:'Dehydration', s:1, c:['hr','sys'], a:[
-    'Thirst is weaker in low gravity, so drink on a schedule.',
-    'Drink water with electrolytes now.',
-    'Recheck heart rate and blood pressure in 1 hour.']},
-  {k:['common cold','caught a cold','infection','sore throat','cough','sick','flu','runny nose'], r:bs('throat'), t:'Possible infection', s:1, c:['temp','spo2'], a:[
-    'Immunity is weaker in spaceflight, and a closed cabin spreads germs fast.',
-    'Wear a mask, clean shared surfaces and keep distance from crewmates.',
-    'Rest and drink fluids.',
-    'Report a fever or breathing difficulty.']},
-  {k:['cut','wound','bleeding'], t:'Cut or bleeding wound', s:1, c:[], a:[
-    'Press a clean dressing on the wound until bleeding stops. The dressing also keeps blood from floating away.',
-    'Clean with antiseptic and cover.',
-    'Wounds can heal more slowly in space, so check daily for redness or swelling.',
-    'Contact the flight surgeon for a deep wound or bleeding that does not stop.']},
-  {k:['burn','burned','burnt','scald'], t:'Burn', s:1, c:[], a:[
-    'Cool the burn with a wet cloth for 10 to 20 minutes.',
-    'Cover it with a sterile non-stick dressing.',
-    'Do not break blisters.',
-    'Contact the flight surgeon for a burn larger than your palm, or on the face or hands.']},
-  {k:['rash','itch','itchy','skin'], r:bs('skin'), t:'Skin rash or irritation', s:0, c:['temp'], a:[
-    'Skin gets dry and irritated easily in the cabin.',
-    'Keep the area clean and dry and use the skin cream from the medical kit.',
-    'Report a rash that spreads or comes with fever.']},
-  {k:['eye irritation','something in my eye','foreign body','red eye'], r:bs('eye'), t:'Eye irritation', s:1, c:['onsd'], a:[
-    'Dust and particles float in low gravity and reach the eyes easily.',
-    'Do not rub. Rinse with the eye wash from the medical kit.',
-    'Report pain, lasting redness or a change in vision.']},
-  {k:['tooth','toothache','dental','teeth'], r:bs('tooth|teeth|gum|jaw'), t:'Toothache', s:1, c:[], a:[
-    'Rinse and clean around the tooth.',
-    'Take pain relief from the medical kit as the procedure allows.',
-    'Report it to the flight surgeon. A temporary filling may be placed under ground guidance.']},
-  {k:['vertigo','spinning','dizzy','dizziness','faint','fainting','lightheaded'], t:'Dizziness or fainting', s:1, c:['sys','dia','hr','glu'], a:[
-    'Sit down or hold on to something stable at once.',
-    'Drink fluids, and eat something if you have not eaten.',
-    'After moving to a new gravity level, stand up slowly.',
-    'Report fainting or dizziness that does not pass.']},
-  {k:['palpitations','heart racing','heart is racing','heart pounding','chest pain','heart attack','cardiac','not breathing','unconscious','collapsed','unresponsive'], r:bs('heart|chest'), t:'Chest pain or collapse', s:2, c:['hr','spo2','sys'], a:[
-    'Call the whole crew now.',
-    'If the person is unresponsive and not breathing, start CPR using the onboard restraint method and bring the defibrillator.',
-    'If the person is awake with chest pain, stop all activity, give oxygen and follow the cardiac procedure in the medical kit.',
-    'Contact the flight surgeon immediately.']},
-  {k:['joint pain','bends','decompression sickness'], t:'Possible decompression sickness', s:2, c:['spo2'], a:[
-    'Joint pain, tingling or breathing trouble after a spacewalk can be decompression sickness.',
-    'Stop activity and breathe pure oxygen.',
-    'Contact the flight surgeon immediately.']},
-  {k:['radiation sickness','solar storm','solar flare','solar particle','storm','flare'], t:'Solar particle event', s:2, c:['rad'], a:[
-    'Move to the most shielded area and stay there until the event ends.',
-    'Keep your dosimeter on and log the dose. NASA limits the dose from a single event to 250 mSv.',
-    'Nausea, vomiting and tiredness in the hours after exposure can be radiation sickness. Report them.',
-    'Postpone any spacewalk or surface excursion.']},
-  {k:['panic','conflict','argument','fight','homesick','angry','bored','boredom','go home','miss my family','missing my family'], t:'Stress, loneliness and crew conflict', s:1, c:['mood','sleep'], a:[
-    'Pause and take slow breaths for a few minutes.',
-    'Talk to a crewmate you trust, or ask for a private conference with the ground.',
-    'Protect your sleep and free time this week.',
-    'Bring repeated conflicts to the commander early.']},
-  {k:['cramp','sprain','strain','injury','injured','pulled muscle','twisted'], r:bs('leg|arm|knee|ankle|shoulder|wrist|elbow|foot|feet|hip|hand|finger|neck|muscle|joint'), t:'Muscle or joint injury', s:1, c:['ex'], a:[
-    'Stop the exercise.',
-    'Cool the area, wrap it and rest it.',
-    'Restart exercise gently when pain allows. Stopping completely speeds up muscle loss.',
-    'Report severe pain, deformity or a joint you cannot move.']},
-  {k:['swelling','swollen','clot'], t:'Swelling in the neck or a limb', s:2, c:[], a:[
-    'Blood flow in the neck veins changes in low gravity, and clots have been found in astronauts.',
-    'Do not massage the area.',
-    'Contact the flight surgeon and prepare the ultrasound for a guided scan.']},
-  {k:['hearing','noise','ringing','ears'], t:'Noise and hearing', s:0, c:[], a:[
-    'Fans and pumps run all the time, so the cabin is noisy.',
-    'Wear hearing protection in loud modules and when sleeping.',
-    'Report ringing or a drop in hearing.']},
-  {k:['fire','smoke','burning smell','flames'], t:'Fire or smoke', s:2, c:['spo2'], a:[
-    'Warn the crew and sound the alarm.',
-    'Put on a breathing mask.',
-    'Cut power to the affected equipment and stop ventilation in that module so the fire is not fed.',
-    'Use the extinguisher. If the fire is not out, leave and close the hatch.',
-    'Check everyone for smoke inhalation afterwards.']},
-  {k:['depressurization','depressurisation','pressure drop','air leak','cabin leak','hull','hissing','losing air'], t:'Cabin pressure loss', s:2, c:['spo2'], a:[
-    'Warn the crew and gather at the escape vehicle or safe module.',
-    'Check how fast pressure is falling to know how much time you have.',
-    'Find the leaking module by closing hatches one by one, then isolate it.',
-    'Watch for signs of low oxygen: confusion, blue lips, fast breathing.']},
-  {k:['ammonia','toxic','chemical','fumes','smell'], t:'Toxic atmosphere', s:2, c:['spo2'], a:[
-    'Put on a breathing mask at once and warn the crew.',
-    'Move away from the source and close the hatch behind you.',
-    'Follow the toxic atmosphere procedure and wait until the air is cleared.',
-    'Rinse exposed skin and eyes and report any breathing trouble.']},
-  {k:['scrubber','co2 removal','carbon dioxide removal','stale air'], t:'CO2 removal failure', s:2, c:['cabin','pco2','spo2'], a:[
-    'Raised CO2 causes headache, sleepiness and poor concentration before it becomes dangerous. The cabin limit is 3 mmHg averaged over 1 hour.',
-    'Switch to the backup CO2 removal unit or canisters.',
-    'Increase airflow and avoid crowding in one module.',
-    'Reduce heavy exercise until the level is back to normal.']},
-  {k:['oxygen generator','oxygen supply','oxygen system'], t:'Oxygen system failure', s:2, c:['spo2'], a:[
-    'Switch to the backup oxygen supply.',
-    'Check the cabin oxygen level and everyone\'s blood oxygen.',
-    'Reduce heavy exercise to lower oxygen use.',
-    'Start the repair with ground guidance.']},
-  {k:['power','blackout','electricity','lights out'], t:'Power loss', s:2, c:[], a:[
-    'Switch off non-essential equipment to protect life support.',
-    'Confirm that air circulation and CO2 removal are still running.',
-    'Use handheld lights and charge battery devices in turns.',
-    'Take critical measurements with battery instruments and log them on paper if needed.']},
-  {k:['communication','communications','comms','signal','radio','lost contact','no contact'], t:'Loss of communication with Earth', s:1, c:[], a:[
-    'Switch to the backup communication channel.',
-    'Continue with the onboard procedures. This tool keeps working without a link.',
-    'Save your reports so they can be sent when the link returns.',
-    'In a medical emergency, the crew medical officer leads treatment from the onboard procedures.']},
-  {k:['water'], t:'Water system problem', s:1, c:['hr'], a:[
-    'Switch to stored water and ration it by the procedure.',
-    'Drinking water comes first, hygiene second.',
-    'Watch for dehydration: dark urine, fast pulse, dizziness.',
-    'Start the repair with ground guidance.']},
-  {k:['toilet','waste system'], t:'Toilet failure', s:0, c:[], a:[
-    'Switch to the backup collection bags.',
-    'Keep strict hand and surface hygiene to prevent infection.',
-    'Do not drink less to avoid using it. That raises the risk of kidney stones.',
-    'Start the repair with ground guidance.']},
-  {k:['too hot','too cold','overheating','cooling','heating','thermal','freezing'], t:'Cabin temperature problem', s:1, c:['temp'], a:[
-    'Too hot: reduce exercise and equipment heat, drink more and cool down with wet cloths.',
-    'Too cold: add clothing layers, gather in one module and use sleeping bags.',
-    'Measure body temperature every few hours.',
-    'Start the repair of the thermal control system with ground guidance.']},
-  {k:['suit','helmet','eva','spacewalk','excursion'], t:'Suit problem during a spacewalk', s:2, c:['spo2'], a:[
-    'Tell your partner and the crew at once.',
-    'End the spacewalk and return to the airlock by the shortest route.',
-    'Water in the helmet, a pressure drop or a CO2 warning each mean stop now.',
-    'After repressurization, check breathing and blood oxygen.']},
-  {k:['debris','meteoroid','micrometeoroid','impact','collision'], t:'Debris or micrometeoroid impact', s:2, c:[], a:[
-    'If a warning comes in advance, shelter in the escape vehicle.',
-    'After an impact, check cabin pressure first.',
-    'If pressure is falling, follow the cabin pressure loss steps.',
-    'Inspect the damage and report it.']},
-  {k:['dust','regolith'], t:'Lunar or Martian dust exposure', s:1, c:['spo2'], a:[
-    'Surface dust is sharp and irritates eyes, skin and lungs.',
-    'Brush and vacuum suits in the airlock before entering the cabin.',
-    'Rinse eyes and wash exposed skin.',
-    'Report a cough or breathing trouble.']},
-  {k:['sensor','not working','broken','cuff','oximeter','thermometer','analyzer','meter'], t:'Measuring device not working', s:0, c:[], a:[
-    'Check the battery and connection, then restart the device.',
-    'Use the backup device from the medical kit.',
-    'If none works, count your pulse by hand for 60 seconds and describe symptoms in words.',
-    'Log that the reading was taken manually.']},
-  {k:['treadmill','exercise device','exercise machine','bike'], t:'Exercise device failure', s:1, c:['ex'], a:[
-    'Switch to another device or to resistance bands.',
-    'Keep the daily exercise time. Bone and muscle loss does not pause.',
-    'Start the repair with ground guidance.']},
-  {k:['food','hungry','spoiled','appetite','eating'], t:'Food and appetite', s:0, c:['glu'], a:[
-    'Appetite and taste are weaker in space, so eat by schedule, not by hunger.',
-    'Do not eat food from a damaged or swollen package.',
-    'Take vitamin D as planned, because there is no sunlight exposure.',
-    'Report steady weight loss.']},
-  {k:['short of breath','shortness of breath','cannot breathe','breathless','hard to breathe','trouble breathing','difficulty breathing','wheezing'], t:'Shortness of breath', s:2, c:['spo2','pco2','cabin','hr'], a:[
-    'Stop what you are doing and tell a crewmate.',
-    'Measure blood oxygen now.',
-    'Move to a module with good airflow and check the cabin CO2 and oxygen levels.',
-    'If blood oxygen is low or breathing does not ease in a few minutes, start oxygen and contact the flight surgeon.']},
-  {k:['indigestion','heartburn','acid reflux','reflux','bloated','bloating','stomach ache','stomachache'], r:bs('stomach|belly|abdomen|tummy'), t:'Stomach pain or indigestion', s:1, c:['temp'], a:[
-    'Without gravity the stomach contents float, so reflux and bloating are common.',
-    'Eat smaller meals and eat slowly.',
-    'Use the antacid from the medical kit as the procedure allows.',
-    'Report severe pain, pain with fever, or pain that settles in the lower right side.']},
-  {k:['constipation','constipated'], t:'Constipation', s:0, c:['ex'], a:[
-    'Bowel movement slows in low gravity, so this is common.',
-    'Drink more water and eat the fibre-rich items on the menu.',
-    'Keep up daily exercise.',
-    'Use the laxative from the medical kit as the procedure allows, and report it if it lasts more than 3 days.']},
-  {k:['diarrhea','diarrhoea','loose stool'], t:'Diarrhea', s:1, c:['hr','temp'], a:[
-    'Drink water with electrolytes after every episode to replace the fluid.',
-    'Wash your hands carefully and clean the toilet area so it does not spread.',
-    'Eat plain food until it settles.',
-    'Report it if it lasts more than a day, or comes with fever or blood.']},
-  {k:['oversleep','oversleeping','overslept','sleeping too much','sleep too much','too much sleep','slept too long','sleeping too long','hypersomnia'], t:'Sleeping too much', s:1, c:['sleep','mood','temp'], a:[
-    'More than 9 hours of sleep, night after night, is not normal on a mission schedule.',
-    'Check your temperature and mood. Illness and low mood are the most common causes.',
-    'Keep a fixed wake time and turn on bright light right after waking to reset your body clock.',
-    'Avoid long naps during the day.',
-    'Tell the crew medical officer if it lasts more than 3 nights or comes with low mood.']},
-  {k:['insomnia','cannot sleep','trouble sleeping','sleep problems','wake up at night','waking up'], t:'Trouble sleeping', s:1, c:['sleep','cabin','mood'], a:[
-    'Keep the same bedtime and wake time every day, including rest days.',
-    'Dim the lights and stop screen work 1 hour before sleep. Use the eye mask and earplugs.',
-    'Avoid caffeine in the 6 hours before sleep.',
-    'Check the airflow and CO2 level in your sleep station.',
-    'Report it if poor sleep lasts more than 3 nights.']},
-  {k:['tired','fatigue','fatigued','exhausted','no energy','weak','weakness','sleepy','drowsy'], t:'Tiredness and low energy', s:1, c:['sleep','glu','pco2','cabin'], a:[
-    'Check last night\'s sleep, your blood glucose and the cabin CO2 level. All three cause tiredness.',
-    'Eat and drink if your last meal was more than 4 hours ago.',
-    'Take a 20-minute nap if the schedule allows.',
-    'Tell the commander before any safety-critical task.']},
-  {k:['allergy','allergic','sneezing','sneeze','hives','itchy eyes'], t:'Allergy', s:1, c:['spo2'], a:[
-    'Dust and particles do not settle in low gravity, so they irritate the nose and eyes more easily.',
-    'Clean the air filters near you and wipe surfaces.',
-    'Use the antihistamine from the medical kit as the procedure allows.',
-    'Swelling of the lips, tongue or face, or trouble breathing, is an emergency. Call the crew and use the emergency injector as the procedure directs.']},
-  {k:['nosebleed','nose bleed','bleeding nose','nose is bleeding'], t:'Nosebleed', s:1, c:[], a:[
-    'Pinch the soft part of the nose firmly for 10 minutes without letting go.',
-    'Hold a cloth under the nose so blood does not float into the cabin.',
-    'Do not blow your nose for a few hours afterwards.',
-    'Report it if the bleeding continues after 20 minutes.']},
-  {k:['choking','choke','choked'], t:'Choking', s:2, c:['spo2'], a:[
-    'If the person can cough or speak, encourage strong coughing.',
-    'If they cannot breathe or speak, call the crew, anchor yourself and give abdominal thrusts as trained.',
-    'If the person becomes unresponsive, start CPR.',
-    'Contact the flight surgeon after any choking event.']},
-  {k:['head injury','hit my head','bumped my head','banged my head','concussion'], t:'Head injury', s:2, c:['onsd'], a:[
-    'Stop work and have a crewmate watch you for the next hours.',
-    'Cool the area and check for bleeding.',
-    'Warning signs are confusion, repeated vomiting, unequal pupils, a growing headache or unusual sleepiness.',
-    'Contact the flight surgeon, and at once if any warning sign appears.']},
-  {k:['cannot urinate','cannot pee','unable to urinate','urinary retention'], t:'Unable to pass urine', s:2, c:[], a:[
-    'Trouble passing urine is known in the first days of spaceflight.',
-    'Do not wait until it becomes painful.',
-    'Contact the flight surgeon. The catheter kit is used only under ground guidance.']},
-  {k:['earache','ear pain','blocked ear'], r:bs('ear'), t:'Ear pain or blocked ear', s:1, c:['temp'], a:[
-    'Swallow, yawn or gently blow with your nose pinched to equalize the pressure.',
-    'Do not put anything into the ear.',
-    'Report pain with fever, discharge or a drop in hearing.']},
-  {k:['fan','fans','ventilation','airflow','air circulation'], t:'Ventilation fan failure', s:1, c:['cabin','pco2'], a:[
-    'Without fans, exhaled CO2 collects around your head, especially while you sleep.',
-    'Do not sleep or work for long in the affected area.',
-    'Use a portable fan and keep the hatches open to move air.',
-    'Check the cabin CO2 reading there and start the repair with ground guidance.']},
-  {k:['humidity','humid','condensation','mold','mould','damp'], t:'Humidity and mold', s:1, c:['spo2'], a:[
-    'Wipe up condensation, because floating water reaches electronics and feeds mold.',
-    'Check the dehumidifier and the airflow in that area.',
-    'Clean visible mold with disinfectant wipes while wearing a mask and gloves.',
-    'Report a cough or eye irritation.']},
-  {k:['computer','laptop','tablet','screen','frozen','software'], t:'Computer or tablet problem', s:0, c:[], a:[
-    'Restart the device and check its power cable or battery.',
-    'Switch to a backup device. Procedures are also kept on paper cards.',
-    'If this health tool is unavailable, log your readings on paper and enter them later.',
-    'Report the fault to the ground.']},
-  {k:['lights','lighting','lamp'], t:'Lighting failure', s:0, c:['sleep'], a:[
-    'Use a headlamp and move slowly so you do not hit equipment.',
-    'Replace the lamp unit or switch to the backup circuit.',
-    'Lighting also sets your body clock, so restore the day and night light schedule as soon as you can.']},
-  {k:['hatch','door','stuck'], t:'Hatch will not open or close', s:1, c:[], a:[
-    'Do not force it. First check that the pressure is equal on both sides.',
-    'Check the seal for objects or damage.',
-    'If a crew member is cut off, keep voice contact and tell the commander.',
-    'Start the repair with ground guidance.']},
-  {k:['battery','batteries','charger'], t:'Battery overheating or swelling', s:2, c:['spo2'], a:[
-    'Stop charging and unplug it. Do not touch a hot or swollen battery with bare hands.',
-    'Move it to the fire-safe containment bag.',
-    'Keep a breathing mask and the extinguisher ready. Battery fires release toxic smoke.',
-    'Report it to the ground.']}
-];
-function findKB(q){
-  return KB.filter(function(e){
-    return e.k.some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }) || (e.r ? e.r.test(q) : false);
-  }).slice(0,2);
-}
-/* Closest topic: when no phrase matches, score every problem by the rare words it shares with the question. */
-var STOP=' i my me the a an is are am do does did what should how why can could would to of in on at it and or have has had feel feeling feels with for very really there that this be been was were when we our you your not no get got some any bit little too now today please help need want so just about from im ive its if will ';
-function stem(w){
-  if(w.length>5 && /ing$/.test(w)) return w.slice(0,-3);
-  if(w.length>4 && /ed$/.test(w)) return w.slice(0,-2);
-  if(w.length>4 && /es$/.test(w)) return w.slice(0,-2);
-  if(w.length>3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0,-1);
-  return w;
-}
-function words(s){
-  return (String(s).toLowerCase().match(/[a-z0-9]+/g)||[]).filter(function(w){ return w.length>2 && STOP.indexOf(' '+w+' ')<0; }).map(stem);
-}
-var KBX=null;
-function kbIndex(){
-  if(KBX) return KBX;
-  var df={}, docs=KB.map(function(e){
-    var set={}; words(e.k.join(' ')+' '+e.t).forEach(function(w){ set[w]=1; });
-    Object.keys(set).forEach(function(w){ df[w]=(df[w]||0)+1; });
-    return set; });
-  var titles=KB.map(function(e){ var t={}; words(e.t).forEach(function(w){ t[w]=1; }); return t; });
-  KBX={docs:docs, df:df, titles:titles}; return KBX;
-}
-function closest(q){
-  var ix=kbIndex(), toks=words(q), best=null, top=0;
-  ix.docs.forEach(function(set,i){
-    var s=0; toks.forEach(function(w){ if(set[w]) s+=Math.log(KB.length/ix.df[w])+0.5+(ix.titles[i][w]?1:0); });
-    if(s>top){ top=s; best=KB[i]; } });
-  return top>=2 ? best : null;
-}
-function kbText(e, d, env){
-  var s=e.t+(e.s===2?' (emergency)':'')+'\n'+e.a.map(function(x,i){ return (i+1)+'. '+x; }).join('\n');
-  if(d && e.c.length) s+='\nYour related readings: '+e.c.map(function(id){
-    return IND[id].label.toLowerCase()+' '+d[id]+' '+IND[id].unit+' ('+WORD[statusOf(id,d[id],env)].toLowerCase()+')'; }).join(', ')+'.';
-  if(e.s===2) s+='\nReport to the ground. Signal delay: '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
-  return s;
 }
 /* Unit explanations (u) and step-by-step measurement instructions (m) for every indicator. */
 var INFO = {
@@ -1135,33 +846,22 @@ var INFO = {
   ex:   {u:'min means minutes of loaded exercise today: resistance training plus treadmill or cycle time.',
          m:['Add up the session times from the exercise device logs.','Count only real loading time, not setup or rest.','Log resistance and cardio together as one total.']},
   rad:  {u:'mSv means millisievert, the unit of dose equivalent: the absorbed energy, measured in milligray (mGy), weighted for how harmful the type of radiation is. 1 Sv = 1000 mSv = 100 rem. On Earth natural background gives about 2 mSv a year, while a six-month ISS stay gives about 80 to 160 mSv (NASA).',
-         m:['Keep your personal dosimeter on your body all day.','Read the daily value at the same time each day.','During a solar particle event, also note where you sheltered and for how long.']}
+         m:['Keep your personal dosimeter on your body all day.','Read the daily value at the same time each day.','During a solar particle event, also note where you sheltered and for how long.']},
+  rr: {u:'Breaths per minute: how many times you breathe in during 60 seconds at rest. MedlinePlus gives 12 to 18 for a healthy adult at rest.',
+         m:['Sit still for 5 minutes first.','Count the rises of your chest for 60 seconds. Breathing changes when you think about it, so a crewmate can count for you without telling you.','Log the number.']},
+  cough: {u:'A self-rating from 0 to 3: 0 none, 1 mild (now and then), 2 moderate (it disturbs work or sleep), 3 severe (constant, painful, or with blood).',
+         m:['Think about the last 24 hours.','Choose the number that fits the worst part of the day.','Tell the crew medical officer about any blood or coloured phlegm.']},
+  breath: {u:'A self-rating from 0 to 3: 0 none, 1 mild (only during hard exercise), 2 moderate (during normal work), 3 severe (even at rest).',
+         m:['Think about the last 24 hours.','Compare with how you feel during your usual exercise.','If it is severe right now, measure your blood oxygen before you log anything.']},
+  head: {u:'A self-rating from 0 to 3: 0 none, 1 mild, 2 moderate (it gets in the way of work), 3 severe (you cannot work).',
+         m:['Think about the last 24 hours.','Note when it started and whether light or movement makes it worse.','Log blurred vision separately, because the two together matter.']},
+  nausea: {u:'A self-rating from 0 to 3: 0 none, 1 mild, 2 moderate (you eat less), 3 severe (you vomit or cannot eat).',
+         m:['Think about the last 24 hours.','Note whether it started with head movement, a meal or a medicine.','Log any vomiting in the use log of the medical kit if you take medicine for it.']},
+  dizzy: {u:'A self-rating from 0 to 3: 0 none, 1 mild, 2 moderate (you need to hold on), 3 severe (you nearly fainted or fainted).',
+         m:['Think about the last 24 hours.','Note whether it came when you moved quickly or stood up in gravity.','Measure your blood pressure and blood sugar when it happens.']},
+  vision: {u:'A self-rating from 0 to 3: 0 none, 1 mild (slightly blurred up close), 2 moderate (reading is hard), 3 severe (sudden or strong change).',
+         m:['Read the vision card at the usual distance.','Test each eye on its own.','Report any change, even a mild one, because it can come from pressure behind the eyes.']}
 };
-var UNIT_WORDS = {'mmhg':'sys','mm hg':'sys','bpm':'hr','mg/dl':'glu','msv':'rad','millisievert':'rad','millisieverts':'rad','celsius':'temp'};
-/* Prompt for the optional on-device language model. Everything the model may say about the astronaut is in this text. */
-function buildMessages(q, days, env, notes, history, ruleAnswer){
-  var d=days[days.length-1], E=ENV[env], lines=[];
-  if(d) ORDER.forEach(function(id){
-    var I=IND[id], b=baseline(id,days);
-    lines.push('- '+I.label+': '+d[id]+' '+I.unit+', status '+WORD[statusOf(id,d[id],env)].toLowerCase()+', reference '+rangeText(id,env)+' '+I.unit+
-      (b?', personal usual '+fx(id,b.mean)+' '+I.unit:''));
-  });
-  var sys='You are the onboard health assistant on a space mission and you are talking to an astronaut. '+
-    'Answer in plain English in at most 120 words. Base every statement about the astronaut on the DATA below. '+
-    'Do not invent readings, limits or procedures. If something is urgent or not covered by the DATA, tell the astronaut to contact the crew medical officer or the flight surgeon. '+
-    'You are not a doctor and you do not diagnose.\n\nDATA\n'+
-    'Location: '+E.full+'. Gravity: '+E.g+'. Signal delay to Earth: '+E.delay+'. Expected radiation dose: '+E.dose+' mSv per day.\n'+
-    doseText(doseStatus(days))+'\n'+
-    (KIT ? kitText(KIT, KIT_LOG, kitNow())+'\n' : '')+
-    (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
-         'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
-       : 'No check-in has been logged yet.\n')+
-    (d ? 'Goals: '+goalsText(days,env).replace(/\n+/g,' ')+'\n' : '')+
-    (LAST_SURVEY ? 'Latest morale survey: '+surveyText(LAST_SURVEY)+'\n' : '')+
-    'Procedure notes that match the question:\n'+(ruleAnswer||'none')+'\n'+
-    ((notes||[]).length ? 'Crew notes:\n'+notes.map(function(n){ return '- '+n.k+': '+n.a; }).join('\n')+'\n' : '');
-  return [{role:'system', content:sys}].concat((history||[]).slice(-6)).concat([{role:'user', content:String(q)}]);
-}
 /* Weekly morale survey, designed by team Kuasar Selçuklu.
    12 scored questions on a 1-5 scale. The number always means more of what the question asks, so questions about good things (rev:true) are reverse coded into risk points, 2 open questions that are logged but not scored.
    General Psychological Risk Index (GPRI) = mood + physical + social + isolation, range 12-60. */
@@ -1264,18 +964,6 @@ function weeklyStreak(days, env){
   }
   return n;
 }
-function goalsText(days, env){
-  var d=days[days.length-1];
-  if(!d) return 'There is no check-in yet. Log one to start your daily goals.';
-  var dg=dailyGoals(d,env), open=dg.filter(function(g){ return !g.done; }), W=weeklyGoals(days,env), wopen=W.goals.filter(function(g){ return !g.done; });
-  var ds=dailyStreak(days,env), ws=weeklyStreak(days,env);
-  return 'Today (mission day '+d.day+'): '+(dg.length-open.length)+' of '+dg.length+' daily goals met.'+
-    (open.length ? ' Still open: '+open.map(function(g){ return g.t.toLowerCase()+' ('+g.v+')'; }).join(', ')+'.' : ' Every daily goal is done.')+
-    ' Daily streak: '+ds+' day'+(ds===1?'':'s')+', best '+bestStreak(days,env)+'.\n\n'+
-    'Mission week '+W.week+' (day '+W.daysIn+' of 7): '+(W.goals.length-wopen.length)+' of '+W.goals.length+' weekly goals met.'+
-    (wopen.length ? ' Still open: '+wopen.map(function(g){ return g.t.toLowerCase()+' ('+(g.unit ? g.have+' of '+g.need+' '+g.unit : 'not yet')+')'; }).join(', ')+'.' : ' Every weekly goal is done.')+
-    ' Weekly streak: '+ws+' week'+(ws===1?'':'s')+'.';
-}
 /* Cumulative career radiation dose against the NASA 600 mSv career limit (NASA-STD-3001, OCHMO radiation brief).
    Warning steps chosen by the team: 50% of the limit = watch, 80% = act now, 100% = limit reached. */
 var CAREER_LIMIT = 600, DOSE_WATCH = 300, DOSE_ACT = 480, PRIOR_DOSE = 0;
@@ -1337,27 +1025,6 @@ function kitIssues(kit, nowMs){
     .sort(function(a,b){ return b.s.level-a.s.level; });
 }
 function kitLevel(kit, nowMs){ return kitIssues(kit, nowMs).reduce(function(a,x){ return Math.max(a, x.s.level); }, 0); }
-function itemText(it, nowMs){
-  var s=itemStatus(it, nowMs);
-  return it.name+': '+amt(it.qty, it.unit)+' left (minimum '+it.min+'), '+(it.exp ? 'expires '+it.exp : 'no expiry date')+', in the '+it.pack+' pack.'+
-    (s.flags.length ? ' '+s.flags.map(function(f){ return f.t; }).join('. ')+'.' : '')+(it.use ? ' Used for: '+it.use.toLowerCase()+'.' : '');
-}
-function kitText(kit, log, nowMs){
-  if(!kit) return 'No medical kit inventory is loaded.';
-  var iss=kitIssues(kit, nowMs), last=(log||[])[ (log||[]).length-1 ];
-  return 'Medical kit: '+kit.length+' item'+(kit.length===1?'':'s')+'. '+
-    (iss.length ? iss.map(function(x){ return x.it.name+' ('+x.s.flags.map(function(f){ return f.t.toLowerCase(); }).join(', ')+')'; }).join('; ')+'.'
-                : 'Nothing is low, out of stock or near expiry.')+
-    (iss.some(function(x){ return x.s.flags.some(function(f){ return f.c==='expired'; }); }) ? ' Do not use expired items without asking the flight surgeon.' : '')+
-    (last ? ' Last logged use: '+amt(last.qty, last.unit)+' of '+last.name+(last.day ? ' on mission day '+last.day : '')+'.' : '');
-}
-function findItem(kit, q){
-  var stop={}; ORDER.forEach(function(id){ TERMS[id].join(' ').split(/[^a-z0-9]+/).forEach(function(w){ stop[w]=1; }); });
-  return (kit||[]).filter(function(it){
-    var w=(it.name.toLowerCase().match(/[a-z]{4,}/g)||[])[0];
-    return w && !stop[w] && new RegExp('\\b'+w+'\\b').test(q);
-  });
-}
 function useItem(kit, id, qty){
   var it=(kit||[]).filter(function(x){ return x.id===id; })[0];
   if(!it) return {ok:false, msg:'That item is not in the kit.'};
@@ -1422,6 +1089,365 @@ function sampleKit(nowMs){
     {id:'gel',          use:'Eye ultrasound', name:'Ultrasound gel',                 type:'Supply',     pack:'Diagnostic',                 qty:3,  unit:'tubes',      min:1,  exp:on(500)}
   ];
 }
+/* ===== Health analysis: several readings together =====
+   1. combined(): how far today's readings as a whole are from the personal baseline (sum of squared z-scores, chi-square test).
+   2. findings(): problems that need at least two readings pointing the same way, with causes and steps.
+   3. whyAll(): for each reading that is off, the possible causes, each checked against the other readings.
+   4. scenarioChecks(): extreme situations, each with its own detection rule and a simulated test day. */
+var SYM_WORD = ['none','mild','moderate','severe'];
+function phi(z){
+  var t=1/(1+0.2316419*Math.abs(z)), d=0.3989423*Math.exp(-z*z/2),
+      p=d*t*(0.3193815+t*(-0.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));
+  return z>0 ? 1-p : p;
+}
+/* Upper tail of the chi-square distribution, Wilson-Hilferty approximation. */
+function chiTail(x, k){
+  if(!(k>0)) return 1; if(!(x>0)) return 1;
+  var h=2/(9*k); return 1-phi((Math.pow(x/k, 1/3)-(1-h))/Math.sqrt(h));
+}
+function zOf(id, days){
+  var b=baseline(id, days); if(!b) return null;
+  var spread=Math.max(b.sd, Math.abs(b.mean)*0.05, IND[id].step);
+  return {z:(days[days.length-1][id]-b.mean)/spread, mean:b.mean, n:b.n};
+}
+function combined(days){
+  var d=days[days.length-1]; if(!d) return {ready:false, n:0};
+  var parts=[];
+  ORDER.forEach(function(id){ var r=zOf(id, days); if(r) parts.push({id:id, z:r.z, mean:r.mean}); });
+  if(parts.length<3) return {ready:false, n:Math.max(0, days.length-1)};
+  var D2=parts.reduce(function(a,x){ return a+x.z*x.z; },0), k=parts.length, p=chiTail(D2, k);
+  var moved=parts.filter(function(x){ return Math.abs(x.z)>=2; }).sort(function(a,b){ return Math.abs(b.z)-Math.abs(a.z); });
+  var strong=parts.filter(function(x){ return Math.abs(x.z)>=3; }).length;
+  var level=(p<0.001 && strong>=3) ? 2 : ((p<0.01 && moved.length>=2) ? 1 : 0);
+  return {ready:true, D2:D2, k:k, p:p, level:level, moved:moved, n:parts[0] ? baseline(parts[0].id, days).n : 0};
+}
+function ctxOf(days, env){
+  var d=days[days.length-1];
+  return {d:d, prev:days[days.length-2]||null, days:days, env:env, log:KIT_LOG||[]};
+}
+function took(c, ids, within){
+  return (c.log||[]).some(function(e){ return ids.indexOf(e.id)>=0 && e.src!=='check-in' && e.day!=null && c.d && c.d.day-e.day>=0 && c.d.day-e.day<=within; });
+}
+function lab(c, id){ var I=IND[id]; return I.scale ? I.label+' '+SYM_WORD[c.d[id]] : I.label+' '+fx(id, c.d[id])+' '+I.unit; }
+function H(id){ return {id:id, on:function(c){ return isHigh(id, c.d, c.env); }, t:function(c){ return lab(c,id)+' (high)'; }}; }
+function L(id){ return {id:id, on:function(c){ return isLow(id, c.d, c.env); }, t:function(c){ return lab(c,id)+' (low)'; }}; }
+function S(id, n){ return {id:id, on:function(c){ return c.d[id]>=n; }, t:function(c){ return lab(c,id); }}; }
+var EVA = {id:'eva', on:function(c){ return !!c.d.eva; }, t:function(){ return 'spacewalk or surface excursion today'; }};
+function RADX(c){ return c.d.rad/ENV[c.env].dose; }
+var RULES = [
+  {id:'infection', title:'Possible respiratory infection',
+   conds:[H('temp'), S('cough',1), H('hr'), H('rr'), L('spo2'), S('breath',2)],
+   need:function(m){ return m.length>=2 && (m.indexOf('temp')>=0 || m.indexOf('cough')>=0); },
+   causes:['A virus or bacteria passed between crewmates in the closed cabin','Weaker immune defences in spaceflight, which can also wake up dormant viruses','Dust or dry air, if there is no fever'],
+   actions:['Wear a mask and clean shared surfaces','Drink fluids and rest','Measure temperature and blood oxygen every 4 hours','Contact the flight surgeon if blood oxygen falls below 95% or temperature reaches 38.5 °C']},
+  {id:'hypoxia', title:'Body short of oxygen',
+   conds:[L('spo2'), H('rr'), H('hr'), S('breath',2), S('dizzy',2), S('head',2)],
+   need:function(m){ return m.indexOf('spo2')>=0 && m.length>=2; },
+   causes:['Low oxygen or low pressure in the cabin air','A lung problem such as an infection','A falsely low reading from a cold finger'],
+   actions:['Measure again on a warm finger','Check the cabin oxygen and pressure readings','Use supplemental oxygen and tell the crew if it stays low']},
+  {id:'co2', title:'Carbon dioxide build-up',
+   conds:[H('cabin'), H('pco2'), S('head',2), H('rr'), L('sleep'), S('dizzy',2), S('vision',1)],
+   need:function(m){ return (m.indexOf('cabin')>=0 || m.indexOf('pco2')>=0) && m.length>=2; },
+   causes:['The CO2 removal system working below capacity','Poor airflow, especially in the sleep station','Several crew members or heavy exercise in one module'],
+   actions:['Move to a well-ventilated module','Check the CO2 removal system and the fans','Postpone heavy exercise until the level drops']},
+  {id:'dehydration', title:'Dehydration or low blood volume',
+   conds:[L('sys'), L('dia'), H('hr'), S('dizzy',1), S('nausea',2), H('temp')],
+   need:function(m){ return m.length>=2 && (m.indexOf('sys')>=0 || m.indexOf('dia')>=0 || (m.indexOf('hr')>=0 && m.indexOf('dizzy')>=0)); },
+   causes:['Drinking too little, because thirst is weaker in space','Fluid lost through vomiting, diarrhea, fever or sweating','A smaller blood volume after the fluid shift of the first weeks'],
+   actions:['Drink water with electrolytes now','Sit or hold on to something when you feel dizzy','Measure blood pressure and heart rate again in 1 hour']},
+  {id:'ars', title:'Possible acute radiation sickness',
+   conds:[{id:'rad', on:function(c){ return statusOf('rad', c.d.rad, c.env)===2; }, t:function(c){ return 'radiation dose '+fx('rad', c.d.rad)+' mSv ('+RADX(c).toFixed(1)+'× expected)'; }}, S('nausea',2), S('head',2), S('dizzy',2)],
+   need:function(m){ return m.indexOf('rad')>=0 && m.length>=2; }, level:2,
+   causes:['Exposure during a solar particle event','Time outside the shielded area during high solar activity'],
+   actions:['Stay in the most shielded area','Report your dosimeter reading and symptoms to the flight surgeon now','Take anti-nausea medicine only as the procedure directs']},
+  {id:'motion', title:'Space motion sickness',
+   conds:[S('nausea',2), S('dizzy',1), S('head',1), {id:'early', on:function(c){ return c.d.day<=3; }, t:function(c){ return 'first days of the mission (day '+c.d.day+')'; }}, EVA],
+   need:function(m){ return m.indexOf('nausea')>=0 && m.length>=2; },
+   causes:['The balance system adapting to a new gravity level','Fast head movements while still adapting'],
+   actions:['Keep head movements slow and keep your eyes on a fixed point','Sip fluids','Take anti-nausea medicine only as the procedure directs']},
+  {id:'sans', title:'Signs of pressure behind the eyes',
+   conds:[H('onsd'), S('vision',1), S('head',2), H('pco2'), H('cabin')],
+   need:function(m){ return (m.indexOf('onsd')>=0 || m.indexOf('vision')>=0) && m.length>=2; },
+   causes:['Blood and brain fluid shifting toward the head in low gravity','High carbon dioxide, which widens blood vessels in the head'],
+   actions:['Run the vision test and repeat the eye ultrasound','Lower your CO2 exposure','Report the change to the flight surgeon']},
+  {id:'cardio', title:'Heart and blood pressure under strain',
+   conds:[H('sys'), H('dia'), H('hr'), S('breath',2), S('head',2), {id:'stim', on:function(c){ return took(c, ['modafinil','pseudoephedrine'], 2); }, t:function(){ return 'a stimulant medicine logged in the last 2 days'; }}],
+   need:function(m){ return (m.indexOf('sys')>=0 || m.indexOf('dia')>=0) && m.indexOf('hr')>=0; },
+   causes:['Stress, pain or anxiety','A stimulating medicine or caffeine','Fluid shift and changes in heart work in low gravity'],
+   actions:['Rest for 10 minutes and measure again','Avoid caffeine and stimulating medicines until it settles','Contact the flight surgeon at once if it rises above 180/120 mmHg or you have chest pain']},
+  {id:'sleepdebt', title:'Fatigue from sleep loss',
+   conds:[L('sleep'), L('mood'), H('hr'), S('head',1), S('dizzy',1), {id:'prev', on:function(c){ return !!c.prev && c.prev.sleep<7; }, t:function(c){ return 'also short sleep the night before ('+c.prev.sleep+' h)'; }}],
+   need:function(m){ return m.indexOf('sleep')>=0 && m.length>=2; },
+   causes:['A shifted work and sleep schedule','Noise, light or carbon dioxide in the sleep station','Stress or worry'],
+   actions:['Avoid safety-critical tasks today if you can','Keep a fixed bedtime and dim the lights 1 hour before it','Check the sleep station airflow']},
+  {id:'hypoglycemia', title:'Low blood sugar affecting the body',
+   conds:[L('glu'), H('hr'), S('dizzy',1), S('head',1), S('nausea',1)],
+   need:function(m){ return m.indexOf('glu')>=0 && m.length>=2; },
+   causes:['A missed or small meal, because appetite drops in space','Long or hard exercise','Nausea that stopped you eating'],
+   actions:['Eat 15 g of fast carbohydrate now','Measure again in 15 minutes','Do not start a safety-critical task until it is back in range']},
+  {id:'heat', title:'Heat stress',
+   conds:[H('temp'), H('hr'), EVA, L('sys'), S('dizzy',1)],
+   need:function(m){ return m.indexOf('temp')>=0 && m.indexOf('hr')>=0 && (m.indexOf('eva')>=0 || m.indexOf('sys')>=0); },
+   causes:['Suit cooling not keeping up during an excursion','A warm cabin or heavy exercise without enough cooling'],
+   actions:['Cool down: remove layers, use wet cloths and a fan','Drink water with electrolytes','Report it if your temperature does not fall within an hour']},
+  {id:'dcs', title:'Possible decompression sickness',
+   conds:[EVA, S('breath',2), S('dizzy',2), S('head',2), L('spo2')],
+   need:function(m){ return m.indexOf('eva')>=0 && m.length>=2; }, level:2,
+   causes:['Nitrogen bubbles forming after the pressure change of a spacewalk'],
+   actions:['Breathe pure oxygen','Stop all activity and tell the crew','Contact the flight surgeon immediately']},
+  {id:'cold', title:'Body cooling down',
+   conds:[L('temp'), L('hr'), S('dizzy',1)],
+   need:function(m){ return m.indexOf('temp')>=0 && m.length>=2; },
+   causes:['A cold cabin or a suit heating problem','Measuring right after a cold drink'],
+   actions:['Add clothing layers and use a sleeping bag','Take a warm drink','Measure again in 30 minutes']},
+  {id:'lowmood', title:'Low mood with changes in sleep or activity',
+   conds:[L('mood'), H('sleep'), L('sleep'), L('ex'), {id:'survey', on:function(){ return !!(LAST_SURVEY && LAST_SURVEY.level>0); }, t:function(){ return 'latest morale survey '+SURVEY_LEVELS[LAST_SURVEY.level].name; }}],
+   need:function(m){ return m.indexOf('mood')>=0 && m.length>=2; },
+   causes:['Isolation and the long distance from home','Monotony or conflict in the crew','Poor sleep'],
+   actions:['Talk to a crewmate you trust','Ask for a private conference with the flight psychologist','Protect your free time and keep exercising']}
+];
+function findings(days, env){
+  var c=ctxOf(days, env); if(!c.d) return [];
+  var out=[];
+  RULES.forEach(function(r){
+    var hit=r.conds.filter(function(k){ return k.on(c); });
+    var ids=hit.map(function(k){ return k.id; });
+    if(!r.need(ids)) return;
+    var lvl=r.level || Math.max(1, Math.max.apply(null, ids.filter(function(id){ return IND[id]; }).map(function(id){ return statusOf(id, c.d[id], env); }).concat([0])));
+    out.push({id:r.id, title:r.title, level:lvl, evidence:hit.map(function(k){ return k.t(c); }), causes:r.causes, actions:r.actions, ids:ids});
+  });
+  return out.sort(function(a,b){ return b.level-a.level; });
+}
+/* Possible causes for a reading that is off. Each test returns [true|false|null, evidence]. */
+function Y(cond, yes, no){ return cond ? [true, yes] : [false, no]; }
+function hiS(c,id){ return isHigh(id, c.d, c.env); }
+function loS(c,id){ return isLow(id, c.d, c.env); }
+var MOOD_LOW = function(c){ return Y(c.d.mood<=2 || !!(LAST_SURVEY && LAST_SURVEY.level>0), 'mood is '+c.d.mood+' of 5'+(LAST_SURVEY && LAST_SURVEY.level>0 ? ' and the morale survey is '+SURVEY_LEVELS[LAST_SURVEY.level].name : ''), 'mood and morale look fine'); };
+var UNCHECKED = function(t){ return function(){ return [null, t]; }; };
+var WHY = {
+  rad: {hi:[
+    {t:'A solar particle event (solar storm)', test:function(c){ var x=RADX(c); return x>=5 ? [true, 'today\'s dose is '+x.toFixed(1)+'× the expected level'] : [null, 'dose is '+x.toFixed(1)+'× expected; check the space weather alert']; }},
+    {t:'A spacewalk or surface excursion', test:function(c){ return Y(!!c.d.eva, 'you logged an excursion today', 'no excursion logged today'); }},
+    {t:'Higher background radiation in this environment', test:function(c){ return Y(ENV[c.env].dose>=1.3, 'expected here: '+ENV[c.env].dose+' mSv per day', ENV[c.env].name+' has a lower background ('+ENV[c.env].dose+' mSv per day)'); }},
+    {t:'Rising solar activity over several days', test:function(c){ var r=run('rad', c.days); return Y(r.dir>0 && r.n>=3, 'dose has risen '+r.n+' days in a row', 'no steady rise over the last days'); }},
+    {t:'Time outside the most shielded area', test:UNCHECKED('not recorded; think about where you worked and slept')},
+    {t:'A dosimeter fault', test:function(c){ return [null, RADX(c)>=10 && !c.d.nausea ? 'very high reading without any symptoms; compare with a crewmate\'s dosimeter' : 'compare with a crewmate\'s dosimeter']; }}]},
+  hr: {hi:[
+    {t:'Fever', test:function(c){ return Y(hiS(c,'temp'), 'temperature '+c.d.temp+' °C', 'temperature is normal'); }},
+    {t:'Dehydration', test:function(c){ return Y(loS(c,'sys'), 'blood pressure is low', 'blood pressure is not low'); }},
+    {t:'Too little oxygen', test:function(c){ return Y(loS(c,'spo2'), 'blood oxygen '+c.d.spo2+'%', 'blood oxygen is normal'); }},
+    {t:'Low blood sugar', test:function(c){ return Y(loS(c,'glu'), 'glucose '+c.d.glu+' mg/dL', 'glucose is not low'); }},
+    {t:'Short sleep', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }},
+    {t:'Stress or anxiety', test:MOOD_LOW},
+    {t:'A stimulating medicine', test:function(c){ return Y(took(c, ['modafinil','pseudoephedrine'], 2), 'modafinil or pseudoephedrine logged in the last 2 days', 'no stimulating medicine logged'); }},
+    {t:'Exercise or an excursion just before measuring', test:function(c){ return c.d.eva ? [true, 'excursion today'] : [null, 'measure again after 5 minutes of rest']; }}],
+   lo:[
+    {t:'High fitness', test:UNCHECKED('compare with your preflight resting rate')},
+    {t:'Body cooling down', test:function(c){ return Y(loS(c,'temp'), 'temperature '+c.d.temp+' °C', 'temperature is not low'); }},
+    {t:'A sleep medicine', test:function(c){ return Y(took(c, ['zolpidem'], 1), 'zolpidem logged in the last day', 'no sleep medicine logged'); }}]},
+  temp: {hi:[
+    {t:'Infection', test:function(c){ return Y(c.d.cough>=1 || hiS(c,'rr') || hiS(c,'hr'), [c.d.cough>=1?'cough':'', hiS(c,'rr')?'fast breathing':'', hiS(c,'hr')?'fast pulse':''].filter(Boolean).join(', '), 'no cough, fast breathing or fast pulse'); }},
+    {t:'Heat after an excursion or hard exercise', test:function(c){ return Y(!!c.d.eva || c.d.ex>=150, c.d.eva ? 'excursion today' : c.d.ex+' min of exercise', 'no excursion and no long exercise'); }},
+    {t:'Measuring right after a hot drink or exercise', test:UNCHECKED('rest 10 minutes and measure again')}],
+   lo:[
+    {t:'A cold cabin or a suit heating problem', test:function(c){ return c.d.eva ? [true, 'excursion today'] : [null, 'check the cabin temperature']; }},
+    {t:'Measuring right after a cold drink', test:UNCHECKED('measure again in 15 minutes')}]},
+  spo2: {lo:[
+    {t:'A cold finger or a sensor problem', test:UNCHECKED('measure again on a warm finger')},
+    {t:'Lung infection', test:function(c){ return Y(c.d.cough>=1 || hiS(c,'temp'), 'cough or fever present', 'no cough and no fever'); }},
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'pco2') || hiS(c,'cabin'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Low oxygen or pressure in the cabin', test:function(c){ return c.d.breath>=2 || c.d.dizzy>=2 ? [true, 'breathlessness or dizziness as well'] : [null, 'check the cabin oxygen and pressure readings']; }},
+    {t:'After a spacewalk', test:function(c){ return Y(!!c.d.eva, 'excursion today', 'no excursion today'); }}]},
+  pco2: {hi:[
+    {t:'High CO2 in the cabin air', test:function(c){ return Y(hiS(c,'cabin'), 'cabin CO2 '+c.d.cabin+' mmHg', 'cabin CO2 is within the limit'); }},
+    {t:'Slow or shallow breathing', test:function(c){ return Y(loS(c,'rr'), 'breathing rate '+c.d.rr+'/min', 'breathing rate is normal'); }},
+    {t:'A sleep medicine slowing breathing', test:function(c){ return Y(took(c, ['zolpidem'], 1), 'zolpidem logged in the last day', 'no sleep medicine logged'); }}],
+   lo:[
+    {t:'Breathing too fast', test:function(c){ return Y(hiS(c,'rr'), 'breathing rate '+c.d.rr+'/min', 'breathing rate is normal'); }},
+    {t:'Anxiety', test:MOOD_LOW}]},
+  cabin: {hi:[
+    {t:'The CO2 removal system working below capacity', test:UNCHECKED('check the system status')},
+    {t:'Poor airflow near you', test:UNCHECKED('check the fans where you work and sleep')},
+    {t:'It is already affecting your body', test:function(c){ return Y(hiS(c,'pco2') || c.d.head>=2, hiS(c,'pco2') ? 'your blood CO2 is high too' : 'you report a headache', 'blood CO2 is still normal and no headache'); }}]},
+  sys: {hi:[
+    {t:'Stress or anxiety', test:MOOD_LOW},
+    {t:'Pain', test:function(c){ return Y(c.d.head>=2, 'moderate or severe headache', 'no strong pain reported'); }},
+    {t:'A stimulating medicine', test:function(c){ return Y(took(c, ['modafinil','pseudoephedrine'], 2), 'stimulant logged in the last 2 days', 'no stimulating medicine logged'); }},
+    {t:'Short sleep', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }},
+    {t:'Salt or caffeine', test:UNCHECKED('think about today\'s meals and drinks')}],
+   lo:[
+    {t:'Dehydration', test:function(c){ return Y(hiS(c,'hr'), 'fast pulse as well', 'pulse is not fast'); }},
+    {t:'Fluid loss through vomiting or diarrhea', test:function(c){ return Y(c.d.nausea>=2 || took(c, ['loperamide'], 2), c.d.nausea>=2 ? 'nausea' : 'diarrhea medicine logged', 'no nausea or diarrhea logged'); }},
+    {t:'Smaller blood volume early in the mission', test:function(c){ return Y(c.d.day<=14, 'mission day '+c.d.day, 'mission day '+c.d.day+', past the first two weeks'); }},
+    {t:'After an excursion', test:function(c){ return Y(!!c.d.eva, 'excursion today', 'no excursion today'); }}]},
+  glu: {lo:[
+    {t:'A missed or small meal', test:UNCHECKED('think about your last meal')},
+    {t:'Long or hard exercise', test:function(c){ return Y(c.d.ex>=120, c.d.ex+' min of exercise', 'exercise was not long'); }},
+    {t:'Nausea that stopped you eating', test:function(c){ return Y(c.d.nausea>=2, 'nausea '+SYM_WORD[c.d.nausea], 'no nausea'); }}],
+   hi:[
+    {t:'Measured soon after a meal', test:UNCHECKED('measure again before the next meal')},
+    {t:'Stress', test:MOOD_LOW},
+    {t:'Infection', test:function(c){ return Y(hiS(c,'temp'), 'temperature '+c.d.temp+' °C', 'no fever'); }}]},
+  sleep: {lo:[
+    {t:'Carbon dioxide in the sleep station', test:function(c){ return Y(hiS(c,'cabin') || hiS(c,'pco2'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Stress or worry', test:MOOD_LOW},
+    {t:'A stimulating medicine', test:function(c){ return Y(took(c, ['modafinil'], 1), 'modafinil logged in the last day', 'no stimulating medicine logged'); }},
+    {t:'Pain or cough at night', test:function(c){ return Y(c.d.head>=2 || c.d.cough>=2, 'headache or cough', 'no strong pain or cough'); }},
+    {t:'Noise, light or a shifted schedule', test:UNCHECKED('think about last night\'s schedule and sleep station')}],
+   hi:[
+    {t:'Illness', test:function(c){ return Y(hiS(c,'temp') || c.d.cough>=2, 'fever or cough', 'no fever or cough'); }},
+    {t:'Low mood', test:MOOD_LOW},
+    {t:'A sleep medicine', test:function(c){ return Y(took(c, ['zolpidem','melatonin'], 1), 'sleep medicine logged in the last day', 'no sleep medicine logged'); }},
+    {t:'Catching up after a short night', test:function(c){ return Y(!!c.prev && c.prev.sleep<6, 'the night before was '+(c.prev?c.prev.sleep:'')+' h', 'the night before was not short'); }}]},
+  mood: {lo:[
+    {t:'Short sleep', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }},
+    {t:'Isolation', test:function(){ return LAST_SURVEY ? Y(LAST_SURVEY.dims.iso>=4, 'isolation score '+LAST_SURVEY.dims.iso+' of 5', 'isolation score is low') : [null, 'take the morale survey']; }},
+    {t:'Tension in the crew', test:function(){ return LAST_SURVEY ? Y(LAST_SURVEY.dims.social>=10, 'social score '+LAST_SURVEY.dims.social+' of 15', 'social score is low') : [null, 'take the morale survey']; }},
+    {t:'Too little exercise', test:function(c){ return Y(loS(c,'ex'), c.d.ex+' min today', 'exercise target met'); }}]},
+  onsd: {hi:[
+    {t:'Fluid shift toward the head in low gravity', test:function(c){ return Y(ENV[c.env].g==='Microgravity', ENV[c.env].name+' is in microgravity', ENV[c.env].name+' has some gravity ('+ENV[c.env].g+')'); }},
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'cabin') || hiS(c,'pco2'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Your own preflight value is already wide', test:UNCHECKED('compare with your preflight scan')}]},
+  ex: {lo:[
+    {t:'Illness', test:function(c){ return Y(hiS(c,'temp') || c.d.cough>=2, 'fever or cough', 'no fever or cough'); }},
+    {t:'Fatigue', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }},
+    {t:'An injury or a busy schedule', test:UNCHECKED('note the reason in your log')}]},
+  dia: null, rr: {hi:[
+    {t:'Infection', test:function(c){ return Y(hiS(c,'temp') || c.d.cough>=1, 'fever or cough', 'no fever or cough'); }},
+    {t:'Too little oxygen', test:function(c){ return Y(loS(c,'spo2'), 'blood oxygen '+c.d.spo2+'%', 'blood oxygen is normal'); }},
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'pco2') || hiS(c,'cabin'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Anxiety', test:MOOD_LOW}],
+   lo:[
+    {t:'A sleep medicine', test:function(c){ return Y(took(c, ['zolpidem'], 1), 'zolpidem logged in the last day', 'no sleep medicine logged'); }},
+    {t:'Very sleepy', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }}]},
+  cough: {hi:[
+    {t:'Infection', test:function(c){ return Y(hiS(c,'temp'), 'temperature '+c.d.temp+' °C', 'no fever'); }},
+    {t:'Lunar or Martian dust', test:function(c){ return Y((c.env==='moon' || c.env==='mars') && !!c.d.eva, 'excursion on the surface today', c.env==='moon'||c.env==='mars' ? 'no surface excursion today' : 'no surface dust in this environment'); }},
+    {t:'An allergy', test:function(c){ return Y(took(c, ['loratadine'], 2), 'allergy medicine logged', 'no allergy medicine logged'); }},
+    {t:'Dry cabin air or smoke', test:function(c){ return c.d.breath>=2 ? [true, 'breathlessness as well; check for smoke'] : [null, 'check the cabin humidity']; }}]},
+  breath: {hi:[
+    {t:'Too little oxygen', test:function(c){ return Y(loS(c,'spo2'), 'blood oxygen '+c.d.spo2+'%', 'blood oxygen is normal'); }},
+    {t:'Infection', test:function(c){ return Y(hiS(c,'temp') || c.d.cough>=2, 'fever or cough', 'no fever or cough'); }},
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'pco2') || hiS(c,'cabin'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Heart strain', test:function(c){ return Y(hiS(c,'hr') && (hiS(c,'sys') || hiS(c,'dia')), 'fast pulse with high blood pressure', 'pulse and blood pressure are not both high'); }},
+    {t:'Decompression sickness after a spacewalk', test:function(c){ return Y(!!c.d.eva, 'excursion today', 'no excursion today'); }}]},
+  head: {hi:[
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'cabin') || hiS(c,'pco2'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'Fluid shift and pressure behind the eyes', test:function(c){ return Y(hiS(c,'onsd'), 'optic nerve sheath '+c.d.onsd+' mm', 'optic nerve sheath is normal'); }},
+    {t:'Dehydration', test:function(c){ return Y(loS(c,'sys') || hiS(c,'hr'), 'low blood pressure or fast pulse', 'blood pressure and pulse are normal'); }},
+    {t:'Short sleep', test:function(c){ return Y(loS(c,'sleep'), 'slept '+c.d.sleep+' h', 'sleep was enough'); }},
+    {t:'High blood pressure', test:function(c){ return Y(hiS(c,'sys'), 'systolic '+c.d.sys+' mmHg', 'blood pressure is not high'); }},
+    {t:'Radiation exposure', test:function(c){ return Y(statusOf('rad', c.d.rad, c.env)===2, 'dose '+RADX(c).toFixed(1)+'× expected', 'dose is not high'); }}]},
+  nausea: {hi:[
+    {t:'Motion sickness in a new gravity level', test:function(c){ return Y(c.d.day<=3 || !!c.d.eva, c.d.day<=3 ? 'mission day '+c.d.day : 'excursion today', 'past the first days and no excursion'); }},
+    {t:'Radiation exposure', test:function(c){ return Y(statusOf('rad', c.d.rad, c.env)===2, 'dose '+RADX(c).toFixed(1)+'× expected', 'dose is not high'); }},
+    {t:'Infection', test:function(c){ return Y(hiS(c,'temp'), 'temperature '+c.d.temp+' °C', 'no fever'); }},
+    {t:'Low blood sugar', test:function(c){ return Y(loS(c,'glu'), 'glucose '+c.d.glu+' mg/dL', 'glucose is not low'); }},
+    {t:'A medicine side effect', test:UNCHECKED('check the leaflet of anything you took today')}]},
+  dizzy: {hi:[
+    {t:'Low blood pressure', test:function(c){ return Y(loS(c,'sys'), 'systolic '+c.d.sys+' mmHg', 'blood pressure is not low'); }},
+    {t:'Low blood sugar', test:function(c){ return Y(loS(c,'glu'), 'glucose '+c.d.glu+' mg/dL', 'glucose is not low'); }},
+    {t:'Too little oxygen', test:function(c){ return Y(loS(c,'spo2'), 'blood oxygen '+c.d.spo2+'%', 'blood oxygen is normal'); }},
+    {t:'Motion sickness', test:function(c){ return Y(c.d.nausea>=1 || c.d.day<=3 || !!c.d.eva, 'nausea, early mission days or an excursion', 'no nausea and no recent gravity change'); }}]},
+  vision: {hi:[
+    {t:'Pressure behind the eyes', test:function(c){ return Y(hiS(c,'onsd'), 'optic nerve sheath '+c.d.onsd+' mm', 'optic nerve sheath is normal'); }},
+    {t:'High carbon dioxide', test:function(c){ return Y(hiS(c,'cabin') || hiS(c,'pco2'), 'CO2 is high', 'CO2 is normal'); }},
+    {t:'High blood pressure', test:function(c){ return Y(hiS(c,'sys'), 'systolic '+c.d.sys+' mmHg', 'blood pressure is not high'); }}]}
+};
+WHY.dia = {hi:WHY.sys.hi, lo:WHY.sys.lo};
+function whyFor(id, c, dir){
+  var w=WHY[id] && WHY[id][dir]; if(!w) return [];
+  var rank=function(s){ return s===true ? 0 : (s===null ? 1 : 2); };
+  return w.map(function(x){ var r=x.test(c); return {t:x.t, s:r[0], ev:r[1]}; })
+          .sort(function(a,b){ return rank(a.s)-rank(b.s); });
+}
+function whyAll(days, env){
+  var c=ctxOf(days, env); if(!c.d) return [];
+  var out=[];
+  ORDER.forEach(function(id){
+    var st=statusOf(id, c.d[id], env), z=zOf(id, days), dir=null;
+    if(st>0) dir=isLow(id, c.d, env) ? 'lo' : 'hi';
+    else if(z && Math.abs(z.z)>=2.5 && !IND[id].scale) dir=z.z<0 ? 'lo' : 'hi';
+    if(!dir) return;
+    var causes=whyFor(id, c, dir); if(!causes.length) return;
+    out.push({id:id, dir:dir, level:st, unusual:st===0, label:IND[id].label, value:lab(c, id), causes:causes});
+  });
+  return out.sort(function(a,b){ return b.level-a.level; });
+}
+var SCENARIOS = [
+  {id:'spe', title:'Solar particle event', looks:'Daily dose 5 times the expected level or more',
+   check:function(c){ var x=RADX(c); return x>=5 ? [2, 'dose '+x.toFixed(1)+'× expected'] : x>=2 ? [1, 'dose '+x.toFixed(1)+'× expected'] : [0, '']; },
+   sim:function(e){ return {rad:+(ENV[e].dose*8).toFixed(2), nausea:1}; },
+   steps:['Go to the storm shelter or the most shielded area now','Postpone spacewalks and excursions','Log your dosimeter reading every hour']},
+  {id:'depress', title:'Cabin pressure loss or low oxygen', looks:'Blood oxygen below 90% with fast breathing, breathlessness or dizziness',
+   check:function(c){ var d=c.d, sym=d.rr>18 || d.breath>=2 || d.dizzy>=2;
+     return d.spo2<90 && sym ? [2, 'blood oxygen '+d.spo2+'% with '+(d.breath>=2?'breathlessness':d.rr>18?'fast breathing':'dizziness')] : (d.spo2<95 && (d.breath>=2 || d.dizzy>=2)) ? [1, 'blood oxygen '+d.spo2+'%'] : [0, '']; },
+   sim:function(){ return {spo2:86, rr:26, hr:118, breath:3, dizzy:2, head:2}; },
+   steps:['Put on an oxygen mask and warn the crew','Check the cabin pressure and oxygen readings','If pressure is falling, follow the leak procedure and gather at the safe module']},
+  {id:'co2fail', title:'CO2 removal failure', looks:'Cabin CO2 above 4.5 mmHg, or above 3 mmHg with high blood CO2',
+   check:function(c){ var d=c.d; return d.cabin>4.5 || (d.cabin>3 && d.pco2>45) ? [2, 'cabin CO2 '+d.cabin+' mmHg'] : (d.cabin>3 || (d.pco2>45 && d.head>=2)) ? [1, 'CO2 above the limit'] : [0, '']; },
+   sim:function(){ return {cabin:6.2, pco2:51, head:2, rr:21, sleep:5.5, dizzy:1}; },
+   steps:['Switch to the backup CO2 removal unit','Spread the crew across modules and stop heavy exercise','Watch for headache, confusion and fast breathing']},
+  {id:'fire', title:'Fire or toxic air', looks:'Severe cough with breathlessness and falling blood oxygen, without fever',
+   check:function(c){ var d=c.d; return d.cough>=3 && d.breath>=2 && d.spo2<95 ? [2, 'severe cough, breathlessness, blood oxygen '+d.spo2+'%'] : (d.cough>=2 && d.breath>=2 && d.temp<=37.5) ? [1, 'cough and breathlessness without fever'] : [0, '']; },
+   sim:function(){ return {cough:3, breath:3, spo2:91, rr:25, hr:112, head:2}; },
+   steps:['Put on a breathing mask and sound the alarm','Look for smoke and cut power to the equipment','Leave and close the hatch if the air does not clear']},
+  {id:'outbreak', title:'Infectious illness', looks:'Fever of 38 °C or more with cough, fast breathing or a fast pulse',
+   check:function(c){ var d=c.d; return d.temp>=38 && (d.cough>=1 || d.rr>18 || d.hr>100) ? [2, 'fever '+d.temp+' °C'] : (d.temp>37.5 || d.cough>=2) ? [1, d.temp>37.5 ? 'temperature '+d.temp+' °C' : 'cough'] : [0, '']; },
+   sim:function(){ return {temp:38.7, cough:2, hr:108, rr:22, sleep:9.6, ex:20}; },
+   steps:['Isolate in your sleep station if you can and wear a mask','Tell the crew so they can watch for symptoms','Contact the flight surgeon']},
+  {id:'heatinj', title:'Heat injury', looks:'Temperature of 38.5 °C or more and pulse above 120 after an excursion or with low blood pressure',
+   check:function(c){ var d=c.d; return d.temp>=38.5 && d.hr>120 && (d.eva || d.sys<90) ? [2, 'temperature '+d.temp+' °C, pulse '+d.hr] : (d.temp>37.5 && d.hr>100 && d.eva) ? [1, 'warm and fast pulse after an excursion'] : [0, '']; },
+   sim:function(){ return {eva:1, temp:38.8, hr:126, sys:86, dia:56, dizzy:2, nausea:1}; },
+   steps:['Stop activity and cool down at once','Drink water with electrolytes','Contact the flight surgeon']},
+  {id:'hypotherm', title:'Hypothermia', looks:'Temperature below 35 °C',
+   check:function(c){ var d=c.d; return d.temp<35 ? [2, 'temperature '+d.temp+' °C'] : d.temp<36.1 ? [1, 'temperature '+d.temp+' °C'] : [0, '']; },
+   sim:function(){ return {temp:34.5, hr:50, dizzy:1}; },
+   steps:['Warm up: dry clothes, layers, sleeping bag, warm drinks','Check the cabin and suit heating','Contact the flight surgeon']},
+  {id:'hypogly', title:'Severe low blood sugar', looks:'Glucose below 54 mg/dL',
+   check:function(c){ var d=c.d; return d.glu<54 ? [2, 'glucose '+d.glu+' mg/dL'] : d.glu<70 ? [1, 'glucose '+d.glu+' mg/dL'] : [0, '']; },
+   sim:function(){ return {glu:47, hr:112, dizzy:2, head:1}; },
+   steps:['Eat 15 g of fast carbohydrate now','Measure again in 15 minutes','A crewmate should stay with you until it is back in range']},
+  {id:'cardiac', title:'Cardiac emergency', looks:'Blood pressure above 180/120, or pulse above 120 or below 40',
+   check:function(c){ var d=c.d; return d.sys>180 || d.dia>120 || d.hr>120 || d.hr<40 ? [2, 'blood pressure '+d.sys+'/'+d.dia+', pulse '+d.hr] : ((d.sys>=140 || d.dia>=90 || d.hr>100) && d.breath>=2) ? [1, 'high blood pressure or pulse with breathlessness'] : [0, '']; },
+   sim:function(){ return {sys:188, dia:121, hr:124, breath:2, head:2}; },
+   steps:['Stop all activity and lie still','Call the crew and get the emergency medical kit and defibrillator ready','Contact the flight surgeon immediately']},
+  {id:'dcs', title:'Decompression sickness', looks:'Breathlessness, dizziness or headache after an excursion',
+   check:function(c){ var d=c.d; return d.eva && (d.breath>=2 || d.dizzy>=2 || d.head>=2 || d.spo2<95) ? [2, 'symptoms after an excursion'] : (d.eva && (d.breath || d.dizzy || d.head)) ? [1, 'mild symptoms after an excursion'] : [0, '']; },
+   sim:function(){ return {eva:1, breath:2, dizzy:2, head:2, spo2:94}; },
+   steps:['Breathe pure oxygen','Stop all activity and tell the crew','Contact the flight surgeon immediately']},
+  {id:'arsx', title:'Acute radiation sickness', looks:'A dose above the action level with moderate or severe nausea',
+   check:function(c){ var d=c.d, s=statusOf('rad', d.rad, c.env); return s===2 && d.nausea>=2 ? [2, 'high dose with nausea'] : (s===2 || (s===1 && d.nausea>=2)) ? [1, 'raised dose'] : [0, '']; },
+   sim:function(e){ return {rad:+(ENV[e].dose*9).toFixed(2), nausea:3, head:2, dizzy:1}; },
+   steps:['Stay in the most shielded area','Report your dose and symptoms to the flight surgeon now','Rest and drink fluids']},
+  {id:'icp', title:'Raised pressure behind the eyes', looks:'Optic nerve sheath above 7.1 mm, or widened with clear vision changes',
+   check:function(c){ var d=c.d; return d.onsd>7.1 || (d.onsd>6.4 && d.vision>=2) ? [2, 'optic nerve sheath '+d.onsd+' mm'] : (d.onsd>6.4 || d.vision>=2) ? [1, d.onsd>6.4 ? 'optic nerve sheath '+d.onsd+' mm' : 'vision change'] : [0, '']; },
+   sim:function(){ return {onsd:7.4, vision:2, head:2}; },
+   steps:['Run the vision test and repeat the eye ultrasound','Lower CO2 exposure','Contact the flight surgeon']},
+  {id:'sleepdep', title:'Severe sleep deprivation', looks:'Less than 4 hours of sleep, or less than 5 hours two nights in a row',
+   check:function(c){ var d=c.d, p=c.prev; return d.sleep<4 || (d.sleep<5 && p && p.sleep<5) ? [2, 'slept '+d.sleep+' h'] : d.sleep<5 ? [1, 'slept '+d.sleep+' h'] : [0, '']; },
+   sim:function(){ return {sleep:3.8, mood:2, hr:98}; },
+   steps:['Do not do safety-critical tasks today','Ask the commander to move your schedule for a recovery sleep','Check the sleep station for noise, light and airflow']},
+  {id:'psych', title:'Psychological crisis', looks:'Mood of 1 together with a Red morale survey',
+   check:function(c){ var d=c.d, red=!!(LAST_SURVEY && LAST_SURVEY.level===2); return d.mood<=1 && red ? [2, 'very low mood and a Red survey'] : (d.mood<=1 || red) ? [1, d.mood<=1 ? 'very low mood' : 'Red morale survey'] : [0, '']; },
+   sim:function(){ return {mood:1, sleep:10.2, ex:15}; },
+   steps:['Talk to a crewmate now','Ask for a private conference with the flight psychologist','The crew medical officer should check in with you today']}
+];
+function scenarioChecks(days, env){
+  var c=ctxOf(days, env); if(!c.d) return [];
+  return SCENARIOS.map(function(s){ var r=s.check(c); return {id:s.id, title:s.title, looks:s.looks, state:r[0], ev:r[1], steps:s.steps}; });
+}
+function simDay(base, scenarioId, env){
+  var s=SCENARIOS.filter(function(x){ return x.id===scenarioId; })[0]; if(!s) return null;
+  var d={}; Object.keys(base).forEach(function(k){ d[k]=base[k]; });
+  d.day=base.day+1; d.example=false; d.sim=scenarioId; d.eva=0;
+  ORDER.forEach(function(id){ if(IND[id].scale) d[id]=0; });
+  var o=s.sim(env); Object.keys(o).forEach(function(k){ d[k]=o[k]; });
+  return d;
+}
+function analyze(days, env){
+  return {combined:combined(days), findings:findings(days, env), why:whyAll(days, env), scenarios:scenarioChecks(days, env)};
+}
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
 function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
@@ -1457,34 +1483,9 @@ function projection(id, days, env){
   if(k===null || k<=0 || k>3 || r.n<3 || r.dir!==Math.sign(s)) return null;
   return {days:Math.max(1,Math.ceil(k)), n:r.n, dir:r.dir};
 }
-var PATTERNS = [
-  {ids:['temp','hr'], on:function(d,e){ return isHigh('temp',d,e)&&isHigh('hr',d,e); },
-   t:'Raised temperature together with a fast pulse points to a possible infection. Rest, keep distance from crewmates and measure again in 1 hour.'},
-  {ids:['spo2','hr'], on:function(d,e){ return isLow('spo2',d,e)&&isHigh('hr',d,e); },
-   t:'Low blood oxygen with a fast pulse suggests your body is short of oxygen. Check the cabin oxygen level and your breathing now.'},
-  {ids:['sys','hr'], on:function(d,e){ return isLow('sys',d,e)&&isHigh('hr',d,e); },
-   t:'Low blood pressure with a fast pulse is a typical sign of dehydration. Drink fluids with electrolytes and measure again in 1 hour.'},
-  {ids:['glu','hr'], on:function(d,e){ return isLow('glu',d,e)&&isHigh('hr',d,e); },
-   t:'Low blood sugar with a fast pulse. Eat fast carbohydrate now, before any other task.'},
-  {ids:['cabin','pco2'], on:function(d,e){ return isHigh('cabin',d,e)&&isHigh('pco2',d,e); },
-   t:'Cabin CO2 and your blood CO2 are both high, so the cabin air is the likely cause. Improve airflow where you work and sleep and check the CO2 removal system.'},
-  {ids:['pco2','onsd'], on:function(d,e){ return isHigh('pco2',d,e)&&isHigh('onsd',d,e); },
-   t:'High carbon dioxide and a wider optic nerve sheath appear together. Carbon dioxide widens blood vessels in the head and may add to pressure behind the eyes, so lowering CO2 exposure is the first step.'},
-  {ids:['pco2','sleep'], on:function(d,e){ return isHigh('pco2',d,e)&&isLow('sleep',d,e); },
-   t:'High carbon dioxide and short sleep appear together. Check the airflow in your sleep station.'},
-  {ids:['sleep','mood'], on:function(d,e){ return isLow('sleep',d,e)&&isLow('mood',d,e); },
-   t:'Short sleep together with low mood raises the risk of mistakes. Ask the commander to lighten today\'s critical tasks.'},
-  {ids:['sleep','mood'], on:function(d,e){ return isHigh('sleep',d,e)&&isLow('mood',d,e); },
-   t:'Long sleep together with low mood can be an early sign of depression. Talk to the crew medical officer and ask for a private conference with the flight psychologist.'},
-  {ids:['sleep','temp'], on:function(d,e){ return isHigh('sleep',d,e)&&isHigh('temp',d,e); },
-   t:'Long sleep together with a raised temperature suggests your body is fighting an infection. Rest, drink fluids and keep distance from crewmates.'},
-  {ids:['sleep','hr'], on:function(d,e){ return isLow('sleep',d,e)&&isHigh('hr',d,e); },
-   t:'Short sleep and a raised resting pulse together suggest incomplete recovery. Plan a lighter exercise session and an earlier bedtime today.'}
-];
 function insights(days, env){
   var d=days[days.length-1], out=[];
   if(!d) return [{l:0, t:'Log a check-in so I can read your day.'}];
-  PATTERNS.forEach(function(p){ if(p.on(d,env)) out.push({l:Math.max.apply(null,p.ids.map(function(id){ return statusOf(id,d[id],env); })), t:p.t}); });
   ORDER.forEach(function(id){
     if(statusOf(id,d[id],env)!==0) return;
     var u=unusual(id,days), I=IND[id];
@@ -1514,116 +1515,14 @@ function learnedText(days){
   return n>=5 ? 'Personal baseline learned from '+n+' earlier check-ins. It updates with every new check-in.'
               : 'I need 5 earlier check-ins to learn your personal baseline. So far: '+n+'.';
 }
-/* Typo tolerance: a word of 5+ letters that is one edit away from a known term is read as that term. */
-function lev1(a, b){
-  if(a===b) return true;
-  var la=a.length, lb=b.length; if(Math.abs(la-lb)>1) return false;
-  var i=0, j=0, e=0;
-  while(i<la && j<lb){
-    if(a[i]===b[j]){ i++; j++; continue; }
-    if(++e>1) return false;
-    if(la>lb) i++; else if(lb>la) j++; else { i++; j++; }
-  }
-  return e+(la-i)+(lb-j)<=1;
-}
-var VOCAB=null;
-function vocab(){
-  if(VOCAB) return VOCAB;
-  var all=[]; ORDER.forEach(function(id){ all=all.concat(TERMS[id]); }); KB.forEach(function(e){ all=all.concat(e.k); });
-  VOCAB=all.filter(function(t,i){ return /^[a-z0-9]{6,}$/.test(t) && all.indexOf(t)===i; });
-  return VOCAB;
-}
-function correct(q){
-  var V=vocab().concat(['should','contact','measure','interpret','status','summary','problems']);
-  return q.replace(/[a-z0-9]{5,}/g, function(w){
-    if(V.indexOf(w)>=0) return w;
-    for(var i=0;i<V.length;i++) if(lev1(w,V[i])) return V[i];
-    return w; });
-}
-function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
-/* Returns the answer text, or null when nothing matched. */
-function core(q, days, env){
-  var d=days[days.length-1];
-  var kb=findKB(q);
-  if(kb.length) return kb.map(function(e){ return kbText(e, d, env); }).join('\n\n');
-  if(/\b(problems|emergencies|topics|go wrong)\b/.test(q))
-    return 'I have first-response steps for: '+KB.map(function(e){ return e.t.toLowerCase(); }).join(', ')+'.';
-  if(/\b(goal|goals|streak|streaks|target|targets)\b/.test(q)) return goalsText(days, env);
-  var kitHit=KIT ? findItem(KIT, q) : [];
-  if(kitHit.length) return kitHit.map(function(it){ return itemText(it, kitNow()); }).join('\n\n');
-  if(/\b(medication|medications|medicine|medicines|meds|pill|pills|drug|drugs|inventory|stock|supplies|supply|expired|expiring|expiry|pharmacy)\b/.test(q))
-    return kitText(KIT, KIT_LOG, kitNow());
-  if(/\b(morale|survey|gpri|psychological|psychology|wellbeing)\b/.test(q))
-    return LAST_SURVEY ? surveyText(LAST_SURVEY) : 'No morale survey has been completed yet. Fill in the weekly morale survey on the page to get your General Psychological Risk Index.';
-  if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
-  function has(re){ return re.test(q); }
-  function st(id){ return statusOf(id, d[id], env); }
-  var flagged=ORDER.filter(function(id){ return st(id)>0; });
-  var worst=flagged.reduce(function(m,id){ return Math.max(m, st(id)); }, 0);
-  var names=flagged.map(function(id){ return IND[id].label.toLowerCase()+' ('+WORD[st(id)].toLowerCase()+')'; }).join(', ');
-  var wantHow=has(/\b(measure|how do i|how to|reading)\b/), wantWhy=has(/\b(why|affect|affects|cause|causes|hazard|hazards|space)\b/),
-      wantTrend=has(/\b(trend|worse|better|changing|change|changed|week|lately|history)\b/);
-  var ids=ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
-  var wantUnit=has(/\b(unit|units|mean|means|stand for|stands for)\b/);
-  Object.keys(UNIT_WORDS).forEach(function(w){ if(q.indexOf(w)>=0){ wantUnit=true; if(!ids.length) ids=[UNIT_WORDS[w]]; } });
-  if(ids.length) return ids.map(function(id){
-    var I=IND[id], v=d[id], b=baseline(id,days), s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
-    if(b) s+=' Your usual is '+fx(id,b.mean)+' '+I.unit+', learned from your last '+b.n+' check-ins.';
-    if(st(id)>0) s+=' '+adviceFor(id,v,env);
-    if(id==='rad') s+=' '+doseText(doseStatus(days));
-    if(wantUnit) s+=' Unit: '+INFO[id].u;
-    if(wantHow) s+=' How to measure: '+INFO[id].m.map(function(x,i){ return (i+1)+'. '+x; }).join(' ');
-    if(wantWhy) s+=' '+REGIONS[regionOf(id)].why;
-    if(wantTrend) s+=' '+trendText(id,days);
-    return s; }).join('\n\n');
-  if(has(/\b(interpret|interpretation|insight|insights|analyze|analyse|analysis|pattern|patterns|unusual|baseline|what does (this|it) mean|normal for me)\b/))
-    return insights(days,env).map(function(x){ return x.t; }).join('\n\n')+'\n\n'+learnedText(days);
-  if(has(/\b(contact|surgeon|doctor|call|earth|ground|report|emergency)\b/)){
-    if(worst===0) return 'No reading needs a report today.';
-    if(worst===1) return 'Tell the crew medical officer about: '+names+'. Measure again later today. If a reading moves to "Act now", contact the flight surgeon.';
-    return 'Contact the flight surgeon now about: '+names+'. Signal delay from the '+ENV[env].full.toLowerCase()+': '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
-  }
-  if(has(/\b(what should i do|do now|advice|recommend|next step|help me|fix|improve)\b/)){
-    if(!flagged.length) return 'Nothing is flagged. Keep your exercise, sleep and meal routine and log the next check-in tomorrow.';
-    return flagged.map(function(id){ return IND[id].label+': '+adviceFor(id,d[id],env); }).join('\n\n');
-  }
-  if(wantTrend){
-    if(!flagged.length) return 'All readings are in range. Name a reading, for example "sleep trend", to see how it has changed.';
-    return flagged.map(function(id){ return IND[id].label+': '+trendText(id,days); }).join('\n\n');
-  }
-  if(wantWhy) return 'Spaceflight has five main hazards: space radiation, isolation and confinement, distance from Earth, gravity fields, and hostile closed environments. Name a reading or body part to see how it is affected.';
-  if(has(/\b(how am i|status|summary|today|overall|healthy|health|ok|okay|fine)\b/)){
-    var top=insights(days,env)[0];
-    return 'Mission day '+d.day+' at the '+ENV[env].full.toLowerCase()+'. '+
-      (flagged.length ? flagged.length+' of '+ORDER.length+' readings need attention: '+names+'. Ask "what should I do now" for guidance.'
-                      : 'All '+ORDER.length+' readings are in range.')+(top.l>0?'\n\nMy reading: '+top.t:'');
-  }
-  if(has(/\b(thanks|thank you|thx)\b/)) return 'You are welcome. Log your next check-in tomorrow.';
-  if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, a problem, or who to contact.';
-  return null;
-}
-function answer(q, days, env, notes){
-  q=String(q||'').toLowerCase().replace(/[\u2018\u2019]/g,"'").replace(/\bcan('?t| not)\b/g,'cannot');
-  var mine=(notes||[]).filter(function(n){ return new RegExp('(^|[^a-z0-9])'+escRe(n.k)+'(?![a-z0-9])').test(q); })
-                      .map(function(n){ return 'Crew note: '+n.a; }).join('\n');
-  var r=core(q, days, env);
-  if(r===null){
-    var fixed=correct(q);
-    if(fixed!==q){ var r2=core(fixed, days, env); if(r2!==null) r='I read that as "'+fixed+'".\n\n'+r2; }
-  }
-  if(r===null || r.indexOf('There is no check-in yet')===0){ var near=closest(q); if(near) r='Closest topic I know:\n\n'+kbText(near, days[days.length-1], env); }
-  if(mine) return r===null ? mine : mine+'\n\n'+r;
-  if(r!==null) return r;
-  return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
-}
-if(typeof module!=='undefined') module.exports={answer:answer,fmtDate:fmtDate,KIT_USES:KIT_USES,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,kitText:kitText,itemText:itemText,findItem:findItem,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={fmtDate:fmtDate,KIT_USES:KIT_USES,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,INFO:INFO,insights:insights,baseline:baseline,learnedText:learnedText,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak,analyze:analyze,combined:combined,findings:findings,whyAll:whyAll,whyFor:whyFor,ctxOf:ctxOf,scenarioChecks:scenarioChecks,simDay:simDay,RULES:RULES,SCENARIOS:SCENARIOS,WHY:WHY,phi:phi,chiTail:chiTail,zOf:zOf,SYM_WORD:SYM_WORD};
 
 if(typeof document!=='undefined'){ (function(){
-  var KEY='kuasar-crew-health-v3';
+  var KEY='kuasar-crew-health-v4';
   var state={env:'iss', days:sample('iss'), sel:'heart', chart:'sleep'};
   try{ var saved=JSON.parse(localStorage.getItem(KEY)||'null');
        if(saved && ENV[saved.env] && Array.isArray(saved.days)){ state.env=saved.env; state.days=saved.days; setPriorDose(saved.prior); } }catch(e){}
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify({env:state.env, days:state.days, prior:PRIOR_DOSE})); }catch(e){} }
+  function save(){ if(state.sim) return; try{ localStorage.setItem(KEY, JSON.stringify({env:state.env, days:state.days, prior:PRIOR_DOSE})); }catch(e){} }
   function $(id){ return document.getElementById(id); }
   function latest(){ return state.days[state.days.length-1]; }
   function pill(st){ return '<span class="pill st'+st+'">'+SYMBOL[st]+' '+WORD[st]+'</span>'; }
@@ -1653,9 +1552,14 @@ if(typeof document!=='undefined'){ (function(){
     else if(worst===1){ title='▲ '+nW+' indicator'+(nW>1?'s':'')+' to watch'; text='Follow the guidance for each flagged reading, tell the crew medical officer and measure again later today.'; }
     else { title='■ '+nC+' reading'+(nC>1?'s':'')+' need action now'; text='Contact the flight surgeon. '+ENV[state.env].reply; }
     if(rWorst>=dz.level && dz.level>0) text+=' Radiation: '+doseText(dz);
+    var sc=scenarioChecks(state.days, state.env).filter(function(s){ return s.state===2; });
+    if(sc.length){
+      worst=2; title='■ '+(sc.length===1 ? 'Extreme situation detected: '+sc[0].title : sc.length+' extreme situations detected');
+      text=sc.map(function(s){ return s.title+' ('+s.ev+')'; }).join('; ')+'. '+sc[0].steps[0]+'. Open the Analysis tab for all steps.';
+    }
     b.className='banner st'+worst;
-    b.innerHTML='<div class="msg"><strong>'+title+'</strong><p class="small">'+text+'</p></div>'+
-      '<div class="actions">'+(worst>0?'<button class="btn" type="button" data-act="crew">Notify crew medical officer</button>':'')+
+    b.innerHTML='<div class="msg"><strong>'+esc(title)+'</strong><p class="small">'+esc(text)+'</p></div>'+
+      '<div class="actions">'+(sc.length?'<button class="btn" type="button" data-goto="analysis">Open analysis</button>':'')+(worst>0?'<button class="btn" type="button" data-act="crew">Notify crew medical officer</button>':'')+
       (worst===2?'<button class="btn primary" type="button" data-act="ground">Send report to flight surgeon</button>':'')+'</div>';
   }
   function renderFigure(){
@@ -1684,7 +1588,7 @@ if(typeof document!=='undefined'){ (function(){
       var I=IND[id];
       if(!d){ html+='<div class="row"><span>'+I.label+'</span><span class="muted">no data</span></div>'; return; }
       var v=d[id], st=statusOf(id,v,state.env);
-      html+='<div class="row"><span>'+I.label+'</span><span class="num val">'+v+' <span class="muted small">'+I.unit+'</span></span>'+pill(st)+
+      html+='<div class="row"><span>'+I.label+'</span><span class="num val">'+(I.scale ? v+' <span class="muted small">'+SYM_WORD[v]+'</span>' : v+' <span class="muted small">'+I.unit+'</span>')+'</span>'+pill(st)+
         '<span class="note muted">Reference '+rangeText(id,state.env)+' '+I.unit+'.</span>'+
         '<details class="info"><summary>What the unit means and how to measure</summary><p>'+INFO[id].u+'</p><ol>'+
         INFO[id].m.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ol></details>'+
@@ -1694,12 +1598,18 @@ if(typeof document!=='undefined'){ (function(){
   }
   function renderForm(){
     var d=latest()||sample(state.env)[0];
+    var firstSym=true;
     $('fields').innerHTML=ORDER.map(function(id){
       var I=IND[id];
+      if(I.scale){
+        var head=firstSym ? '<p class="fgroup">Symptoms in the last 24 hours</p>' : ''; firstSym=false;
+        return head+'<div class="field"><label for="f_'+id+'">'+I.label+'</label><select id="f_'+id+'">'+
+          SYM_WORD.map(function(w,i){ return '<option value="'+i+'"'+((d[id]||0)===i?' selected':'')+'>'+i+' · '+w+'</option>'; }).join('')+'</select></div>';
+      }
       if(id==='mood') return '<div class="field"><label for="f_mood">Mood (1 very low – 5 very good)</label><select id="f_mood">'+
         ['Very low','Low','Neutral','Good','Very good'].map(function(t,i){ return '<option value="'+(i+1)+'"'+(d.mood===i+1?' selected':'')+'>'+(i+1)+' · '+t+'</option>'; }).join('')+'</select></div>';
       return '<div class="field"><label for="f_'+id+'">'+I.label+' ('+I.unit+')</label><input id="f_'+id+'" type="number" inputmode="decimal" required min="'+I.min+'" max="'+I.max+'" step="'+I.step+'" value="'+d[id]+'"></div>';
-    }).join('');
+    }).join('')+'<label class="check fwide" for="f_eva"><input type="checkbox" id="f_eva"'+(d.eva?' checked':'')+'> I did a spacewalk or surface excursion today</label>';
     var ex=state.days.filter(function(x){return x.example;}).length;
     $('dataTag').textContent=ex? ex+' of '+state.days.length+' days are example data' : state.days.length+' logged day'+(state.days.length===1?'':'s');
     $('clearEx').hidden=!ex;
@@ -1916,7 +1826,65 @@ if(typeof document!=='undefined'){ (function(){
     var msg=(r.added ? 'Added ' : 'Restocked ')+r.item.name+'. The kit now has '+amt(r.item.qty, r.item.unit)+(r.item.exp ? ', expiring '+fmtDate(r.item.exp) : '')+'.';
     $('addMsg').textContent=msg; toast(msg);
   });
-  var TABS=['overview','checkin','body','trends','radiation','morale','medkit','sources'];
+  function renderAnalysis(a){
+    var c=a.combined;
+    if(!c.ready){
+      $('anLevel').innerHTML='';
+      $('anCombined').innerHTML='<p class="small muted">The combined check needs at least 5 earlier check-ins to learn your usual pattern. So far: '+c.n+'.</p>';
+    } else {
+      var word=['Within your usual pattern','Unusual combination','Strongly unusual combination'][c.level];
+      $('anLevel').innerHTML='<span class="pill st'+c.level+'">'+SYMBOL[c.level]+' '+word+'</span>';
+      var pText=c.p<0.001 ? 'less than 0.1%' : (c.p<0.01 ? 'less than 1%' : Math.round(c.p*100)+'%');
+      $('anCombined').innerHTML='<div class="anstats"><div><b class="num">'+c.moved.length+'</b><span class="small muted">of '+c.k+' readings far from your usual value</span></div>'+
+        '<div><b class="num">'+pText+'</b><span class="small muted">chance of a day this unusual by normal day-to-day variation</span></div>'+
+        '<div><b class="num">'+c.n+'</b><span class="small muted">earlier check-ins in your baseline</span></div></div>'+
+        (c.moved.length ? '<ul class="zlist">'+c.moved.map(function(x){
+          var I=IND[x.id], up=x.z>0, w=Math.min(100, Math.abs(x.z)/6*100);
+          return '<li><span>'+I.label+'</span><span class="num">'+(I.scale ? SYM_WORD[latest()[x.id]] : fx(x.id, latest()[x.id])+' '+I.unit)+'</span>'+
+            '<span class="small muted">usual '+fx(x.id, x.mean)+(I.scale?'':' '+I.unit)+'</span>'+
+            '<span class="zbar '+(up?'up':'down')+'" aria-label="'+Math.abs(x.z).toFixed(1)+' spreads '+(up?'above':'below')+' usual"><span style="width:'+w.toFixed(0)+'%"></span></span>'+
+            '<span class="num small">'+(up?'+':'−')+Math.abs(x.z).toFixed(1)+'σ</span></li>'; }).join('')+'</ul>'
+          : '<p class="small muted">No reading is more than 2 spreads away from your usual value.</p>')+
+        '<p class="small muted">Method: each reading is compared with your own mean and spread from up to 30 earlier check-ins. The squared distances are added and tested against a chi-square distribution. The test treats readings as independent, so it is a screening signal, not a diagnosis.</p>';
+    }
+    $('anFindCount').textContent=a.findings.length ? a.findings.length+' found' : '';
+    $('anFindings').innerHTML=a.findings.length ? a.findings.map(function(f){
+      return '<article class="fcard st'+f.level+'"><h3>'+SYMBOL[f.level]+' '+esc(f.title)+'</h3>'+
+        '<p class="small"><strong>Because:</strong> '+esc(f.evidence.join(', '))+'.</p>'+
+        '<div class="fcols"><div><h4>Possible causes</h4><ul>'+f.causes.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ul></div>'+
+        '<div><h4>What to do</h4><ol>'+f.actions.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ol></div></div></article>'; }).join('')
+      : '<p class="small muted">No problem shows up in two or more readings at once today.</p>';
+    $('anWhy').innerHTML=a.why.length ? a.why.map(function(w){
+      return '<article class="wcard"><h3>'+esc(w.value)+' <span class="pill st'+(w.unusual?1:w.level)+'">'+(w.unusual ? '▲ Unusual for you' : SYMBOL[w.level]+' '+WORD[w.level])+'</span></h3>'+
+        '<p class="small muted">Possible causes, best supported first:</p><ul class="causes">'+w.causes.map(function(x){
+          var k=x.s===true?'cy':(x.s===false?'cn':'cq'), m=x.s===true?'✓':(x.s===false?'✗':'?');
+          return '<li class="'+k+'"><i aria-label="'+(x.s===true?'supported':(x.s===false?'ruled out':'cannot be checked'))+'">'+m+'</i><span>'+esc(x.t)+'<span class="small muted"> · '+esc(x.ev)+'</span></span></li>'; }).join('')+'</ul></article>'; }).join('')
+      : '<p class="small muted">Every reading is in range and close to your usual value, so there is nothing to explain today.</p>';
+    var det=a.scenarios.filter(function(s){ return s.state===2; }).length, pos=a.scenarios.filter(function(s){ return s.state===1; }).length;
+    $('anScenCount').textContent=a.scenarios.length+' checks · '+det+' detected · '+pos+' possible';
+    $('anScen').innerHTML=a.scenarios.slice().sort(function(x,y){ return y.state-x.state; }).map(function(s){
+      var lab=['● Not detected','▲ Possible','■ Detected'][s.state];
+      return '<li class="scen st'+s.state+'"><div class="smain"><strong>'+esc(s.title)+'</strong><span class="small muted">Looks for: '+esc(s.looks)+'</span>'+
+        (s.state ? '<span class="small">Found: '+esc(s.ev)+'</span><ol class="small">'+s.steps.map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+'</ol>' : '')+'</div>'+
+        '<span class="pill st'+s.state+'">'+lab+'</span>'+
+        '<button class="btn" type="button" data-sim="'+s.id+'"'+(state.sim===s.id?' disabled':'')+'>'+(state.sim===s.id?'Running':'Test')+'</button></li>'; }).join('');
+  }
+  /* Simulation: a test day added on top of the real data, never saved. */
+  function startSim(id){
+    if(state.sim) endSim(true);
+    var base=state.days[state.days.length-1]||sample(state.env)[13];
+    var d=simDay(base, id, state.env); if(!d) return;
+    state.realDays=state.days; state.days=state.days.concat([d]); state.sim=id;
+    var s=SCENARIOS.filter(function(x){ return x.id===id; })[0];
+    $('simBar').innerHTML='<span><strong>■ Simulation: '+esc(s.title)+'.</strong> These are test readings for mission day '+d.day+', not your real data, and they are not saved.</span><button class="btn" type="button" data-endsim>End simulation</button>';
+    $('simBar').hidden=false; render(); goTab('analysis'); window.scrollTo(0, 0);
+  }
+  function endSim(quiet){
+    if(!state.sim) return;
+    state.days=state.realDays; state.realDays=null; state.sim=null; $('simBar').hidden=true;
+    if(!quiet) render();
+  }
+  var TABS=['overview','checkin','analysis','body','trends','radiation','morale','medkit','sources'];
   function showTab(name, focus){
     if(TABS.indexOf(name)<0) name='overview';
     TABS.forEach(function(t){
@@ -1951,6 +1919,9 @@ if(typeof document!=='undefined'){ (function(){
     var rw=d ? Math.max.apply(null, ORDER.map(function(id){ return statusOf(id,d[id],env); })) : 0;
     dot('body', rw, rw===2?'A reading needs action':'A reading to watch');
     var dz=doseStatus(state.days).level; dot('radiation', dz, dz===2?'Dose needs action':'Dose to watch');
+    var an=analyze(state.days, env), al=Math.max(an.combined.ready ? an.combined.level : 0,
+      an.findings.reduce(function(m,f){ return Math.max(m,f.level); },0), an.scenarios.reduce(function(m,s){ return Math.max(m,s.state); },0));
+    dot('analysis', al, al===2?'Something needs action':'Something to watch');
     var kl=kitLevel(kitState.kit, Date.now()); dot('medkit', kl, kl===2?'An item is expired or out of stock':'An item is low or expiring soon');
     var sv=LAST_SURVEY ? LAST_SURVEY.level : 0, due=!weeklyGoals(state.days, env).goals[4].done;
     if(sv) dot('morale', sv, sv===2?'Morale needs attention':'Morale to watch'); else dot('morale', due?'due':0, 'Survey due this week');
@@ -1962,9 +1933,9 @@ if(typeof document!=='undefined'){ (function(){
   document.addEventListener('click', function(ev){
     var os=ev.target.closest('[data-open-survey]'); if(os){ openSurvey(os); return; }
     var gt=ev.target.closest('[data-goto]'); if(gt){ goTab(gt.dataset.goto); return; }
-    var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q],[data-open-chat]'); if(!t) return;
-    if(t.hasAttribute('data-open-chat')){ openChat(true); return; }
-    if(t.dataset.q){ ask(t.dataset.q); return; }
+    var sm=ev.target.closest('[data-sim]'); if(sm){ startSim(sm.dataset.sim); return; }
+    if(ev.target.closest('[data-endsim]')){ endSim(); return; }
+    var t=ev.target.closest('[data-env],[data-region],[data-act]'); if(!t) return;
     if(t.dataset.env){
       state.env=t.dataset.env; var s=sample(state.env);
       state.days.forEach(function(d){ if(d.example && s[d.day-1]) d.rad=s[d.day-1].rad; });
@@ -1988,12 +1959,14 @@ if(typeof document!=='undefined'){ (function(){
   $('chartSel').addEventListener('change', function(){ state.chart=this.value; renderChart(); });
   $('checkin').addEventListener('submit', function(ev){
     ev.preventDefault();
+    endSim(true);
     var day={day:(latest()?latest().day:0)+1, example:false}, bad=null;
     ORDER.forEach(function(id){
       var el=$('f_'+id), v=parseFloat(el.value), I=IND[id];
       if(isNaN(v)||v<I.min||v>I.max){ if(!bad) bad=el; } else day[id]=v;
     });
     if(bad){ $('formMsg').textContent='Check the highlighted value: it is missing or outside what the instrument can read.'; bad.focus(); return; }
+    day.eva=$('f_eva').checked ? 1 : 0;
     state.days.push(day); save(); notice('');
     var sup='';
     if($('useSupplies').checked){
@@ -2007,68 +1980,9 @@ if(typeof document!=='undefined'){ (function(){
     $('formMsg').innerHTML='Saved as mission day '+day.day+'.'+esc(sup)+' <button class="btn linkbtn" type="button" data-goto="overview">See today\'s overview</button>';
   });
   $('clearEx').addEventListener('click', function(){
-    state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
+    endSim(true); state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
   $('reset').addEventListener('click', function(){
-    state.days=sample(state.env); save(); notice(''); render(); $('formMsg').textContent='Demo data restored.'; });
-  function say(text, who){
-    var m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
-    $('chat').appendChild(m); $('chat').scrollTop=$('chat').scrollHeight; return m;
-  }
-  /* Optional language model, loaded on request with WebLLM and run on this device through WebGPU.
-     The rule engine stays the fallback: if the model is missing or fails, its answer is shown instead. */
-  var AI={engine:null, busy:false, history:[]};
-  var AI_LIB='https://esm.run/@mlc-ai/web-llm@0.2.84';
-  var AI_MODELS=['Llama-3.2-1B-Instruct-q4f16_1-MLC','Llama-3.2-1B-Instruct-q4f32_1-MLC','Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
-                 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC','SmolLM2-360M-Instruct-q4f16_1-MLC'];
-  function aiStatus(t){ $('aiStatus').textContent=t; }
-  function cleanAI(t){ return t.replace(/<think>[\s\S]*?(<\/think>|$)/g,'').trim(); }
-  function loadAI(){
-    if(!navigator.gpu){ aiStatus('This browser has no WebGPU, so the AI model cannot run here. The rule engine keeps working.'); return; }
-    $('aiLoad').disabled=true; aiStatus('Loading the AI library...');
-    import(AI_LIB).then(async function(webllm){
-      var list=webllm.prebuiltAppConfig.model_list, have=list.map(function(m){ return m.model_id; });
-      var cands=AI_MODELS.filter(function(id){ return have.indexOf(id)>=0; });
-      if(!cands.length) cands=list.filter(function(m){ return /instruct|chat/i.test(m.model_id) && m.vram_required_MB; })
-        .sort(function(a,b){ return a.vram_required_MB-b.vram_required_MB; }).slice(0,2).map(function(m){ return m.model_id; });
-      var last=new Error('no model available');
-      for(var i=0;i<cands.length && i<3 && !AI.engine;i++){
-        try{
-          aiStatus('Downloading '+cands[i]+'...');
-          AI.engine=await webllm.CreateMLCEngine(cands[i], {initProgressCallback:function(p){ aiStatus(p.text||'Loading the AI model...'); }});
-          AI.model=cands[i];
-        }catch(e){ last=e; }
-      }
-      if(!AI.engine) throw last;
-      aiStatus('AI model ready: '+AI.model+'. It runs on this device.'); $('aiLoad').hidden=true;
-      say('The AI model is loaded. I can now answer free questions using your readings. Each AI answer is labeled.','bot');
-    }).catch(function(e){
-      aiStatus('The AI model could not be loaded here ('+String(e && e.message || e).slice(0,80)+'). The rule engine keeps working.');
-      $('aiLoad').disabled=false;
-    });
-  }
-  function ask(q){
-    q=String(q).trim(); if(!q) return;
-    if(AI.busy){ say('I am still answering the previous question.','bot'); return; }
-    say(q,'me');
-    var rule=answer(q, state.days, state.env, notes);
-    if(!AI.engine){ say(rule,'bot'); return; }
-    var bubble=say('Thinking...','bot ai'); AI.busy=true;
-    AI.engine.chat.completions.create({messages:buildMessages(q, state.days, state.env, notes, AI.history, rule.indexOf('I did not understand')===0 ? 'none' : rule), temperature:0.3, max_tokens:300, stream:true})
-      .then(async function(chunks){
-        var r='';
-        for await (var c of chunks){
-          r+=(c.choices[0] && c.choices[0].delta && c.choices[0].delta.content) || '';
-          bubble.textContent=cleanAI(r)||'Thinking...'; $('chat').scrollTop=$('chat').scrollHeight;
-        }
-        r=cleanAI(r);
-        if(!r) throw new Error('empty answer');
-        AI.history.push({role:'user', content:q}, {role:'assistant', content:r});
-      })
-      .catch(function(){ bubble.className='msg bot'; bubble.textContent=rule; })
-      .then(function(){ AI.busy=false; });
-  }
-  $('aiLoad').addEventListener('click', loadAI);
-  $('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); ask($('askInput').value); $('askInput').value=''; });
+    endSim(true); state.days=sample(state.env); save(); notice(''); render(); $('formMsg').textContent='Demo data restored.'; });
   /* Weekly morale survey */
   var SKEY='kuasar-crew-survey-v1', surveys=[];
   try{ var ss=JSON.parse(localStorage.getItem(SKEY)||'[]'); if(Array.isArray(ss)) surveys=ss.filter(function(x){ return x && x.valid && x.dims; }); }catch(e){}
@@ -2171,39 +2085,20 @@ if(typeof document!=='undefined'){ (function(){
   });
   renderSurvey(); renderSurveyResult(); renderSurveyHistory(); surveyProgress();
 
-  var NKEY='kuasar-crew-notes-v1', notes=[];
-  try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
-       if(Array.isArray(sn)) notes=sn.filter(function(n){ return n && typeof n.k==='string' && typeof n.a==='string'; }); }catch(e){}
-  function saveNotes(){ try{ localStorage.setItem(NKEY, JSON.stringify(notes)); }catch(e){} }
-  function noteCount(){
-    $('teachMsg').textContent=notes.length ? notes.length+' crew note'+(notes.length===1?'':'s')+' saved on this device.' : 'No crew notes yet.';
-    $('forgetNotes').hidden=!notes.length;
-  }
-  function openChat(open){
-    $('drawer').hidden=!open; $('fab').hidden=open; $('fab').setAttribute('aria-expanded', String(open));
-    if(open){ $('chat').scrollTop=$('chat').scrollHeight; $('askInput').focus(); } else { $('fab').focus(); }
-  }
   function renderInsights(){
-    $('insights').innerHTML=insights(state.days, state.env).map(function(x){
+    var a=analyze(state.days, state.env), items=[];
+    a.scenarios.filter(function(s){ return s.state===2; }).forEach(function(s){ items.push({l:2, t:'Extreme situation detected: '+s.title+' ('+s.ev+'). '+s.steps[0]+'.'}); });
+    a.findings.forEach(function(f){ items.push({l:f.level, t:f.title+': '+f.evidence.join(', ')+'. First step: '+f.actions[0].toLowerCase()+'.'}); });
+    if(a.combined.ready && a.combined.level>0) items.push({l:a.combined.level, t:a.combined.moved.length+' readings moved away from your usual pattern at the same time: '+
+      a.combined.moved.slice(0,4).map(function(x){ return IND[x.id].label.toLowerCase(); }).join(', ')+'.'});
+    insights(state.days, state.env).forEach(function(x){ if(x.l>0 || !items.length) items.push(x); });
+    $('insights').innerHTML=items.slice(0,6).map(function(x){
       return '<li class="st'+x.l+'"><i>'+SYMBOL[x.l]+'</i><span>'+esc(x.t)+'</span></li>'; }).join('');
     $('learned').textContent=learnedText(state.days);
+    renderAnalysis(a);
   }
-  $('fab').addEventListener('click', function(){ openChat(true); });
-  $('closeChat').addEventListener('click', function(){ openChat(false); });
-  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && $('surveyModal').hidden && !$('drawer').hidden) openChat(false); });
-  $('teachForm').addEventListener('submit', function(ev){
-    ev.preventDefault();
-    var k=$('teachKey').value.trim().toLowerCase(), a=$('teachAns').value.trim();
-    if(k.length<2 || !a){ $('teachMsg').textContent='Enter a keyword of at least 2 letters and an answer.'; return; }
-    notes=notes.filter(function(n){ return n.k!==k; }); notes.push({k:k, a:a}); saveNotes();
-    $('teachKey').value=''; $('teachAns').value=''; noteCount();
-    say('Saved. Ask me about "'+k+'" and I will answer with your note.','bot');
-  });
-  $('forgetNotes').addEventListener('click', function(){ notes=[]; saveNotes(); noteCount(); say('All crew notes were removed.','bot'); });
-  noteCount();
   render();
   showTab(location.hash.slice(1));
-  say(answer('summary', state.days, state.env),'bot');
 })(); }
 </script>
 </body>
