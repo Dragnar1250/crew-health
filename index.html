@@ -193,6 +193,31 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .htable{border-collapse:collapse;width:100%;min-width:640px;font-size:13px}
 .htable th{text-align:left;font-weight:500;color:var(--muted);font-size:12px;padding:6px 10px 6px 0;border-bottom:1px solid var(--line);white-space:nowrap}
 .htable td{padding:8px 10px 8px 0;border-bottom:1px solid var(--line);white-space:nowrap}
+.srclist{margin:4px 0 14px;display:flex;flex-direction:column;gap:6px}
+#tab-sources h3{margin-top:4px}
+.kittable{min-width:860px}
+.kittable td{white-space:normal;vertical-align:top}
+.kittable .kname{font-weight:500}
+.kittable tr.st2 td:first-child{box-shadow:inset 3px 0 0 var(--crit)}
+.kittable tr.st1 td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.kittable td:first-child{padding-left:10px}
+.kstat .pill{margin:0 4px 4px 0}
+.kact{white-space:nowrap}
+.kact .btn{padding:5px 10px;font-size:12px}
+.kitsum{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:640px){
+  .kittable{min-width:0}
+  .kittable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .kittable tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding:12px 0 12px 12px;border-bottom:1px solid var(--line)}
+  .kittable td{border:0;padding:0}
+  .kittable td:first-child,.kittable td.kstat,.kittable td.kact{grid-column:1/-1}
+  .kittable td:first-child{padding-left:0;box-shadow:none!important}
+  .kittable tr.st2{box-shadow:inset 3px 0 0 var(--crit)}
+  .kittable tr.st1{box-shadow:inset 3px 0 0 var(--warn)}
+  .kittable td[data-label]::before{content:attr(data-label);display:block;font:500 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+}
+.check{display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:13px;color:var(--muted)}
+.check input{margin-top:3px}
 </style>
 
 </head>
@@ -223,6 +248,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
       <button type="button" role="tab" id="t-trends" data-tab="trends" aria-controls="tab-trends" aria-selected="false" tabindex="-1">Trends<span class="tdot" id="d-trends" hidden></span></button>
       <button type="button" role="tab" id="t-radiation" data-tab="radiation" aria-controls="tab-radiation" aria-selected="false" tabindex="-1">Radiation<span class="tdot" id="d-radiation" hidden></span></button>
       <button type="button" role="tab" id="t-morale" data-tab="morale" aria-controls="tab-morale" aria-selected="false" tabindex="-1">Morale<span class="tdot" id="d-morale" hidden></span></button>
+      <button type="button" role="tab" id="t-medkit" data-tab="medkit" aria-controls="tab-medkit" aria-selected="false" tabindex="-1">Med kit<span class="tdot" id="d-medkit" hidden></span></button>
       <button type="button" role="tab" id="t-sources" data-tab="sources" aria-controls="tab-sources" aria-selected="false" tabindex="-1">Sources<span class="tdot" id="d-sources" hidden></span></button>
     </div>
   </nav>
@@ -276,6 +302,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     </div>
     <form id="checkin" novalidate>
       <div class="fields" id="fields"></div>
+      <label class="check" for="useSupplies"><input type="checkbox" id="useSupplies" checked> Count the test supplies this check-in uses: 1 glucose test strip, 2 lancets and 1 blood analyzer cartridge</label>
       <div class="formfoot">
         <button class="btn primary" type="submit">Save check-in</button>
         <button class="btn" type="button" id="clearEx">Remove example data</button>
@@ -370,23 +397,102 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
   </section>
   </section>
 
+  <section class="tabpanel" id="tab-medkit" role="tabpanel" aria-labelledby="t-medkit" hidden>
+  <section class="panel">
+    <div class="head">
+      <div>
+        <p class="label">Medical kit · NASA-STD-3001 [V2 7059] inventory tracking</p>
+        <h2>Medicines and supplies</h2>
+      </div>
+      <div class="kitsum" id="kitSum"></div>
+    </div>
+    <p class="small muted">Example inventory: the medicine names come from the ISS formulary items named in NASA's pharmaceuticals brief, while amounts, strengths and dates are invented for the demo. Take medicines only as your mission procedures and the flight surgeon direct.</p>
+    <div class="tablewrap" style="margin-top:12px">
+      <table class="htable kittable">
+        <thead><tr><th scope="col">Item</th><th scope="col">Pack</th><th scope="col">Stock</th><th scope="col">Minimum</th><th scope="col">Expires</th><th scope="col">Status</th><th scope="col"><span class="sr">Actions</span></th></tr></thead>
+        <tbody id="kitRows"></tbody>
+      </table>
+    </div>
+    <div class="formfoot">
+      <button class="btn" type="button" id="kitRestore">Restore example kit</button>
+      <span class="small" id="kitMsg" aria-live="polite"></span>
+    </div>
+  </section>
+
+  <div class="two">
+    <section class="panel">
+      <div class="head"><h2>Log a use</h2></div>
+      <form id="useForm" novalidate>
+        <div class="fields">
+          <div class="field"><label for="useItem">Item</label><select id="useItem"></select></div>
+          <div class="field"><label for="useQty">Amount</label><input id="useQty" type="number" inputmode="numeric" min="1" step="1" value="1"></div>
+          <div class="field" style="grid-column:1/-1"><label for="useWhy">Reason (optional)</label><input id="useWhy" type="text" maxlength="80" autocomplete="off" placeholder="For example: headache after exercise"></div>
+        </div>
+        <div class="formfoot"><button class="btn primary" type="submit">Log use</button><span class="small" id="useMsg" aria-live="polite"></span></div>
+      </form>
+    </section>
+    <section class="panel">
+      <div class="head"><h2>Add or restock an item</h2></div>
+      <form id="addForm" novalidate>
+        <div class="fields">
+          <div class="field" style="grid-column:1/-1"><label for="addName">Name</label><input id="addName" type="text" maxlength="60" autocomplete="off" list="kitNames" placeholder="For example: Ibuprofen 400 mg tablets"><datalist id="kitNames"></datalist></div>
+          <div class="field"><label for="addType">Type</label><select id="addType"><option>Medication</option><option>Supply</option></select></div>
+          <div class="field"><label for="addPack">Pack</label><select id="addPack"><option>Emergency Medical</option><option>Convenience Med</option><option>Oral Med</option><option>Topical and Injectable Med</option><option>Diagnostic</option><option>Minor Treatment</option><option>Medical Supply</option><option>IV Supply</option><option>Physician Equipment</option></select></div>
+          <div class="field"><label for="addQty">Amount to add</label><input id="addQty" type="number" inputmode="numeric" min="0" max="10000" step="1" value="10"></div>
+          <div class="field"><label for="addUnit">Unit</label><input id="addUnit" type="text" maxlength="20" autocomplete="off" value="tablets"></div>
+          <div class="field"><label for="addMin">Minimum to keep</label><input id="addMin" type="number" inputmode="numeric" min="0" max="10000" step="1" value="5"></div>
+          <div class="field"><label for="addExp">Expiry date</label><input id="addExp" type="date"></div>
+        </div>
+        <p class="small muted" style="margin-top:8px">If the name matches an item in the kit, the amount is added to it and its expiry date, minimum and pack are updated.</p>
+        <div class="formfoot"><button class="btn primary" type="submit">Save item</button><span class="small" id="addMsg" aria-live="polite"></span></div>
+      </form>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="head"><h2>Use log</h2><span class="small muted">Newest first</span></div>
+    <div id="kitLog"></div>
+  </section>
+  </section>
+
   <section class="tabpanel" id="tab-sources" role="tabpanel" aria-labelledby="t-sources" hidden>
   <section class="panel">
     <div class="head"><h2>Sources and limits of this prototype</h2></div>
-    <ul class="small">
+    <h3>NASA</h3>
+    <ul class="small srclist">
       <li><a href="https://www.nasa.gov/hrp/hazards">NASA Human Research Program, 5 Hazards of Human Spaceflight</a>: the hazard model behind every body region.</li>
       <li><a href="https://www.nasa.gov/humans-in-space/the-human-body-in-space/">NASA, The Human Body in Space</a>: bone loss of 1% to 1.5% per month, one-way signal delay of up to 20 minutes from Mars.</li>
       <li><a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-004-carbon-dioxide.pdf">NASA OCHMO-TB-004, Carbon Dioxide</a> (NASA-STD-3001 [V2 6004]): cabin limit of 3 mmHg as a 1-hour average, symptoms reported from 2.8 to 4.5 mmHg.</li>
-      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf">NASA OCHMO Radiation Protection technical brief</a>: 600 mSv career limit, 250 mSv per solar particle event, about 1.5 mSv per day in Mars transit.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf">NASA OCHMO Radiation Protection technical brief</a>: 600 mSv career limit, 250 mSv per solar particle event.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2017/04/radiationchallenge.pdf">NASA, Space Faring: The Radiation Challenge</a>: about 80 mSv (solar maximum) to 160 mSv (solar minimum) for a six-month ISS stay, so 0.66 mSv per day is used for the ISS; about 2 mSv per year from natural background on Earth; sievert, gray and rem.</li>
+      <li><a href="https://www.jpl.nasa.gov/images/pia17600-radiation-measurements-on-mars/">NASA JPL, Curiosity RAD radiation measurements</a>: 0.64 mSv per day on the Mars surface (Hassler et al., Science, 2014) and 1.84 mSv per day during the cruise to Mars (Zeitlin et al., Science, 2013), as reported by <a href="https://www.space.com/23875-mars-radiation-life-manned-mission.html">Space.com</a>.</li>
       <li><a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-031-exercise-overview.pdf">NASA OCHMO-TB-031, Exercise Overview</a>: station crews average about 600 minutes of exercise per week, with 60 to 90 minutes prescribed per day.</li>
-      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149">Optic nerve sheath diameter and spaceflight, npj Microgravity 2022</a>: no single cut-off exists (5.0 to 6.4 mm on Earth) and astronaut values without eye changes average about 5.8 mm, so the personal preflight value matters most.</li>
-      <li>Not yet confirmed from NASA documents: the expected daily dose for the ISS (0.5 mSv), the lunar surface (1.4 mSv, from published lander measurements) and the Mars surface (0.64 mSv, from published Curiosity RAD results).</li>
-      <li>Blood pressure, heart rate, oxygen, blood CO2, glucose, temperature, sleep and mood use general adult clinical ranges. A flight version would use each crew member's preflight baseline.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/03/sleep-accomodations-technical-brief-ochmo.pdf">NASA OCHMO Sleep Accommodations technical brief</a>: adults need 7 to 9 hours of sleep; ISS crews average 6 to 6.5 hours.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-006-pharmaceuticals.pdf">NASA OCHMO-TB-006, Pharmaceuticals</a>: NASA-STD-3001 [V2 7059] requires tracking item locations and quantities; the ISS kit is split into packs and holds 190 medications; average expiration is 1 to 2 years while exploration missions are planned for 1 to 5 years; NASA tested a Dose Tracker app for logging medication use. The example medicines come from the formulary items it names.</li>
+    </ul>
+    <h3>Other spaceflight research</h3>
+    <ul class="small srclist">
+      <li><a href="https://www.sci.news/space/radiation-dose-rates-lunar-surface-08893.html">Zhang et al., First measurements of the radiation dose on the lunar surface, Science Advances, 2020</a>: 1.369 mSv per day on the lunar surface (Chang'e 4), against 0.731 mSv per day inside the ISS in the same period.</li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149">Optic nerve sheath diameter and spaceflight, npj Microgravity, 2022</a>: no single cut-off exists (5.0 to 6.4 mm on Earth) and astronaut values without eye changes average about 5.8 mm, so the personal preflight value matters most.</li>
+    </ul>
+    <h3>Clinical reference ranges</h3>
+    <ul class="small srclist">
+      <li><a href="https://www.heart.org/bplevels">American Heart Association, Understanding Blood Pressure Readings</a>: normal below 120/80 mmHg, crisis above 180/120 mmHg.</li>
+      <li><a href="https://www.mayoclinic.org/healthy-lifestyle/fitness/expert-answers/heart-rate/faq-20057979">Mayo Clinic, What's a normal resting heart rate?</a>: 60 to 100 bpm for adults, close to 40 bpm for very fit athletes.</li>
+      <li><a href="https://magazine.medlineplus.gov/pdf/Pulse_oximeters.PDF_.final_.011123.pdf">MedlinePlus Magazine, Pulse oximeters</a>: 95% to 100% for most healthy people, accuracy limits of finger sensors.</li>
+      <li><a href="https://medlineplus.gov/ency/article/003855.htm">MedlinePlus, Blood gases</a>: PaCO2 38 to 42 mmHg at sea level; ranges vary between labs.</li>
+      <li><a href="https://ada.silverchair.com/view-large/3051584">American Diabetes Association, Classification of Hypoglycemia (Diabetes Care, 2017)</a>: level 1 below 70 mg/dL, level 2 below 54 mg/dL.</li>
+      <li><a href="https://www.cdc.gov/port-health/php/definitions-symptoms-reportable-illness/index.html">CDC, Definitions of Signs, Symptoms, and Conditions of Ill Travelers</a>: fever is a measured 100.4 °F (38 °C) or higher.</li>
+    </ul>
+    <h3>Team decisions and limits</h3>
+    <ul class="small srclist">
+      <li>Where a clinical source gives a normal range, this tool uses it for "In range". The "Act now" steps (for example 38.5 °C or a heart rate above 120 bpm) are the team's own proposal for when to call the flight surgeon. A flight version would use each crew member's preflight baseline and NASA-STD-3001 limits.</li>
       <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign.</li>
-      <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
-      <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
       <li>Cumulative dose warning steps at 300 mSv (half of the career limit) and 480 mSv (80%) were chosen by the team. The 600 mSv career limit is NASA's.</li>
       <li>The weekly morale survey and its General Psychological Risk Index were designed by the team. It is not a validated clinical instrument, and its thresholds are a first proposal.</li>
+      <li>The medical kit is an example. Amounts, strengths and dates are invented for the demo, and the tool does not give medicine doses.</li>
+      <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
+      <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
@@ -447,6 +553,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
     <button type="button" class="chip" data-q="Interpret my day">Interpret my day</button>
     <button type="button" class="chip" data-q="How are my goals?">How are my goals?</button>
     <button type="button" class="chip" data-q="How is my morale?">How is my morale?</button>
+    <button type="button" class="chip" data-q="Any expired or low medicines?">Any expired or low medicines?</button>
     <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
     <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
     <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
@@ -479,21 +586,21 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 <script>
 /* SI/AI disclosure: this script was generated with AI assistance (Claude, Anthropic). */
 var ENV = {
-  iss:  {name:'ISS', full:'Low Earth orbit station', g:'Microgravity', delay:'Near real-time', dose:0.5,
+  iss:  {name:'ISS', full:'Low Earth orbit station', g:'Microgravity', delay:'Near real-time', dose:0.66,
          reply:'Ground can answer within minutes.'},
-  moon: {name:'Moon base', full:'Lunar surface base', g:'0.17 g', delay:'About 1.3 s one way', dose:1.4,
+  moon: {name:'Moon base', full:'Lunar surface base', g:'0.17 g', delay:'About 1.3 s one way', dose:1.37,
          reply:'Ground can answer within minutes.'},
   mars: {name:'Mars base', full:'Mars surface base', g:'0.38 g', delay:'Up to 20 min one way', dose:0.64,
          reply:'A reply can take 40 minutes or more. Start the onboard protocol while you wait.'},
-  transit:{name:'Mars transit', full:'Deep-space transit vehicle', g:'Microgravity', delay:'Seconds to 20 min one way', dose:1.5,
+  transit:{name:'Mars transit', full:'Deep-space transit vehicle', g:'Microgravity', delay:'Seconds to 20 min one way', dose:1.84,
          reply:'The delay grows as you travel. Far from Earth a reply can take 40 minutes or more, so start the onboard protocol while you wait.'}
 };
 var IND = {
-  sys:  {label:'Systolic blood pressure', unit:'mmHg', ok:[90,129], cau:[80,179], min:50, max:260, step:1,
+  sys:  {label:'Systolic blood pressure', unit:'mmHg', ok:[90,119], cau:[80,180], min:50, max:260, step:1,
          how:'Sit still for 5 minutes, then use the arm cuff.',
          lo:'Low pressure. Drink fluids, add salt to your next meal and avoid standing up fast.',
          hi:'High pressure. Rest 10 minutes and measure again. Cut salt and caffeine today.'},
-  dia:  {label:'Diastolic blood pressure', unit:'mmHg', ok:[60,84], cau:[50,119], min:30, max:160, step:1,
+  dia:  {label:'Diastolic blood pressure', unit:'mmHg', ok:[60,79], cau:[50,120], min:30, max:160, step:1,
          how:'Read the lower number from the same cuff measurement.',
          lo:'Low pressure. Drink fluids and recheck in 30 minutes.',
          hi:'High pressure. Rest 10 minutes and measure again.'},
@@ -585,7 +692,7 @@ function sample(env){
   function r(){ s=(s*16807)%2147483647; return s/2147483647; }
   for(var i=0;i<14;i++){
     days.push({day:i+1, example:true,
-      sys:Math.round(112+r()*14), dia:Math.round(68+r()*10), hr:Math.round(58+r()*14),
+      sys:Math.round(108+r()*10), dia:Math.round(68+r()*10), hr:Math.round(58+r()*14),
       glu:Math.round(84+r()*30), temp:+(36.5+r()*0.6).toFixed(1), sleep:+(7+r()*1.3).toFixed(1),
       mood:3+Math.floor(r()*3), ex:Math.round(95+r()*50), rad:+(d*(0.8+r()*0.5)).toFixed(2),
       spo2:97+Math.floor(r()*3), pco2:Math.round(38+r()*5), onsd:+(5.6+r()*0.6).toFixed(1), cabin:+(1.8+r()*1.0).toFixed(1)});
@@ -937,23 +1044,23 @@ function kbText(e, d, env){
 }
 /* Unit explanations (u) and step-by-step measurement instructions (m) for every indicator. */
 var INFO = {
-  sys:  {u:'mmHg means millimetres of mercury, the classic unit of pressure. Systolic is the upper number: the pressure in your arteries at the moment the heart beats.',
+  sys:  {u:'mmHg means millimetres of mercury, the classic unit of pressure. Systolic is the upper number: the pressure in your arteries at the moment the heart beats. The American Heart Association calls below 120/80 mmHg normal, 120 to 129 elevated, 130/80 or higher high blood pressure, and above 180/120 a crisis.',
          m:['Rest for 5 minutes with your body still and the arm at heart level.','Wrap the cuff around the bare upper arm, about two finger widths above the elbow.','Do not talk or move while the cuff inflates.','Take two readings one minute apart and log the average.']},
-  dia:  {u:'mmHg means millimetres of mercury. Diastolic is the lower number: the pressure in your arteries while the heart rests between beats.',
+  dia:  {u:'mmHg means millimetres of mercury. Diastolic is the lower number: the pressure in your arteries while the heart rests between beats. Below 80 mmHg is normal, 80 to 89 is stage 1 high blood pressure, and above 120 is a crisis (American Heart Association).',
          m:['Use the same cuff measurement as for the systolic value.','Read the second, lower number on the display.','Log it together with the systolic value from the same reading.']},
-  hr:   {u:'bpm means beats per minute: how many times the heart beats in 60 seconds while you are at rest.',
+  hr:   {u:'bpm means beats per minute: how many times the heart beats in 60 seconds while you are at rest. A normal resting rate for adults is 60 to 100 bpm, and very fit people can be close to 40 (Mayo Clinic). This tool accepts 50 to 100 for trained crew.',
          m:['Rest for 5 minutes before measuring, and measure before exercise or caffeine.','Read the value from the pulse oximeter, or count the pulse at your wrist for 60 seconds.','Measure at the same time each day so the values can be compared.']},
-  spo2: {u:'% here is the share of the hemoglobin in your blood that is carrying oxygen. 100% means fully loaded.',
-         m:['Warm the finger first. A cold finger gives a falsely low value.','Clip the pulse oximeter on the fingertip and keep the hand still.','Wait about 30 seconds until the number stops changing, then log it.']},
-  pco2: {u:'pCO2 is the partial pressure of carbon dioxide dissolved in the blood, in millimetres of mercury (mmHg). It shows how well your breathing removes carbon dioxide.',
+  spo2: {u:'% here is the share of the hemoglobin in your blood that is carrying oxygen. 100% means fully loaded. Most healthy people read 95% to 100%. Finger sensors are most accurate between 90% and 100%, and a reading of 90% can mean anything from 86% to 94% (MedlinePlus).',
+         m:['Warm the finger first and remove any nail polish. A cold finger gives a falsely low value.','Rest the hand below the level of the heart, relaxed and still, and clip the pulse oximeter on the fingertip.','Wait until the number stops changing, then log it.','Darker skin can make some sensors read falsely high, so compare with your own usual value as well.']},
+  pco2: {u:'pCO2 is the partial pressure of carbon dioxide dissolved in the blood, in millimetres of mercury (mmHg). It shows how well your breathing removes carbon dioxide. MedlinePlus lists 38 to 42 mmHg for arterial blood. Many labs use 35 to 45 mmHg, which this tool uses. A fingertip sample reads close to, but not exactly, the arterial value.',
          m:['Clean and dry a fingertip.','Prick the side of the fingertip and fill the test cartridge without air bubbles, keeping the drop contained.','Insert the cartridge into the portable blood analyzer and wait for the result.','Put the lancet and cartridge in the sharps container.']},
-  cabin:{u:'This is the partial pressure of carbon dioxide in the cabin air, in millimetres of mercury (mmHg). 3 mmHg is about 0.4% of normal sea-level air pressure.',
+  cabin:{u:'This is the partial pressure of carbon dioxide in the cabin air, in millimetres of mercury (mmHg). 3 mmHg is about 0.4% of normal sea-level air pressure. NASA limits it to 3 mmHg as a 1-hour average (NASA-STD-3001 [V2 6004]).',
          m:['Read the value from the air monitor nearest to where you work or sleep.','Use the 1-hour average, not a momentary peak.','Without airflow, exhaled air stays around your head, so also check the fan in your sleep station.']},
-  glu:  {u:'mg/dL means milligrams of glucose in one decilitre (a tenth of a litre) of blood. Divide by 18 to get mmol/L.',
+  glu:  {u:'mg/dL means milligrams of glucose in one decilitre (a tenth of a litre) of blood. Divide by 18 to get mmol/L. Below 70 mg/dL (3.9 mmol/L) is low blood sugar, and below 54 mg/dL (3.0 mmol/L) is clinically significant low blood sugar (American Diabetes Association).',
          m:['Clean and dry a fingertip.','Prick the side of the fingertip and touch the test strip to the drop.','Read the meter after a few seconds.','Log whether you measured before or after a meal.']},
-  temp: {u:'°C means degrees Celsius. To convert to Fahrenheit, multiply by 1.8 and add 32.',
+  temp: {u:'°C means degrees Celsius. To convert to Fahrenheit, multiply by 1.8 and add 32. A measured 38.0 °C (100.4 °F) or higher counts as a fever (CDC). This tool already asks you to watch from 37.6 °C and to contact the flight surgeon from 38.5 °C.',
          m:['Rest for 10 minutes. Do not measure right after exercise or a hot drink.','Use the ear or forehead thermometer as its instructions show.','Always measure at the same place on the body so the values can be compared.']},
-  sleep:{u:'h means hours of actual sleep, not the time spent in the sleep station.',
+  sleep:{u:'h means hours of actual sleep, not the time spent in the sleep station. Adults need 7 to 9 hours. On the ISS crews average only 6 to 6.5 hours a night (NASA OCHMO sleep brief).',
          m:['Wear the wrist activity monitor at night, or note the times you fell asleep and woke up.','Subtract the time you lay awake.','Log the value soon after waking, while you still remember the night.']},
   mood: {u:'This is a self-rating from 1 (very low) to 5 (very good). It has no physical unit, but the change from day to day is what matters.',
          m:['Rate your mood before you start work.','Choose the number that fits the whole day so far, not one moment.','Be honest. The value is used to support you, not to judge you.']},
@@ -961,7 +1068,7 @@ var INFO = {
          m:['Put gel on the closed eyelid and place the ultrasound probe on it gently.','Find the dark band of the optic nerve behind the eyeball.','Measure the sheath width 3 mm behind the eyeball.','Measure both eyes and log the average. Ask the ground to guide the scan if you are unsure.']},
   ex:   {u:'min means minutes of loaded exercise today: resistance training plus treadmill or cycle time.',
          m:['Add up the session times from the exercise device logs.','Count only real loading time, not setup or rest.','Log resistance and cardio together as one total.']},
-  rad:  {u:'mSv means millisievert, the unit for the biological effect of radiation on the body. On Earth a person receives roughly 2 to 3 mSv in a whole year from natural sources.',
+  rad:  {u:'mSv means millisievert, the unit of dose equivalent: the absorbed energy, measured in milligray (mGy), weighted for how harmful the type of radiation is. 1 Sv = 1000 mSv = 100 rem. On Earth natural background gives about 2 mSv a year, while a six-month ISS stay gives about 80 to 160 mSv (NASA).',
          m:['Keep your personal dosimeter on your body all day.','Read the daily value at the same time each day.','During a solar particle event, also note where you sheltered and for how long.']}
 };
 var UNIT_WORDS = {'mmhg':'sys','mm hg':'sys','bpm':'hr','mg/dl':'glu','msv':'rad','millisievert':'rad','millisieverts':'rad','celsius':'temp'};
@@ -979,6 +1086,7 @@ function buildMessages(q, days, env, notes, history, ruleAnswer){
     'You are not a doctor and you do not diagnose.\n\nDATA\n'+
     'Location: '+E.full+'. Gravity: '+E.g+'. Signal delay to Earth: '+E.delay+'. Expected radiation dose: '+E.dose+' mSv per day.\n'+
     doseText(doseStatus(days))+'\n'+
+    (KIT ? kitText(KIT, KIT_LOG, kitNow())+'\n' : '')+
     (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
          'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
        : 'No check-in has been logged yet.\n')+
@@ -1124,6 +1232,123 @@ function doseAdvice(s){
   if(s.level===1) return 'Half of the limit is used. Plan to lower your dose: keep spacewalks short, sleep in the most shielded area and follow space weather alerts closely.'+eta;
   return s.left.toFixed(1)+' mSv remain before the limit.';
 }
+function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+/* Medical kit and medication tracking.
+   NASA OCHMO-TB-006 (Pharmaceuticals): NASA-STD-3001 [V2 7059] requires tracking the locations and quantities of items through the mission;
+   the ISS kit is split into packs; average expiration is 1-2 years while exploration missions are planned for 1-5 years;
+   NASA tested a "Dose Tracker" app for logging medication use on the ISS. */
+var MED_PACKS = ['Emergency Medical','Convenience Med','Oral Med','Topical and Injectable Med','Diagnostic','Minor Treatment','Medical Supply','IV Supply','Physician Equipment'];
+var SUPPLY_USE = [
+  {id:'strips', n:1, why:'blood glucose test'},
+  {id:'lancets', n:2, why:'glucose and blood gas samples'},
+  {id:'cartridges', n:1, why:'blood gas analyzer'}
+];
+var KIT=null, KIT_LOG=[], KIT_NOW=null;
+function setKit(kit, log, nowMs){ KIT=kit||null; KIT_LOG=log||[]; KIT_NOW=(typeof nowMs==='number' && isFinite(nowMs)) ? nowMs : null; }
+function kitNow(){ return KIT_NOW!==null ? KIT_NOW : Date.now(); }
+function isoDate(ms){
+  var d=new Date(ms); function p(n){ return (n<10?'0':'')+n; }
+  return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());
+}
+function daysUntil(exp, nowMs){
+  var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(exp||''); if(!m) return null;
+  var t=Date.UTC(+m[1], +m[2]-1, +m[3]), c=new Date(t);
+  if(c.getUTCMonth()!==+m[2]-1 || c.getUTCDate()!==+m[3]) return null;
+  var n=new Date(nowMs), t0=Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+  return Math.round((t-t0)/86400000);
+}
+function itemStatus(it, nowMs){
+  var f=[], du=daysUntil(it.exp, nowMs);
+  if(du!==null && du<0) f.push({c:'expired', l:2, t:'Expired '+(-du)+' day'+(du===-1?'':'s')+' ago'});
+  if(it.qty<=0) f.push({c:'out', l:2, t:'Out of stock'});
+  else if(it.qty<=it.min) f.push({c:'low', l:1, t:'Low: '+it.qty+' left, minimum '+it.min});
+  if(du!==null && du>=0 && du<=30) f.push({c:'expiring', l:1, t:du===0 ? 'Expires today' : 'Expires in '+du+' day'+(du===1?'':'s')});
+  return {level:f.reduce(function(a,x){ return Math.max(a,x.l); },0), flags:f, days:du};
+}
+function kitIssues(kit, nowMs){
+  return (kit||[]).map(function(it){ return {it:it, s:itemStatus(it, nowMs)}; })
+    .filter(function(x){ return x.s.level>0; })
+    .sort(function(a,b){ return b.s.level-a.s.level; });
+}
+function kitLevel(kit, nowMs){ return kitIssues(kit, nowMs).reduce(function(a,x){ return Math.max(a, x.s.level); }, 0); }
+function itemText(it, nowMs){
+  var s=itemStatus(it, nowMs);
+  return it.name+': '+amt(it.qty, it.unit)+' left (minimum '+it.min+'), '+(it.exp ? 'expires '+it.exp : 'no expiry date')+', in the '+it.pack+' pack.'+
+    (s.flags.length ? ' '+s.flags.map(function(f){ return f.t; }).join('. ')+'.' : '');
+}
+function kitText(kit, log, nowMs){
+  if(!kit) return 'No medical kit inventory is loaded.';
+  var iss=kitIssues(kit, nowMs), last=(log||[])[ (log||[]).length-1 ];
+  return 'Medical kit: '+kit.length+' item'+(kit.length===1?'':'s')+'. '+
+    (iss.length ? iss.map(function(x){ return x.it.name+' ('+x.s.flags.map(function(f){ return f.t.toLowerCase(); }).join(', ')+')'; }).join('; ')+'.'
+                : 'Nothing is low, out of stock or near expiry.')+
+    (iss.some(function(x){ return x.s.flags.some(function(f){ return f.c==='expired'; }); }) ? ' Do not use expired items without asking the flight surgeon.' : '')+
+    (last ? ' Last logged use: '+amt(last.qty, last.unit)+' of '+last.name+(last.day ? ' on mission day '+last.day : '')+'.' : '');
+}
+function findItem(kit, q){
+  var stop={}; ORDER.forEach(function(id){ TERMS[id].join(' ').split(/[^a-z0-9]+/).forEach(function(w){ stop[w]=1; }); });
+  return (kit||[]).filter(function(it){
+    var w=(it.name.toLowerCase().match(/[a-z]{4,}/g)||[])[0];
+    return w && !stop[w] && new RegExp('\\b'+w+'\\b').test(q);
+  });
+}
+function useItem(kit, id, qty){
+  var it=(kit||[]).filter(function(x){ return x.id===id; })[0];
+  if(!it) return {ok:false, msg:'That item is not in the kit.'};
+  if(!(Number.isInteger(qty) && qty>0)) return {ok:false, msg:'Enter a whole number of 1 or more.'};
+  if(qty>it.qty) return {ok:false, msg:'Only '+it.qty+' '+it.unit+' of '+it.name+' are left.'};
+  it.qty-=qty; return {ok:true, item:it};
+}
+function amt(n, unit){ return n+' '+(n===1 ? String(unit).replace(/s$/,'') : unit); }
+function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,40) || 'item'; }
+function restockItem(kit, f){
+  var name=String(f.name||'').trim();
+  if(!name || name.length>60) return {ok:false, msg:'Enter an item name of up to 60 characters.'};
+  if(!(Number.isInteger(f.qty) && f.qty>=0 && f.qty<=10000)) return {ok:false, msg:'Enter a quantity from 0 to 10000.'};
+  if(f.exp && daysUntil(f.exp, 0)===null) return {ok:false, msg:'Enter the expiry date as a full date.'};
+  var it=kit.filter(function(x){ return x.name.toLowerCase()===name.toLowerCase(); })[0];
+  if(it){
+    it.qty+=f.qty;
+    if(f.exp) it.exp=f.exp;
+    if(Number.isInteger(f.min) && f.min>=0) it.min=f.min;
+    if(MED_PACKS.indexOf(f.pack)>=0) it.pack=f.pack;
+    return {ok:true, item:it, added:false};
+  }
+  var id=slug(name), n=2; while(kit.some(function(x){ return x.id===id; })) id=slug(name)+'-'+(n++);
+  it={id:id, name:name, type:f.type==='Supply'?'Supply':'Medication', pack:MED_PACKS.indexOf(f.pack)>=0?f.pack:'Medical Supply',
+      qty:f.qty, unit:String(f.unit||'units').trim().slice(0,20)||'units', min:Number.isInteger(f.min)&&f.min>=0?f.min:0, exp:f.exp||''};
+  kit.push(it); return {ok:true, item:it, added:true};
+}
+function consumeCheckin(kit){
+  var used=[], short=[];
+  SUPPLY_USE.forEach(function(u){
+    var it=(kit||[]).filter(function(x){ return x.id===u.id; })[0];
+    if(!it) return;
+    if(it.qty>=u.n){ it.qty-=u.n; used.push({item:it, n:u.n, why:u.why}); }
+    else short.push({item:it, n:u.n, why:u.why});
+  });
+  return {used:used, short:short};
+}
+/* Example kit. Medicine names come from the ISS formulary items named in NASA OCHMO-TB-006; strengths, amounts and dates are invented for the demo. */
+function sampleKit(nowMs){
+  function on(days){ return isoDate(nowMs+days*86400000); }
+  return [
+    {id:'ibuprofen',    name:'Ibuprofen 400 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:40, unit:'tablets',    min:10, exp:on(420)},
+    {id:'acetaminophen',name:'Acetaminophen 500 mg tablets',   type:'Medication', pack:'Oral Med',                   qty:30, unit:'tablets',    min:10, exp:on(300)},
+    {id:'zolpidem',     name:'Zolpidem 5 mg tablets',          type:'Medication', pack:'Oral Med',                   qty:8,  unit:'tablets',    min:10, exp:on(500)},
+    {id:'melatonin',    name:'Melatonin 3 mg tablets',         type:'Medication', pack:'Convenience Med',            qty:20, unit:'tablets',    min:5,  exp:on(-12)},
+    {id:'loratadine',   name:'Loratadine 10 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:14, unit:'tablets',    min:5,  exp:on(22)},
+    {id:'pseudoephedrine',name:'Pseudoephedrine 60 mg tablets',type:'Medication', pack:'Oral Med',                   qty:20, unit:'tablets',    min:5,  exp:on(380)},
+    {id:'promethazine', name:'Promethazine 25 mg/mL injection',type:'Medication', pack:'Topical and Injectable Med', qty:4,  unit:'ampoules',   min:2,  exp:on(250)},
+    {id:'loperamide',   name:'Loperamide 2 mg capsules',       type:'Medication', pack:'Oral Med',                   qty:12, unit:'capsules',   min:4,  exp:on(600)},
+    {id:'modafinil',    name:'Modafinil 100 mg tablets',       type:'Medication', pack:'Oral Med',                   qty:10, unit:'tablets',    min:4,  exp:on(410)},
+    {id:'strips',       name:'Glucose test strips',            type:'Supply',     pack:'Diagnostic',                 qty:46, unit:'strips',     min:10, exp:on(200)},
+    {id:'lancets',      name:'Lancets',                        type:'Supply',     pack:'Diagnostic',                 qty:60, unit:'lancets',    min:20, exp:on(900)},
+    {id:'cartridges',   name:'Blood analyzer cartridges',      type:'Supply',     pack:'Diagnostic',                 qty:12, unit:'cartridges', min:5,  exp:on(40)},
+    {id:'gauze',        name:'Sterile gauze dressings',        type:'Supply',     pack:'Minor Treatment',            qty:25, unit:'dressings',  min:10, exp:on(1000)},
+    {id:'gel',          name:'Ultrasound gel',                 type:'Supply',     pack:'Diagnostic',                 qty:3,  unit:'tubes',      min:1,  exp:on(500)}
+  ];
+}
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
 function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
@@ -1202,6 +1427,12 @@ function insights(days, env){
   if(lowEx>=3) out.push({l:1, t:'Exercise was below target on '+lowEx+' of the last '+Math.min(7,days.length)+' days. Bone and muscle loss speeds up without daily loading.'});
   if(LAST_SURVEY && LAST_SURVEY.level>0) out.unshift({l:LAST_SURVEY.level, t:surveyText(LAST_SURVEY)});
   var dz=doseStatus(days); if(dz.level>0) out.unshift({l:dz.level, t:doseText(dz)});
+  var ki=KIT ? kitIssues(KIT, kitNow()) : [];
+  if(ki.length){
+    var kt='Medical kit: '+ki.slice(0,3).map(function(x){ return x.it.name+' ('+x.s.flags.map(function(f){ return f.t.toLowerCase(); }).join(', ')+')'; }).join('; ')+
+      (ki.length>3 ? ' and '+(ki.length-3)+' more' : '')+'. Open the Med kit tab to restock or replace them.';
+    if(ki[0].s.level===2) out.unshift({l:2, t:kt}); else out.push({l:1, t:kt});
+  }
   if(!out.length) out.push({l:0, t:baseline('hr',days)?'No unusual pattern today. Your readings match your personal baseline.':'No unusual pattern today.'});
   return out.slice(0,5);
 }
@@ -1245,6 +1476,10 @@ function core(q, days, env){
   if(/\b(problems|emergencies|topics|go wrong)\b/.test(q))
     return 'I have first-response steps for: '+KB.map(function(e){ return e.t.toLowerCase(); }).join(', ')+'.';
   if(/\b(goal|goals|streak|streaks|target|targets)\b/.test(q)) return goalsText(days, env);
+  var kitHit=KIT ? findItem(KIT, q) : [];
+  if(kitHit.length) return kitHit.map(function(it){ return itemText(it, kitNow()); }).join('\n\n');
+  if(/\b(medication|medications|medicine|medicines|meds|pill|pills|drug|drugs|inventory|stock|supplies|supply|expired|expiring|expiry|pharmacy)\b/.test(q))
+    return kitText(KIT, KIT_LOG, kitNow());
   if(/\b(morale|survey|gpri|psychological|psychology|wellbeing)\b/.test(q))
     return LAST_SURVEY ? surveyText(LAST_SURVEY) : 'No morale survey has been completed yet. Fill in the weekly morale survey on the page to get your General Psychological Risk Index.';
   if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
@@ -1308,7 +1543,7 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,esc:esc,setKit:setKit,sampleKit:sampleKit,itemStatus:itemStatus,daysUntil:daysUntil,isoDate:isoDate,kitIssues:kitIssues,kitLevel:kitLevel,kitText:kitText,itemText:itemText,findItem:findItem,useItem:useItem,restockItem:restockItem,consumeCheckin:consumeCheckin,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -1462,7 +1697,98 @@ if(typeof document!=='undefined'){ (function(){
       met===dg.length ? 'Every daily goal is done today.' :
       (ds===0 && best>0 ? 'Your streak restarts today. Your best run was '+best+' day'+(best===1?'':'s')+'.' : (dg.length-met)+' daily goal'+(dg.length-met===1?'':'s')+' left today.');
   }
-  var TABS=['overview','checkin','body','trends','radiation','morale','sources'];
+  /* Medical kit */
+  var KKEY='kuasar-crew-kit-v1', kitState={kit:null, log:[]};
+  try{ var ks=JSON.parse(localStorage.getItem(KKEY)||'null');
+       if(ks && Array.isArray(ks.kit) && Array.isArray(ks.log)) kitState={kit:ks.kit.filter(function(x){ return x && typeof x.name==='string' && typeof x.qty==='number'; }), log:ks.log}; }catch(e){}
+  if(!kitState.kit) kitState={kit:sampleKit(Date.now()), log:[]};
+  setKit(kitState.kit, kitState.log);
+  function saveKit(){ setKit(kitState.kit, kitState.log); try{ localStorage.setItem(KKEY, JSON.stringify(kitState)); }catch(e){} }
+  function logUse(it, qty, reason, src){
+    var d=latest();
+    kitState.log.push({day:d?d.day:null, at:new Date().toISOString(), id:it.id, name:it.name, qty:qty, unit:it.unit, reason:reason||'', src:src});
+  }
+  function statusPills(s){
+    if(!s.flags.length) return '<span class="pill st0">● OK</span>';
+    return s.flags.map(function(f){ return '<span class="pill st'+f.l+'">'+SYMBOL[f.l]+' '+f.t+'</span>'; }).join(' ');
+  }
+  function renderKit(){
+    var now=Date.now(), kit=kitState.kit, iss=kitIssues(kit, now);
+    var c={expired:0,out:0,low:0,expiring:0}; iss.forEach(function(x){ x.s.flags.forEach(function(f){ c[f.c]++; }); });
+    $('kitSum').innerHTML = iss.length ? Object.keys(c).filter(function(k){ return c[k]; }).map(function(k){
+        var l=(k==='expired'||k==='out')?2:1; return '<span class="pill st'+l+'">'+SYMBOL[l]+' '+c[k]+' '+(k==='out'?'out of stock':k)+'</span>'; }).join(' ')
+      : '<span class="pill st0">● All items OK</span>';
+    $('kitRows').innerHTML = kit.length ? kit.map(function(it){
+      var s=itemStatus(it, now), dd=s.days;
+      return '<tr class="'+(s.level?'st'+s.level:'')+'"><td><span class="kname">'+esc(it.name)+'</span><br><span class="small muted">'+esc(it.type)+'</span></td>'+
+        '<td data-label="Pack">'+esc(it.pack)+'</td><td class="num" data-label="Stock">'+it.qty+' '+esc(it.unit)+'</td><td class="num" data-label="Minimum">'+it.min+'</td>'+
+        '<td class="num" data-label="Expires">'+(it.exp ? esc(it.exp)+'<br><span class="small muted">'+(dd<0 ? (-dd)+' days ago' : dd===0 ? 'today' : 'in '+dd+' days')+'</span>' : '–')+'</td>'+
+        '<td class="kstat">'+statusPills(s)+'</td>'+
+        '<td class="kact"><button class="btn" type="button" data-use="'+esc(it.id)+'"'+(it.qty<1?' disabled':'')+'>Use 1</button> '+
+        '<button class="btn" type="button" data-remove="'+esc(it.id)+'">Remove</button></td></tr>'; }).join('')
+      : '<tr><td colspan="7" class="muted">The kit is empty. Add an item below or restore the example kit.</td></tr>';
+    var sel=$('useItem').value;
+    $('useItem').innerHTML=kit.map(function(it){ return '<option value="'+esc(it.id)+'">'+esc(it.name)+' ('+it.qty+' '+esc(it.unit)+' left)</option>'; }).join('');
+    if(kit.some(function(it){ return it.id===sel; })) $('useItem').value=sel;
+    $('kitNames').innerHTML=kit.map(function(it){ return '<option value="'+esc(it.name)+'"></option>'; }).join('');
+    var log=kitState.log;
+    $('kitLog').innerHTML = log.length ? '<div class="tablewrap"><table class="htable"><thead><tr><th scope="col">Mission day</th><th scope="col">Time</th><th scope="col">Item</th><th scope="col">Amount</th><th scope="col">Reason</th><th scope="col">Logged by</th></tr></thead><tbody>'+
+      log.slice().reverse().slice(0,50).map(function(e){
+        var t=new Date(e.at); var tt=isNaN(t) ? '–' : isoDate(t.getTime())+' '+(t.getHours()<10?'0':'')+t.getHours()+':'+(t.getMinutes()<10?'0':'')+t.getMinutes();
+        return '<tr><td class="num">'+(e.day||'–')+'</td><td class="num">'+tt+'</td><td>'+esc(e.name)+'</td><td class="num">'+esc(amt(e.qty, e.unit))+'</td><td>'+(e.reason?esc(e.reason):'–')+'</td><td>'+(e.src==='check-in'?'Check-in':'Crew')+'</td></tr>'; }).join('')+
+      '</tbody></table></div>' : '<p class="small muted">No uses logged yet. Log a medicine you take or a supply you use, and it appears here.</p>';
+  }
+  function kitChanged(){ saveKit(); renderKit(); renderInsights(); renderTabDots(); }
+  var armed=null;
+  $('tab-medkit').addEventListener('click', function(ev){
+    var u=ev.target.closest('[data-use]'), rm=ev.target.closest('[data-remove]');
+    if(u){
+      var r=useItem(kitState.kit, u.dataset.use, 1);
+      if(!r.ok){ $('kitMsg').textContent=r.msg; return; }
+      logUse(r.item, 1, '', 'crew'); kitChanged();
+      $('kitMsg').textContent='Logged '+amt(1, r.item.unit)+' of '+r.item.name+'. '+r.item.qty+' left.';
+      var again=document.querySelector('[data-use="'+u.dataset.use+'"]'); if(again && !again.disabled) again.focus();
+      return;
+    }
+    if(rm){
+      var id=rm.dataset.remove;
+      if(armed!==id){ armed=id; rm.textContent='Confirm remove'; rm.classList.add('danger');
+        $('kitMsg').textContent='Press "Confirm remove" to delete this item from the kit.';
+        setTimeout(function(){ if(armed===id){ armed=null; renderKit(); } }, 5000); return; }
+      armed=null;
+      var gone=kitState.kit.filter(function(x){ return x.id===id; })[0];
+      kitState.kit=kitState.kit.filter(function(x){ return x.id!==id; }); kitChanged();
+      $('kitMsg').textContent=gone ? gone.name+' was removed from the kit.' : '';
+      $('kitRestore').focus();
+    }
+  });
+  var restoreArmed=false;
+  $('kitRestore').addEventListener('click', function(){
+    if(!restoreArmed){ restoreArmed=true; this.textContent='Confirm: replace the kit and clear the log'; this.classList.add('danger');
+      var b=this; setTimeout(function(){ restoreArmed=false; b.textContent='Restore example kit'; b.classList.remove('danger'); }, 5000); return; }
+    restoreArmed=false; this.textContent='Restore example kit'; this.classList.remove('danger');
+    kitState={kit:sampleKit(Date.now()), log:[]}; kitChanged();
+    $('kitMsg').textContent='The example kit was restored and the use log was cleared.';
+  });
+  $('useForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var qty=Number($('useQty').value), r=useItem(kitState.kit, $('useItem').value, qty);
+    if(!r.ok){ $('useMsg').textContent=r.msg; $('useQty').focus(); return; }
+    logUse(r.item, qty, $('useWhy').value.trim(), 'crew'); kitChanged();
+    $('useMsg').textContent='Logged '+amt(qty, r.item.unit)+' of '+r.item.name+'. '+r.item.qty+' left.';
+    $('useWhy').value=''; $('useQty').value=1;
+  });
+  $('addForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var f={name:$('addName').value, type:$('addType').value, pack:$('addPack').value, qty:Number($('addQty').value),
+           unit:$('addUnit').value, min:$('addMin').value==='' ? undefined : Number($('addMin').value), exp:$('addExp').value};
+    var r=restockItem(kitState.kit, f);
+    if(!r.ok){ $('addMsg').textContent=r.msg; return; }
+    kitChanged();
+    $('addMsg').textContent=(r.added ? 'Added ' : 'Restocked ')+r.item.name+': '+r.item.qty+' '+r.item.unit+' in the kit.';
+    $('addName').value='';
+  });
+  var TABS=['overview','checkin','body','trends','radiation','morale','medkit','sources'];
   function showTab(name, focus){
     if(TABS.indexOf(name)<0) name='overview';
     TABS.forEach(function(t){
@@ -1497,10 +1823,11 @@ if(typeof document!=='undefined'){ (function(){
     var rw=d ? Math.max.apply(null, ORDER.map(function(id){ return statusOf(id,d[id],env); })) : 0;
     dot('body', rw, rw===2?'A reading needs action':'A reading to watch');
     var dz=doseStatus(state.days).level; dot('radiation', dz, dz===2?'Dose needs action':'Dose to watch');
+    var kl=kitLevel(kitState.kit, Date.now()); dot('medkit', kl, kl===2?'An item is expired or out of stock':'An item is low or expiring soon');
     var sv=LAST_SURVEY ? LAST_SURVEY.level : 0, due=!weeklyGoals(state.days, env).goals[4].done;
     if(sv) dot('morale', sv, sv===2?'Morale needs attention':'Morale to watch'); else dot('morale', due?'due':0, 'Survey due this week');
   }
-  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderInsights(); renderTabDots(); }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderKit(); renderInsights(); renderTabDots(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
@@ -1539,8 +1866,17 @@ if(typeof document!=='undefined'){ (function(){
       if(isNaN(v)||v<I.min||v>I.max){ if(!bad) bad=el; } else day[id]=v;
     });
     if(bad){ $('formMsg').textContent='Check the highlighted value: it is missing or outside what the instrument can read.'; bad.focus(); return; }
-    state.days.push(day); save(); notice(''); render();
-    $('formMsg').innerHTML='Saved as mission day '+day.day+'. <button class="btn linkbtn" type="button" data-goto="overview">See today\'s overview</button>';
+    state.days.push(day); save(); notice('');
+    var sup='';
+    if($('useSupplies').checked){
+      var cr=consumeCheckin(kitState.kit);
+      cr.used.forEach(function(x){ logUse(x.item, x.n, x.why, 'check-in'); });
+      saveKit();
+      if(cr.used.length) sup+=' Supplies used: '+cr.used.map(function(x){ return amt(x.n, x.item.unit); }).join(', ')+'.';
+      if(cr.short.length) sup+=' Not enough in the kit: '+cr.short.map(function(x){ return x.item.name; }).join(', ')+'.';
+    }
+    render();
+    $('formMsg').innerHTML='Saved as mission day '+day.day+'.'+esc(sup)+' <button class="btn linkbtn" type="button" data-goto="overview">See today\'s overview</button>';
   });
   $('clearEx').addEventListener('click', function(){
     state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
@@ -1721,7 +2057,7 @@ if(typeof document!=='undefined'){ (function(){
   }
   function renderInsights(){
     $('insights').innerHTML=insights(state.days, state.env).map(function(x){
-      return '<li class="st'+x.l+'"><i>'+SYMBOL[x.l]+'</i><span>'+x.t+'</span></li>'; }).join('');
+      return '<li class="st'+x.l+'"><i>'+SYMBOL[x.l]+'</i><span>'+esc(x.t)+'</span></li>'; }).join('');
     $('learned').textContent=learnedText(state.days);
   }
   $('fab').addEventListener('click', function(){ openChat(true); });
