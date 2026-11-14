@@ -28,6 +28,15 @@ Open `index.html` in any modern browser. No installation or server is needed.
 
 Other reference: [Optic nerve sheath diameter and spaceflight, npj Microgravity 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149).
 
+## Tools and other resources
+
+- [WebLLM](https://github.com/mlc-ai/web-llm) 0.2.84 by MLC AI (Apache-2.0 license): runs the optional language model in the browser.
+- Llama 3.2 1B Instruct by Meta (Llama 3.2 Community License): the optional language model, downloaded only when the user asks for it. If it is not available, WebLLM's Qwen2.5 or SmolLM2 models are used instead.
+- [IBM Plex Sans and IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Sans) fonts (SIL Open Font License), loaded from Google Fonts.
+- Claude by Anthropic: AI assistance for writing the code.
+
+Values still to be confirmed against NASA sources: expected daily dose for the ISS (0.5 mSv), the lunar surface (1.4 mSv) and the Mars surface (0.64 mSv), and the general adult clinical ranges for blood pressure, heart rate, blood oxygen, blood CO2, glucose, temperature and sleep.
+
 ## Limits of this prototype
 
 - Reference ranges are general adult clinical ranges used as placeholders.
