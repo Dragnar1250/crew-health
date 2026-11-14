@@ -33,7 +33,7 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
-.wrap{max-width:1080px;margin:0 auto;padding-block:20px 40px;
+.wrap{max-width:1080px;margin:0 auto;padding-block:20px 96px;
   padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
   display:flex;flex-direction:column;gap:16px}
 h1{font-size:22px;margin:0;font-weight:600;letter-spacing:-.01em}
@@ -103,6 +103,20 @@ footer{font-size:12px;color:var(--muted)}
 .quick{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
 .ask{display:flex;flex-wrap:wrap;gap:8px}
 .ask input{flex:1 1 220px;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.assist{border-color:var(--accent)}
+.insights{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:8px}
+.insights li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-size:14px}
+.insights i{font-style:normal;font-weight:600;color:var(--s)}
+.fab{position:fixed;z-index:20;right:calc(16px + env(safe-area-inset-right, 0px));bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  font:inherit;font-weight:600;font-size:14px;color:var(--surface);background:var(--accent);border:0;border-radius:999px;padding:12px 18px;cursor:pointer;
+  box-shadow:0 6px 20px rgba(0,0,0,.28)}
+.drawer{position:fixed;z-index:21;right:calc(16px + env(safe-area-inset-right, 0px));bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+  width:min(420px, calc(100% - 32px));max-height:min(660px, calc(100% - 32px));display:flex;flex-direction:column;gap:10px;
+  background:var(--surface);border:1px solid var(--accent);border-radius:14px;padding:14px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.drawer .chat{flex:1 1 auto;min-height:110px;max-height:none}
+.drawer .quick{margin:0;max-height:66px;overflow-y:auto;flex:0 0 auto}
+.teach summary{cursor:pointer;font-size:13px;color:var(--muted)}
+.teach form{margin-top:8px}
 </style>
 
 </head>
@@ -125,6 +139,18 @@ footer{font-size:12px;color:var(--muted)}
   <section id="banner" class="banner st0" aria-live="polite"></section>
   <p id="notice" class="small muted" aria-live="polite" hidden></p>
 
+  <section class="panel assist">
+    <div class="head">
+      <div>
+        <p class="label">Onboard assistant · learns your baseline · works offline</p>
+        <h2>The assistant's reading of today</h2>
+      </div>
+      <button class="btn primary" type="button" data-open-chat>Ask the assistant</button>
+    </div>
+    <ul class="insights" id="insights"></ul>
+    <p class="small muted" id="learned"></p>
+  </section>
+
   <div class="grid">
     <section class="panel figure" aria-label="Body map">
       <p class="label">Body map · select a region</p>
@@ -133,31 +159,6 @@ footer{font-size:12px;color:var(--muted)}
     </section>
     <section class="panel detail" id="detail" aria-live="polite"></section>
   </div>
-
-  <section class="panel">
-    <div class="head">
-      <h2>Onboard assistant</h2>
-      <span class="small muted">Rule-based. Runs on this device with no internet. Gives first-response summaries for health and technical problems. Official mission procedures come first.</span>
-    </div>
-    <div class="chat" id="chat" aria-live="polite"></div>
-    <div class="quick">
-      <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
-      <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
-      <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
-      <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
-      <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
-      <button type="button" class="chip" data-q="Why does space affect my eyes?">Why does space affect my eyes?</button>
-      <button type="button" class="chip" data-q="I have a headache">I have a headache</button>
-      <button type="button" class="chip" data-q="There is smoke in the module">There is smoke in the module</button>
-      <button type="button" class="chip" data-q="We lost power">We lost power</button>
-      <button type="button" class="chip" data-q="What problems do you cover?">What problems do you cover?</button>
-    </div>
-    <form class="ask" id="askForm">
-      <label for="askInput" hidden>Ask a question</label>
-      <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading or a problem: sleep, CO2, nausea, air leak">
-      <button class="btn primary" type="submit">Ask</button>
-    </form>
-  </section>
 
   <section class="panel">
     <div class="head">
@@ -214,6 +215,47 @@ footer{font-size:12px;color:var(--muted)}
 
   <footer>Code generated with AI assistance (Claude, Anthropic); concept, design decisions and review by team Kuasar Selçuklu. No NASA branding is used.</footer>
 </div>
+
+<button class="fab" id="fab" type="button" aria-expanded="false" aria-controls="drawer">Ask the assistant</button>
+<aside class="drawer" id="drawer" aria-label="Onboard assistant" hidden>
+  <div class="head" style="margin:0">
+    <div>
+      <h2>Onboard assistant</h2>
+      <p class="small muted">Rule-based and offline. First-response summaries only. Official mission procedures come first.</p>
+    </div>
+    <button class="btn" type="button" id="closeChat" aria-label="Close assistant">Close</button>
+  </div>
+  <div class="chat" id="chat" aria-live="polite"></div>
+  <div class="quick">
+    <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
+    <button type="button" class="chip" data-q="Interpret my day">Interpret my day</button>
+    <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
+    <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
+    <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
+    <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
+    <button type="button" class="chip" data-q="I have a headache">I have a headache</button>
+    <button type="button" class="chip" data-q="There is smoke in the module">There is smoke in the module</button>
+    <button type="button" class="chip" data-q="We lost power">We lost power</button>
+    <button type="button" class="chip" data-q="What problems do you cover?">What problems do you cover?</button>
+  </div>
+  <form class="ask" id="askForm">
+    <label for="askInput" hidden>Ask a question</label>
+    <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading or a problem">
+    <button class="btn primary" type="submit">Ask</button>
+  </form>
+  <details class="teach">
+    <summary>Teach the assistant a crew note</summary>
+    <form class="ask" id="teachForm">
+      <label for="teachKey" hidden>Keyword</label>
+      <input id="teachKey" type="text" autocomplete="off" placeholder="Keyword, for example: medical kit">
+      <label for="teachAns" hidden>Answer</label>
+      <input id="teachAns" type="text" autocomplete="off" placeholder="Answer, for example: locker 4 in the lab module">
+      <button class="btn" type="submit">Save note</button>
+      <button class="btn" type="button" id="forgetNotes">Forget all notes</button>
+    </form>
+    <p class="small muted" id="teachMsg" aria-live="polite"></p>
+  </details>
+</aside>
 
 <script>
 /* SI/AI disclosure: this script was generated with AI assistance (Claude, Anthropic). */
@@ -538,8 +580,111 @@ function kbText(e, d, env){
   if(e.s===2) s+='\nReport to the ground. Signal delay: '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
   return s;
 }
-function answer(q, days, env){
-  q=String(q||'').toLowerCase();
+/* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
+function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
+function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
+function isLow(id, d, env){ return d[id]<ranges(id,env).ok[0]; }
+/* Personal baseline: mean and spread of the earlier check-ins (up to 30). Needs at least 5. */
+function baseline(id, days){
+  var p=days.slice(0,-1).slice(-30).map(function(x){ return x[id]; });
+  if(p.length<5) return null;
+  var m=p.reduce(function(a,b){ return a+b; },0)/p.length;
+  var sd=Math.sqrt(p.reduce(function(a,b){ return a+(b-m)*(b-m); },0)/p.length);
+  return {mean:m, sd:sd, n:p.length};
+}
+function unusual(id, days){
+  var b=baseline(id,days); if(!b) return null;
+  var v=days[days.length-1][id], spread=Math.max(b.sd, Math.abs(b.mean)*0.05, IND[id].step), z=(v-b.mean)/spread;
+  return Math.abs(z)>=2.5 ? {z:z, b:b, v:v} : null;
+}
+function run(id, days){
+  var n=0, dir=0;
+  for(var i=days.length-1;i>0;i--){
+    var s=Math.sign(days[i][id]-days[i-1][id]);
+    if(s===0) break; if(dir===0) dir=s; if(s!==dir) break; n++;
+  }
+  return {n:n, dir:dir};
+}
+function projection(id, days, env){
+  if(days.length<5) return null;
+  var w=days.slice(-5).map(function(x){ return x[id]; }), mx=2, my=w.reduce(function(a,b){return a+b;},0)/5, num=0, den=0;
+  w.forEach(function(v,i){ num+=(i-mx)*(v-my); den+=(i-mx)*(i-mx); });
+  var s=num/den, v=w[4], ok=ranges(id,env).ok, r=run(id,days), k=null;
+  if(s>0 && isFinite(ok[1]) && v<=ok[1]) k=(ok[1]-v)/s;
+  if(s<0 && ok[0]>0 && v>=ok[0]) k=(v-ok[0])/(-s);
+  if(k===null || k<=0 || k>3 || r.n<3 || r.dir!==Math.sign(s)) return null;
+  return {days:Math.max(1,Math.ceil(k)), n:r.n, dir:r.dir};
+}
+var PATTERNS = [
+  {ids:['temp','hr'], on:function(d,e){ return isHigh('temp',d,e)&&isHigh('hr',d,e); },
+   t:'Raised temperature together with a fast pulse points to a possible infection. Rest, keep distance from crewmates and measure again in 1 hour.'},
+  {ids:['spo2','hr'], on:function(d,e){ return isLow('spo2',d,e)&&isHigh('hr',d,e); },
+   t:'Low blood oxygen with a fast pulse suggests your body is short of oxygen. Check the cabin oxygen level and your breathing now.'},
+  {ids:['sys','hr'], on:function(d,e){ return isLow('sys',d,e)&&isHigh('hr',d,e); },
+   t:'Low blood pressure with a fast pulse is a typical sign of dehydration. Drink fluids with electrolytes and measure again in 1 hour.'},
+  {ids:['glu','hr'], on:function(d,e){ return isLow('glu',d,e)&&isHigh('hr',d,e); },
+   t:'Low blood sugar with a fast pulse. Eat fast carbohydrate now, before any other task.'},
+  {ids:['pco2','onsd'], on:function(d,e){ return isHigh('pco2',d,e)&&isHigh('onsd',d,e); },
+   t:'High carbon dioxide and a wider optic nerve sheath appear together. Carbon dioxide widens blood vessels in the head and may add to pressure behind the eyes, so lowering CO2 exposure is the first step.'},
+  {ids:['pco2','sleep'], on:function(d,e){ return isHigh('pco2',d,e)&&isLow('sleep',d,e); },
+   t:'High carbon dioxide and short sleep appear together. Check the airflow in your sleep station.'},
+  {ids:['sleep','mood'], on:function(d,e){ return isLow('sleep',d,e)&&isLow('mood',d,e); },
+   t:'Short sleep together with low mood raises the risk of mistakes. Ask the commander to lighten today\'s critical tasks.'},
+  {ids:['sleep','hr'], on:function(d,e){ return isLow('sleep',d,e)&&isHigh('hr',d,e); },
+   t:'Short sleep and a raised resting pulse together suggest incomplete recovery. Plan a lighter exercise session and an earlier bedtime today.'}
+];
+function insights(days, env){
+  var d=days[days.length-1], out=[];
+  if(!d) return [{l:0, t:'Log a check-in so I can read your day.'}];
+  PATTERNS.forEach(function(p){ if(p.on(d,env)) out.push({l:Math.max.apply(null,p.ids.map(function(id){ return statusOf(id,d[id],env); })), t:p.t}); });
+  ORDER.forEach(function(id){
+    if(statusOf(id,d[id],env)!==0) return;
+    var u=unusual(id,days), I=IND[id];
+    if(u) out.push({l:1, t:I.label+' is '+d[id]+' '+I.unit+'. That is inside the reference range but '+(u.z>0?'above':'below')+
+      ' your usual '+fx(id,u.b.mean)+' '+I.unit+', learned from your last '+u.b.n+' check-ins.'});
+    var p=projection(id,days,env);
+    if(p) out.push({l:1, t:I.label+' has '+(p.dir>0?'risen':'fallen')+' '+p.n+' check-ins in a row and may leave the reference range in about '+
+      p.days+' day'+(p.days===1?'':'s')+'.'});
+  });
+  var lowEx=days.slice(-7).filter(function(x){ return x.ex<90; }).length;
+  if(lowEx>=3) out.push({l:1, t:'Exercise was below target on '+lowEx+' of the last '+Math.min(7,days.length)+' days. Bone and muscle loss speeds up without daily loading.'});
+  if(!out.length) out.push({l:0, t:baseline('hr',days)?'No unusual pattern today. Your readings match your personal baseline.':'No unusual pattern today.'});
+  return out.slice(0,5);
+}
+function learnedText(days){
+  var n=Math.min(30, Math.max(0, days.length-1));
+  return n>=5 ? 'Personal baseline learned from '+n+' earlier check-ins. It updates with every new check-in.'
+              : 'I need 5 earlier check-ins to learn your personal baseline. So far: '+n+'.';
+}
+/* Typo tolerance: a word of 5+ letters that is one edit away from a known term is read as that term. */
+function lev1(a, b){
+  if(a===b) return true;
+  var la=a.length, lb=b.length; if(Math.abs(la-lb)>1) return false;
+  var i=0, j=0, e=0;
+  while(i<la && j<lb){
+    if(a[i]===b[j]){ i++; j++; continue; }
+    if(++e>1) return false;
+    if(la>lb) i++; else if(lb>la) j++; else { i++; j++; }
+  }
+  return e+(la-i)+(lb-j)<=1;
+}
+var VOCAB=null;
+function vocab(){
+  if(VOCAB) return VOCAB;
+  var all=[]; ORDER.forEach(function(id){ all=all.concat(TERMS[id]); }); KB.forEach(function(e){ all=all.concat(e.k); });
+  VOCAB=all.filter(function(t,i){ return /^[a-z0-9]{6,}$/.test(t) && all.indexOf(t)===i; });
+  return VOCAB;
+}
+function correct(q){
+  var V=vocab();
+  return q.replace(/[a-z0-9]{5,}/g, function(w){
+    if(V.indexOf(w)>=0) return w;
+    for(var i=0;i<V.length;i++) if(lev1(w,V[i])) return V[i];
+    return w; });
+}
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+/* Returns the answer text, or null when nothing matched. */
+function core(q, days, env){
   var d=days[days.length-1];
   var kb=findKB(q);
   if(kb.length) return kb.map(function(e){ return kbText(e, d, env); }).join('\n\n');
@@ -553,14 +698,17 @@ function answer(q, days, env){
   var names=flagged.map(function(id){ return IND[id].label.toLowerCase()+' ('+WORD[st(id)].toLowerCase()+')'; }).join(', ');
   var wantHow=has(/\b(measure|how do i|how to|reading)\b/), wantWhy=has(/\b(why|affect|affects|cause|causes|hazard|hazards|space)\b/),
       wantTrend=has(/\b(trend|worse|better|changing|change|changed|week|lately|history)\b/);
-  var ids=findIds(q);
+  var ids=ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
   if(ids.length) return ids.map(function(id){
-    var I=IND[id], v=d[id], s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
+    var I=IND[id], v=d[id], b=baseline(id,days), s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
+    if(b) s+=' Your usual is '+fx(id,b.mean)+' '+I.unit+', learned from your last '+b.n+' check-ins.';
     if(st(id)>0) s+=' '+adviceFor(id,v,env);
     if(wantHow) s+=' How to measure: '+I.how;
     if(wantWhy) s+=' '+REGIONS[regionOf(id)].why;
     if(wantTrend) s+=' '+trendText(id,days);
     return s; }).join('\n\n');
+  if(has(/\b(interpret|interpretation|insight|insights|analyze|analyse|analysis|pattern|patterns|unusual|baseline|what does (this|it) mean|normal for me)\b/))
+    return insights(days,env).map(function(x){ return x.t; }).join('\n\n')+'\n\n'+learnedText(days);
   if(has(/\b(contact|surgeon|doctor|call|earth|ground|report|emergency)\b/)){
     if(worst===0) return 'No reading needs a report today.';
     if(worst===1) return 'Tell the crew medical officer about: '+names+'. Measure again later today. If a reading moves to "Act now", contact the flight surgeon.';
@@ -575,14 +723,29 @@ function answer(q, days, env){
     return flagged.map(function(id){ return IND[id].label+': '+trendText(id,days); }).join('\n\n');
   }
   if(wantWhy) return 'Spaceflight has five main hazards: space radiation, isolation and confinement, distance from Earth, gravity fields, and hostile closed environments. Name a reading or body part to see how it is affected.';
-  if(has(/\b(how am i|status|summary|today|overall|healthy|health|ok|okay|fine)\b/))
+  if(has(/\b(how am i|status|summary|today|overall|healthy|health|ok|okay|fine)\b/)){
+    var top=insights(days,env)[0];
     return 'Mission day '+d.day+' at the '+ENV[env].full.toLowerCase()+'. '+
       (flagged.length ? flagged.length+' of '+ORDER.length+' readings need attention: '+names+'. Ask "what should I do now" for guidance.'
-                      : 'All '+ORDER.length+' readings are in range.');
-  if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, or who to contact.';
-  return 'I can answer from your logged readings. Try "how am I today", "what should I do now", "who should I contact", name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation, or describe a problem such as headache, nausea, fire, air leak or power loss. Ask "what problems do you cover" for the full list.';
+                      : 'All '+ORDER.length+' readings are in range.')+(top.l>0?'\n\nMy reading: '+top.t:'');
+  }
+  if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, a problem, or who to contact.';
+  return null;
 }
-if(typeof module!=='undefined') module.exports={answer:answer,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+function answer(q, days, env, notes){
+  q=String(q||'').toLowerCase();
+  var mine=(notes||[]).filter(function(n){ return new RegExp('(^|[^a-z0-9])'+escRe(n.k)+'(?![a-z0-9])').test(q); })
+                      .map(function(n){ return 'Crew note: '+n.a; }).join('\n');
+  var r=core(q, days, env);
+  if(r===null){
+    var fixed=correct(q);
+    if(fixed!==q){ var r2=core(fixed, days, env); if(r2!==null) r='I read that as "'+fixed+'".\n\n'+r2; }
+  }
+  if(mine) return r===null ? mine : mine+'\n\n'+r;
+  if(r!==null) return r;
+  return 'I can answer from your logged readings. Try "how am I today", "interpret my day", "what should I do now", "who should I contact", name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation, or describe a problem such as headache, nausea, fire, air leak or power loss. Ask "what problems do you cover" for the full list. You can also teach me a crew note below.';
+}
+if(typeof module!=='undefined') module.exports={answer:answer,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v2';
@@ -704,12 +867,13 @@ if(typeof document!=='undefined'){ (function(){
     $('doseVal').textContent=total.toFixed(2)+' mSv';
     $('doseBar').style.width=Math.min(100,total/600*100).toFixed(2)+'%';
   }
-  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderInsights(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
   document.addEventListener('click', function(ev){
-    var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q]'); if(!t) return;
+    var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q],[data-open-chat]'); if(!t) return;
+    if(t.hasAttribute('data-open-chat')){ openChat(true); return; }
     if(t.dataset.q){ ask(t.dataset.q); return; }
     if(t.dataset.env){
       state.env=t.dataset.env; var s=sample(state.env);
@@ -744,8 +908,38 @@ if(typeof document!=='undefined'){ (function(){
     var m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
     $('chat').appendChild(m); $('chat').scrollTop=$('chat').scrollHeight;
   }
-  function ask(q){ q=String(q).trim(); if(!q) return; say(q,'me'); say(answer(q, state.days, state.env),'bot'); }
+  function ask(q){ q=String(q).trim(); if(!q) return; say(q,'me'); say(answer(q, state.days, state.env, notes),'bot'); }
   $('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); ask($('askInput').value); $('askInput').value=''; });
+  var NKEY='kuasar-crew-notes-v1', notes=[];
+  try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
+       if(Array.isArray(sn)) notes=sn.filter(function(n){ return n && typeof n.k==='string' && typeof n.a==='string'; }); }catch(e){}
+  function saveNotes(){ try{ localStorage.setItem(NKEY, JSON.stringify(notes)); }catch(e){} }
+  function noteCount(){
+    $('teachMsg').textContent=notes.length ? notes.length+' crew note'+(notes.length===1?'':'s')+' saved on this device.' : 'No crew notes yet.';
+    $('forgetNotes').hidden=!notes.length;
+  }
+  function openChat(open){
+    $('drawer').hidden=!open; $('fab').hidden=open; $('fab').setAttribute('aria-expanded', String(open));
+    if(open){ $('chat').scrollTop=$('chat').scrollHeight; $('askInput').focus(); } else { $('fab').focus(); }
+  }
+  function renderInsights(){
+    $('insights').innerHTML=insights(state.days, state.env).map(function(x){
+      return '<li class="st'+x.l+'"><i>'+SYMBOL[x.l]+'</i><span>'+x.t+'</span></li>'; }).join('');
+    $('learned').textContent=learnedText(state.days);
+  }
+  $('fab').addEventListener('click', function(){ openChat(true); });
+  $('closeChat').addEventListener('click', function(){ openChat(false); });
+  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && !$('drawer').hidden) openChat(false); });
+  $('teachForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var k=$('teachKey').value.trim().toLowerCase(), a=$('teachAns').value.trim();
+    if(k.length<2 || !a){ $('teachMsg').textContent='Enter a keyword of at least 2 letters and an answer.'; return; }
+    notes=notes.filter(function(n){ return n.k!==k; }); notes.push({k:k, a:a}); saveNotes();
+    $('teachKey').value=''; $('teachAns').value=''; noteCount();
+    say('Saved. Ask me about "'+k+'" and I will answer with your note.','bot');
+  });
+  $('forgetNotes').addEventListener('click', function(){ notes=[]; saveNotes(); noteCount(); say('All crew notes were removed.','bot'); });
+  noteCount();
   render();
   say(answer('summary', state.days, state.env),'bot');
 })(); }

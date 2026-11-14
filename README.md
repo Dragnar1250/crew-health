@@ -10,7 +10,7 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 - **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise and daily radiation dose.
 - **Guidance:** every reading shows its reference range, how to measure it, and what to do when it is out of range.
 - **Escalation:** tells the astronaut when to inform the crew medical officer and when to contact the flight surgeon, including the signal delay to Earth.
-- **Onboard assistant:** a rule-based helper that runs fully offline. It answers questions about the logged readings and gives first-response steps for 36 likely health and technical problems, such as headache, nausea, fire, cabin pressure loss and power loss.
+- **Onboard assistant:** a rule-based helper that runs fully offline. It learns each astronaut's personal baseline from earlier check-ins, flags readings that are unusual for that person, interprets readings together (for example fever with a fast pulse), tolerates typos, and can be taught crew notes. It answers questions about the logged readings and gives first-response steps for 36 likely health and technical problems, such as headache, nausea, fire, cabin pressure loss and power loss.
 - **Environments:** ISS, Moon base and Mars base, each with its own gravity, signal delay and expected radiation dose.
 - **Trends and routine:** a chart for each indicator, streak badges and a cumulative radiation dose bar.
 
