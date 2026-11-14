@@ -89,8 +89,6 @@ form .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr
 .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin-bottom:12px}
 .badge{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--muted)}
 .badge.on{border-style:solid;border-color:var(--ok);color:var(--ink);background:var(--ok-soft)}
-.dose{height:10px;background:var(--bg);border:1px solid var(--line);border-radius:999px;overflow:hidden}
-.dose span{display:block;height:100%;background:var(--accent)}
 .two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
 ul{margin:0;padding-left:18px}
 a{color:var(--accent)}
@@ -159,6 +157,23 @@ footer{font-size:12px;color:var(--muted)}
 .gbar span{display:block;height:100%;background:var(--accent)}
 .glist li.done .gbar span{background:var(--ok)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.modal{position:fixed;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;background:rgba(8,12,20,.6);
+  padding:max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) max(16px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px))}
+.sheet{background:var(--surface);color:var(--ink);border:1px solid var(--accent);border-radius:14px;width:min(760px,100%);max-height:100%;overflow-y:auto;
+  padding:16px 18px;box-shadow:0 20px 60px rgba(0,0,0,.4);display:flex;flex-direction:column;gap:10px}
+.mhead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:flex-start;justify-content:space-between}
+.mprog{position:sticky;top:-16px;z-index:1;background:var(--surface);display:flex;align-items:center;gap:12px;padding:8px 0}
+.mprog .gbar{flex:1 1 auto}
+.linkbtn{padding:2px 10px;font-size:12px;border-color:var(--accent);color:var(--accent)}
+.doseval{font-size:22px}
+#priorForm input{flex:none}
+.dosep.st1{border-color:var(--warn)} .dosep.st2{border-color:var(--crit)}
+#doseWrap{margin:10px 0 2px}
+.dose{position:relative;height:12px;background:var(--bg);border:1px solid var(--line);border-radius:999px}
+.dose>span{display:block;height:100%;min-width:6px;border-radius:999px;background:var(--s)}
+.dose i{position:absolute;top:-4px;bottom:-4px;width:2px;margin-left:-1px;background:var(--muted)}
+.doseticks{position:relative;height:18px;margin-top:4px}
+.doseticks span{position:absolute;top:0;transform:translateX(-50%)}
 </style>
 
 </head>
@@ -249,25 +264,12 @@ footer{font-size:12px;color:var(--muted)}
       <span class="small muted" id="surveyTag"></span>
     </div>
     <div id="surveyResult" aria-live="polite"></div>
-    <p class="small muted">On every question, 1 is the least and 5 is the most of what is asked.</p>
-    <form id="surveyForm" novalidate>
-      <div id="surveyQs"></div>
-      <div class="two" style="margin-top:12px">
-        <div class="field">
-          <label for="sv_q13">13. What was the hardest moment of this week? (logged, not scored)</label>
-          <textarea id="sv_q13"></textarea>
-        </div>
-        <div class="field">
-          <label for="sv_q14">14. What would help you most right now? (logged, not scored)</label>
-          <textarea id="sv_q14"></textarea>
-        </div>
-      </div>
-      <div class="formfoot">
-        <button class="btn primary" type="submit">Submit survey</button>
-        <span class="small" id="surveyMsg" aria-live="polite"></span>
-      </div>
-    </form>
+    <div class="formfoot" style="margin-top:0">
+      <button class="btn primary" type="button" data-open-survey>Start the morale survey</button>
+      <span class="small" id="surveyDone" aria-live="polite"></span>
+    </div>
   </section>
+
 
   <section class="panel">
     <div class="head">
@@ -281,14 +283,32 @@ footer{font-size:12px;color:var(--muted)}
     <p class="small muted" id="chartNote"></p>
   </section>
 
-  <div>
-    <section class="panel">
-      <div class="head"><h2>Cumulative radiation dose</h2></div>
-      <p><span class="num" id="doseVal"></span> <span class="muted small">of a 600 mSv career limit</span></p>
-      <div class="dose" style="margin:8px 0"><span id="doseBar"></span></div>
-      <p class="small muted">Sum of the logged daily dosimeter readings for this mission.</p>
-    </section>
-  </div>
+  <section class="panel" id="dosePanel">
+    <div class="head">
+      <div>
+        <p class="label">Space radiation · career limit 600 mSv</p>
+        <h2>Cumulative radiation dose</h2>
+      </div>
+      <span id="doseState"></span>
+    </div>
+    <p><span class="num doseval" id="doseVal"></span> <span class="muted small">of the 600 mSv career limit</span></p>
+    <div id="doseWrap">
+      <div class="dose" role="progressbar" aria-label="Career radiation dose" aria-valuemin="0" aria-valuemax="600" id="doseMeter">
+        <span id="doseBar"></span><i style="left:50%"></i><i style="left:80%"></i>
+      </div>
+      <div class="doseticks small muted num" aria-hidden="true"><span style="left:0;transform:none">0</span><span style="left:50%">300</span><span style="left:80%">480</span><span style="left:100%;transform:translateX(-100%)">600</span></div>
+    </div>
+    <p class="small" id="doseMsg"></p>
+    <p class="small muted" id="doseSplit"></p>
+    <form class="ask" id="priorForm" novalidate style="margin-top:10px">
+      <div class="field" style="flex:1 1 240px">
+        <label for="priorDose">Career dose from earlier missions (mSv)</label>
+        <input id="priorDose" type="number" inputmode="decimal" min="0" max="2000" step="0.1" value="0">
+      </div>
+      <button class="btn" type="submit" style="align-self:flex-end">Save earlier dose</button>
+    </form>
+    <p class="small muted">Warning steps: 300 mSv (half of the limit) to watch, 480 mSv (80%) to act, 600 mSv limit reached.</p>
+  </section>
 
   <section class="panel">
     <div class="head"><h2>Sources and limits of this prototype</h2></div>
@@ -304,12 +324,45 @@ footer{font-size:12px;color:var(--muted)}
       <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign.</li>
       <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
       <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
+      <li>Cumulative dose warning steps at 300 mSv (half of the career limit) and 480 mSv (80%) were chosen by the team. The 600 mSv career limit is NASA's.</li>
       <li>The weekly morale survey and its General Psychological Risk Index were designed by the team. It is not a validated clinical instrument, and its thresholds are a first proposal.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
 
   <footer>Code generated with AI assistance (Claude, Anthropic); concept, design decisions and review by team Kuasar Selçuklu. No NASA branding is used.</footer>
+</div>
+
+<div class="modal" id="surveyModal" role="dialog" aria-modal="true" aria-labelledby="surveyModalTitle" hidden>
+  <div class="sheet" id="surveySheet">
+    <div class="mhead">
+      <div>
+        <p class="label">Weekly morale survey · 12 questions · about 3 minutes</p>
+        <h2 id="surveyModalTitle">How are you this week?</h2>
+      </div>
+      <button class="btn" type="button" data-close-survey aria-label="Close the survey">Close</button>
+    </div>
+    <p class="small muted">On every question, 1 is the least and 5 is the most of what is asked. Your answers stay on this device until you submit.</p>
+    <div class="mprog"><div class="gbar"><span id="surveyBar"></span></div><span class="small muted num" id="surveyProg">0 of 12 answered</span></div>
+      <form id="surveyForm" novalidate>
+        <div id="surveyQs"></div>
+        <div class="two" style="margin-top:12px">
+          <div class="field">
+            <label for="sv_q13">13. What was the hardest moment of this week? (logged, not scored)</label>
+            <textarea id="sv_q13"></textarea>
+          </div>
+          <div class="field">
+            <label for="sv_q14">14. What would help you most right now? (logged, not scored)</label>
+            <textarea id="sv_q14"></textarea>
+          </div>
+        </div>
+        <div class="formfoot">
+          <button class="btn primary" type="submit">Submit survey</button>
+          <button class="btn" type="button" data-close-survey>Close</button>
+          <span class="small" id="surveyMsg" aria-live="polite"></span>
+        </div>
+      </form>
+  </div>
 </div>
 
 <button class="fab" id="fab" type="button" aria-expanded="false" aria-controls="drawer">Ask the assistant</button>
@@ -409,10 +462,10 @@ var IND = {
          how:'Use the forehead or ear thermometer at rest.',
          lo:'Low temperature. Add clothing layers and take a warm drink.',
          hi:'Raised temperature. Rest, drink fluids and recheck in 1 hour. Fever can signal infection.'},
-  sleep:{label:'Sleep last night', unit:'h', ok:[7,9], cau:[5,24], min:0, max:24, step:0.1,
+  sleep:{label:'Sleep last night', unit:'h', ok:[7,9], cau:[5,11], min:0, max:24, step:0.1,
          how:'Count the hours you actually slept, not time in the sleep station.',
          lo:'Short sleep. Avoid critical tasks if you can, dim lights 1 hour before sleep and keep a fixed bedtime.',
-         hi:'Long sleep. Note how rested you feel. Constant tiredness should be reported.'},
+         hi:'Too much sleep. Sleeping more than 9 hours can point to an illness, low mood, a disturbed light schedule or fatigue that sleep does not fix. Check your temperature and mood, keep to the light schedule, and tell the crew medical officer if it happens again.'},
   mood: {label:'Mood', unit:'/ 5', ok:[3,5], cau:[2,5], min:1, max:5, step:1,
          how:'Rate how you feel overall today, from 1 (very low) to 5 (very good).',
          lo:'Low mood. Talk to a crewmate, schedule a family call and take your planned free time.',
@@ -491,7 +544,7 @@ var TERMS = {
   temp:['temperature','fever','temp'], sleep:['sleep','slept','asleep'],
   mood:['mood','sad','stress','stressed','lonely','anxious'],
   onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid'],
-  ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar']
+  ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar','cumulative','career limit']
 };
 function findIds(q){
   return ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
@@ -703,6 +756,12 @@ var KB = [
     'Wash your hands carefully and clean the toilet area so it does not spread.',
     'Eat plain food until it settles.',
     'Report it if it lasts more than a day, or comes with fever or blood.']},
+  {k:['oversleep','oversleeping','overslept','sleeping too much','sleep too much','too much sleep','slept too long','sleeping too long','hypersomnia'], t:'Sleeping too much', s:1, c:['sleep','mood','temp'], a:[
+    'More than 9 hours of sleep, night after night, is not normal on a mission schedule.',
+    'Check your temperature and mood. Illness and low mood are the most common causes.',
+    'Keep a fixed wake time and turn on bright light right after waking to reset your body clock.',
+    'Avoid long naps during the day.',
+    'Tell the crew medical officer if it lasts more than 3 nights or comes with low mood.']},
   {k:['insomnia','cannot sleep','trouble sleeping','sleep problems','wake up at night','waking up'], t:'Trouble sleeping', s:1, c:['sleep','cabin','mood'], a:[
     'Keep the same bedtime and wake time every day, including rest days.',
     'Dim the lights and stop screen work 1 hour before sleep. Use the eye mask and earplugs.',
@@ -856,6 +915,7 @@ function buildMessages(q, days, env, notes, history, ruleAnswer){
     'Do not invent readings, limits or procedures. If something is urgent or not covered by the DATA, tell the astronaut to contact the crew medical officer or the flight surgeon. '+
     'You are not a doctor and you do not diagnose.\n\nDATA\n'+
     'Location: '+E.full+'. Gravity: '+E.g+'. Signal delay to Earth: '+E.delay+'. Expected radiation dose: '+E.dose+' mSv per day.\n'+
+    doseText(doseStatus(days))+'\n'+
     (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
          'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
        : 'No check-in has been logged yet.\n')+
@@ -914,7 +974,7 @@ function setSurvey(r){ LAST_SURVEY=(r && r.valid) ? r : null; }
 /* Daily and weekly goals with streaks. A mission week is days 1-7, 8-14 and so on. */
 var DAILY_GOALS = [
   {id:'checkin', t:'Log today\'s check-in',    ok:function(d){ return !!d; },          v:function(){ return 'Done'; }},
-  {id:'sleep',   t:'Sleep 7 h or more',        ok:function(d){ return d.sleep>=7; },   v:function(d){ return d.sleep+' h'; }},
+  {id:'sleep',   t:'Sleep 7 to 9 h',           ok:function(d){ return d.sleep>=7 && d.sleep<=9; },   v:function(d){ return d.sleep+' h'; }},
   {id:'ex',      t:'Exercise 60 min or more',  ok:function(d){ return d.ex>=60; },     v:function(d){ return d.ex+' min'; }},
   {id:'green',   t:'Every reading in range',
    ok:function(d,env){ return ORDER.every(function(id){ return statusOf(id,d[id],env)===0; }); },
@@ -950,7 +1010,7 @@ function weeklyGoals(days, env, week){
   var goals=[
     {id:'log',     t:'Check in every day',                have:wd.length, need:7, unit:'days'},
     {id:'ex',      t:'Exercise '+WEEK_EX+' min in total', have:Math.round(ex), need:WEEK_EX, unit:'min'},
-    {id:'sleep',   t:'Sleep 7 h or more on 5 nights',     have:wd.filter(function(x){ return x.sleep>=7; }).length, need:5, unit:'nights'},
+    {id:'sleep',   t:'Sleep 7 to 9 h on 5 nights',        have:wd.filter(function(x){ return x.sleep>=7 && x.sleep<=9; }).length, need:5, unit:'nights'},
     {id:'perfect', t:'Meet every daily goal on 5 days',   have:wd.filter(function(x){ return dayDone(x,env); }).length, need:5, unit:'days'},
     {id:'survey',  t:'Complete the morale survey',        have:SURVEY_DAYS.some(function(s){ return weekOf(s)===w; }) ? 1 : 0, need:1, unit:''}
   ];
@@ -978,6 +1038,28 @@ function goalsText(days, env){
     'Mission week '+W.week+' (day '+W.daysIn+' of 7): '+(W.goals.length-wopen.length)+' of '+W.goals.length+' weekly goals met.'+
     (wopen.length ? ' Still open: '+wopen.map(function(g){ return g.t.toLowerCase()+' ('+(g.unit ? g.have+' of '+g.need+' '+g.unit : 'not yet')+')'; }).join(', ')+'.' : ' Every weekly goal is done.')+
     ' Weekly streak: '+ws+' week'+(ws===1?'':'s')+'.';
+}
+/* Cumulative career radiation dose against the NASA 600 mSv career limit (NASA-STD-3001, OCHMO radiation brief).
+   Warning steps chosen by the team: 50% of the limit = watch, 80% = act now, 100% = limit reached. */
+var CAREER_LIMIT = 600, DOSE_WATCH = 300, DOSE_ACT = 480, PRIOR_DOSE = 0;
+function setPriorDose(v){ PRIOR_DOSE = (typeof v==='number' && isFinite(v) && v>=0 && v<=2000) ? v : 0; }
+function doseStatus(days){
+  var mission=days.reduce(function(a,x){ return a+(+x.rad||0); },0), total=PRIOR_DOSE+mission;
+  var recent=days.slice(-7), rate=recent.length ? recent.reduce(function(a,x){ return a+(+x.rad||0); },0)/recent.length : 0;
+  var left=Math.max(0, CAREER_LIMIT-total);
+  return {mission:mission, prior:PRIOR_DOSE, total:total, pct:total/CAREER_LIMIT*100, left:left, rate:rate,
+          daysLeft: rate>0 && left>0 ? Math.floor(left/rate) : null,
+          reached: total>=CAREER_LIMIT, level: total>=DOSE_ACT ? 2 : (total>=DOSE_WATCH ? 1 : 0)};
+}
+function doseText(s){
+  return 'Career radiation dose: '+s.total.toFixed(1)+' of '+CAREER_LIMIT+' mSv ('+Math.floor(s.pct)+'%), of which '+s.mission.toFixed(1)+' mSv is from this mission. '+doseAdvice(s);
+}
+function doseAdvice(s){
+  if(s.reached) return 'The career limit is reached. Report to the flight surgeon now. No further spacewalks or surface excursions, and spend as much time as possible in the most shielded area.';
+  var eta = s.daysLeft!==null ? ' At your recent rate of '+s.rate.toFixed(2)+' mSv per day, the limit is about '+s.daysLeft+' day'+(s.daysLeft===1?'':'s')+' away.' : '';
+  if(s.level===2) return 'More than 80% of the limit is used. Tell the flight surgeon. Spacewalks and surface excursions now need approval, and you shelter at once in any solar particle event.'+eta;
+  if(s.level===1) return 'Half of the limit is used. Plan to lower your dose: keep spacewalks short, sleep in the most shielded area and follow space weather alerts closely.'+eta;
+  return s.left.toFixed(1)+' mSv remain before the limit.';
 }
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
@@ -1031,6 +1113,10 @@ var PATTERNS = [
    t:'High carbon dioxide and short sleep appear together. Check the airflow in your sleep station.'},
   {ids:['sleep','mood'], on:function(d,e){ return isLow('sleep',d,e)&&isLow('mood',d,e); },
    t:'Short sleep together with low mood raises the risk of mistakes. Ask the commander to lighten today\'s critical tasks.'},
+  {ids:['sleep','mood'], on:function(d,e){ return isHigh('sleep',d,e)&&isLow('mood',d,e); },
+   t:'Long sleep together with low mood can be an early sign of depression. Talk to the crew medical officer and ask for a private conference with the flight psychologist.'},
+  {ids:['sleep','temp'], on:function(d,e){ return isHigh('sleep',d,e)&&isHigh('temp',d,e); },
+   t:'Long sleep together with a raised temperature suggests your body is fighting an infection. Rest, drink fluids and keep distance from crewmates.'},
   {ids:['sleep','hr'], on:function(d,e){ return isLow('sleep',d,e)&&isHigh('hr',d,e); },
    t:'Short sleep and a raised resting pulse together suggest incomplete recovery. Plan a lighter exercise session and an earlier bedtime today.'}
 ];
@@ -1047,9 +1133,12 @@ function insights(days, env){
     if(p) out.push({l:1, t:I.label+' has '+(p.dir>0?'risen':'fallen')+' '+p.n+' check-ins in a row and may leave the reference range in about '+
       p.days+' day'+(p.days===1?'':'s')+'.'});
   });
+  var longN=days.slice(-7).filter(function(x){ return x.sleep>9; }).length;
+  if(longN>=3) out.push({l:1, t:'You slept more than 9 hours on '+longN+' of the last '+Math.min(7,days.length)+' nights. Oversleeping that keeps coming back should be checked by the crew medical officer.'});
   var lowEx=days.slice(-7).filter(function(x){ return x.ex<60; }).length;
   if(lowEx>=3) out.push({l:1, t:'Exercise was below target on '+lowEx+' of the last '+Math.min(7,days.length)+' days. Bone and muscle loss speeds up without daily loading.'});
   if(LAST_SURVEY && LAST_SURVEY.level>0) out.unshift({l:LAST_SURVEY.level, t:surveyText(LAST_SURVEY)});
+  var dz=doseStatus(days); if(dz.level>0) out.unshift({l:dz.level, t:doseText(dz)});
   if(!out.length) out.push({l:0, t:baseline('hr',days)?'No unusual pattern today. Your readings match your personal baseline.':'No unusual pattern today.'});
   return out.slice(0,5);
 }
@@ -1110,6 +1199,7 @@ function core(q, days, env){
     var I=IND[id], v=d[id], b=baseline(id,days), s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
     if(b) s+=' Your usual is '+fx(id,b.mean)+' '+I.unit+', learned from your last '+b.n+' check-ins.';
     if(st(id)>0) s+=' '+adviceFor(id,v,env);
+    if(id==='rad') s+=' '+doseText(doseStatus(days));
     if(wantUnit) s+=' Unit: '+INFO[id].u;
     if(wantHow) s+=' How to measure: '+INFO[id].m.map(function(x,i){ return (i+1)+'. '+x; }).join(' ');
     if(wantWhy) s+=' '+REGIONS[regionOf(id)].why;
@@ -1155,14 +1245,14 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,doseStatus:doseStatus,doseText:doseText,setPriorDose:setPriorDose,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
   var state={env:'iss', days:sample('iss'), sel:'heart', chart:'sleep'};
   try{ var saved=JSON.parse(localStorage.getItem(KEY)||'null');
-       if(saved && ENV[saved.env] && Array.isArray(saved.days)){ state.env=saved.env; state.days=saved.days; } }catch(e){}
-  function save(){ try{ localStorage.setItem(KEY, JSON.stringify({env:state.env, days:state.days})); }catch(e){} }
+       if(saved && ENV[saved.env] && Array.isArray(saved.days)){ state.env=saved.env; state.days=saved.days; setPriorDose(saved.prior); } }catch(e){}
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify({env:state.env, days:state.days, prior:PRIOR_DOSE})); }catch(e){} }
   function $(id){ return document.getElementById(id); }
   function latest(){ return state.days[state.days.length-1]; }
   function pill(st){ return '<span class="pill st'+st+'">'+SYMBOL[st]+' '+WORD[st]+'</span>'; }
@@ -1182,10 +1272,16 @@ if(typeof document!=='undefined'){ (function(){
     if(!d){ b.className='banner st0'; b.innerHTML='<div class="msg"><strong>No check-in yet</strong><p class="small">Log today\'s measurements below to see your status.</p></div>'; return; }
     var sts=ORDER.map(function(id){ return statusOf(id, d[id], state.env); });
     var worst=Math.max.apply(null, sts), nC=sts.filter(function(s){return s===2;}).length, nW=sts.filter(function(s){return s===1;}).length;
+    var dz=doseStatus(state.days), rWorst=worst; worst=Math.max(worst, dz.level);
     var title, text;
-    if(worst===0){ title='● All indicators in range'; text='Keep your routine. Next check-in is due in 24 hours.'; }
+    if(rWorst<dz.level){
+      title=(dz.level===2?'■ ':'▲ ')+(dz.reached ? 'Career radiation limit reached' : (dz.level===2 ? 'Over 80% of the career radiation limit used' : 'Half of the career radiation limit used'));
+      text=doseText(dz);
+    }
+    else if(worst===0){ title='● All indicators in range'; text='Keep your routine. Next check-in is due in 24 hours.'; }
     else if(worst===1){ title='▲ '+nW+' indicator'+(nW>1?'s':'')+' to watch'; text='Follow the guidance for each flagged reading, tell the crew medical officer and measure again later today.'; }
     else { title='■ '+nC+' reading'+(nC>1?'s':'')+' need action now'; text='Contact the flight surgeon. '+ENV[state.env].reply; }
+    if(rWorst>=dz.level && dz.level>0) text+=' Radiation: '+doseText(dz);
     b.className='banner st'+worst;
     b.innerHTML='<div class="msg"><strong>'+title+'</strong><p class="small">'+text+'</p></div>'+
       '<div class="actions">'+(worst>0?'<button class="btn" type="button" data-act="crew">Notify crew medical officer</button>':'')+
@@ -1268,9 +1364,15 @@ if(typeof document!=='undefined'){ (function(){
   function renderExtras(){
     var days=state.days, env=state.env, d=latest();
     renderGoals();
-    var total=days.reduce(function(a,x){return a+x.rad;},0);
-    $('doseVal').textContent=total.toFixed(2)+' mSv';
-    $('doseBar').style.width=Math.min(100,total/600*100).toFixed(2)+'%';
+    var ds=doseStatus(days);
+    $('doseVal').textContent=ds.total.toFixed(2)+' mSv';
+    $('doseBar').style.width=Math.min(100,ds.pct).toFixed(2)+'%';
+    $('doseMeter').setAttribute('aria-valuenow', ds.total.toFixed(1));
+    $('doseWrap').className='st'+ds.level; $('dosePanel').className='panel dosep st'+ds.level;
+    $('doseState').innerHTML=pill(ds.level).replace(WORD[ds.level], ds.reached ? 'Limit reached' : WORD[ds.level]);
+    $('doseMsg').textContent=doseAdvice(ds);
+    $('doseSplit').textContent='This mission: '+ds.mission.toFixed(2)+' mSv from the logged dosimeter readings. Earlier missions: '+ds.prior.toFixed(1)+' mSv.';
+    if(document.activeElement!==$('priorDose')) $('priorDose').value=ds.prior;
   }
   function renderGoals(){
     var days=state.days, env=state.env, d=latest(), dg=dailyGoals(d,env), W=weeklyGoals(days,env);
@@ -1291,7 +1393,7 @@ if(typeof document!=='undefined'){ (function(){
     $('weekGoals').innerHTML=W.goals.map(function(g){
       var pct=Math.min(100, Math.round(g.have/g.need*100));
       return '<li class="'+(g.done?'st0 done':'open')+'"><i aria-hidden="true">'+(g.done?'●':'○')+'</i><span>'+g.t+'</span>'+
-        '<span class="num gv">'+(g.unit ? g.have+' / '+g.need : (g.done?'Done':'Not yet'))+'</span>'+
+        '<span class="num gv">'+(g.unit ? g.have+' / '+g.need : (g.done?'Done':'<button class="btn linkbtn" type="button" data-open-survey>Take it now</button>'))+'</span>'+
         '<span class="gbar" role="progressbar" aria-label="'+g.t+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><span style="width:'+pct+'%"></span></span></li>'; }).join('');
     $('goalsNote').textContent = !d ? 'Log a check-in to start.' :
       met===dg.length ? 'Every daily goal is done today.' :
@@ -1302,6 +1404,7 @@ if(typeof document!=='undefined'){ (function(){
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
   document.addEventListener('click', function(ev){
+    var os=ev.target.closest('[data-open-survey]'); if(os){ openSurvey(os); return; }
     var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q],[data-open-chat]'); if(!t) return;
     if(t.hasAttribute('data-open-chat')){ openChat(true); return; }
     if(t.dataset.q){ ask(t.dataset.q); return; }
@@ -1317,6 +1420,13 @@ if(typeof document!=='undefined'){ (function(){
     var t=ev.target.closest('[data-region]');
     if(t && (ev.key==='Enter'||ev.key===' ')){ ev.preventDefault(); pick(t.dataset.region);
       var again=$('figure').querySelector('[data-region="'+t.dataset.region+'"]'); if(again) again.focus(); }
+  });
+  $('priorForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var v=parseFloat($('priorDose').value);
+    if(!(v>=0 && v<=2000)){ notice('Enter the earlier career dose in mSv, from 0 to 2000.'); $('priorDose').focus(); return; }
+    setPriorDose(v); save(); notice(''); render();
+    notice('Earlier career dose saved: '+v.toFixed(1)+' mSv.');
   });
   $('chartSel').addEventListener('change', function(){ state.chart=this.value; renderChart(); });
   $('checkin').addEventListener('submit', function(ev){
@@ -1406,7 +1516,7 @@ if(typeof document!=='undefined'){ (function(){
   function renderSurveyResult(){
     var r=surveys[surveys.length-1];
     $('surveyTag').textContent=surveys.length ? surveys.length+' survey'+(surveys.length===1?'':'s')+' completed' : '';
-    if(!r){ $('surveyResult').innerHTML='<p class="small muted" style="margin-bottom:12px">No survey completed yet. Answer the 12 questions below to get your General Psychological Risk Index (12 to 60). Lower is better.</p>'; return; }
+    if(!r){ $('surveyResult').innerHTML='<p class="small muted" style="margin-bottom:12px">No survey completed yet. Answer 12 short questions to get your General Psychological Risk Index (12 to 60). Lower is better.</p>'; return; }
     var L=SURVEY_LEVELS[r.level];
     $('surveyResult').innerHTML='<div class="sres st'+r.level+'"><div><strong>'+SYMBOL[r.level]+' '+L.name+': '+L.state+'</strong>'+
       '<p>General Psychological Risk Index <span class="num">'+r.total+'</span> of 60'+(r.day?', mission day '+r.day:'')+'</p></div>'+
@@ -1426,11 +1536,42 @@ if(typeof document!=='undefined'){ (function(){
     var d=latest(); r.day=d?d.day:null; r.ans=ans;
     r.q13=$('sv_q13').value.trim(); r.q14=$('sv_q14').value.trim(); r.hasNotes=!!(r.q13||r.q14);
     surveys.push(r); try{ localStorage.setItem(SKEY, JSON.stringify(surveys)); }catch(e){}
-    setSurvey(r); setSurveyDays(surveys.map(function(x){ return x.day; })); $('surveyForm').reset(); renderSurveyResult(); renderInsights(); renderGoals();
-    $('surveyMsg').textContent='Survey saved.';
+    setSurvey(r); setSurveyDays(surveys.map(function(x){ return x.day; })); $('surveyForm').reset(); surveyProgress();
+    renderSurveyResult(); renderInsights(); renderGoals();
+    $('surveyMsg').textContent=''; closeSurvey();
+    $('surveyDone').textContent='Survey saved. Your result is shown above.';
     $('surveyResult').scrollIntoView({block:'nearest'});
   });
-  renderSurvey(); renderSurveyResult();
+  var surveyOpener=null;
+  function surveyProgress(){
+    var n=SURVEY.filter(function(s){ return document.querySelector('input[name="sv_'+s.id+'"]:checked'); }).length;
+    $('surveyProg').textContent=n+' of '+SURVEY.length+' answered';
+    $('surveyBar').style.width=Math.round(n/SURVEY.length*100)+'%';
+  }
+  function openSurvey(from){
+    surveyOpener=from||null; $('surveyMsg').textContent=''; $('surveyDone').textContent='';
+    $('surveyModal').hidden=false; document.body.style.overflow='hidden'; $('surveySheet').scrollTop=0;
+    var first=$('surveyModal').querySelector('input[type=radio]'); if(first) first.focus();
+  }
+  function closeSurvey(){
+    if($('surveyModal').hidden) return;
+    $('surveyModal').hidden=true; document.body.style.overflow='';
+    var back=surveyOpener && document.body.contains(surveyOpener) ? surveyOpener : document.querySelector('[data-open-survey]');
+    if(back) back.focus();
+  }
+  $('surveyForm').addEventListener('change', surveyProgress);
+  $('surveyModal').addEventListener('click', function(ev){
+    if(ev.target===$('surveyModal') || ev.target.closest('[data-close-survey]')) closeSurvey(); });
+  $('surveyModal').addEventListener('keydown', function(ev){
+    if(ev.key==='Escape'){ ev.stopPropagation(); closeSurvey(); return; }
+    if(ev.key!=='Tab') return;
+    var f=[].slice.call($('surveyModal').querySelectorAll('button, input, textarea')).filter(function(x){ return !x.disabled && x.offsetParent!==null; });
+    if(!f.length) return;
+    var a=f[0], z=f[f.length-1];
+    if(ev.shiftKey && document.activeElement===a){ ev.preventDefault(); z.focus(); }
+    else if(!ev.shiftKey && document.activeElement===z){ ev.preventDefault(); a.focus(); }
+  });
+  renderSurvey(); renderSurveyResult(); surveyProgress();
 
   var NKEY='kuasar-crew-notes-v1', notes=[];
   try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
@@ -1451,7 +1592,7 @@ if(typeof document!=='undefined'){ (function(){
   }
   $('fab').addEventListener('click', function(){ openChat(true); });
   $('closeChat').addEventListener('click', function(){ openChat(false); });
-  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && !$('drawer').hidden) openChat(false); });
+  document.addEventListener('keydown', function(ev){ if(ev.key==='Escape' && $('surveyModal').hidden && !$('drawer').hidden) openChat(false); });
   $('teachForm').addEventListener('submit', function(ev){
     ev.preventDefault();
     var k=$('teachKey').value.trim().toLowerCase(), a=$('teachAns').value.trim();
