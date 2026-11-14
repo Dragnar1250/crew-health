@@ -6,17 +6,24 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 
 ## What it does
 
-The page is split into tabs: Overview, Check-in, Analysis, Body map, Trends, Radiation, Morale, Med kit and Sources. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
+The page is split into tabs: Overview, Check-in, Live, Analysis, Performance, Body map, Trends, Radiation, Morale, Med kit and Sources. An EN / TR button in the header switches the whole interface between English and Turkish; the choice is remembered on the device. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
 
 
 - **Body map:** a clickable astronaut figure. Each region shows its status by color and symbol.
 - **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise, cabin carbon dioxide and daily radiation dose.
+- **Mind and performance:** daily mood (1 to 5), stress level (0 to 10), reaction time and attention lapses from the reaction test, plus fluid intake and back pain.
 - **More health data:** breathing rate, and six self-rated symptoms from 0 (none) to 3 (severe): cough, shortness of breath, headache, nausea, dizziness and blurred vision. The check-in also asks whether there was a spacewalk or surface excursion that day.
 - **Health analysis (Analysis tab):**
   - *Combined check:* every reading is compared with the crew member's own mean and spread, and the sum of squared distances is tested with a chi-square distribution, so several small changes on the same day are noticed together.
-  - *Problems across several readings:* 14 rules (for example infection, low oxygen, CO2 build-up, dehydration, radiation sickness, decompression sickness) fire only when at least two readings point the same way, and each lists possible causes and what to do.
+  - *Problems across several readings:* 15 rules (now including slower thinking from fatigue or stress) (for example infection, low oxygen, CO2 build-up, dehydration, radiation sickness, decompression sickness) fire only when at least two readings point the same way, and each lists possible causes and what to do.
   - *Why is a reading off?* For every reading that is out of range or unusual, the possible causes are checked against the other readings, excursions, the environment, the morale survey and the medicine log, and marked as supported, ruled out or not checkable.
   - *Extreme situation checks:* 14 checks (solar particle event, cabin pressure loss, CO2 removal failure, fire or toxic air, infectious illness, heat injury, hypothermia, severe low blood sugar, cardiac emergency, decompression sickness, acute radiation sickness, raised pressure behind the eyes, severe sleep deprivation, psychological crisis). Each has a Test button that loads simulated readings, so the whole tool can be seen reacting. Simulated readings are never saved.
+- **Live telemetry (simulation mode):** simulated wearable sensors stream heart rate, blood oxygen, body temperature and breathing rate once a second as live charts. Events (fast heart rate, oxygen drop, fever) can be injected; a reading out of range for 5 seconds raises a sensor alert. The last 30 seconds can be copied into the check-in. A hypnogram shows last night's sleep stages, simulated from the logged sleep length.
+- **Performance risk and early warning:** a score from 0 to 100 built from sleep debt, short sleep, stress, low mood, isolation, slower reactions, attention lapses, high CO2 and low fluid intake, with the factors behind it, actions, and a 3-day trend forecast that warns before the risk reaches the next level. Based on NASA's risk of performance decrements from sleep loss and circadian desynchronization; the weights are the team's proposal.
+- **Reaction test:** a short psychomotor vigilance test (10 trials, false starts detected). Responses of 355 ms or more count as attention lapses (Jones et al., Sleep, 2022). The median and lapses can be saved to the check-in.
+- **Circadian light plan and sleep hygiene:** a 24-hour plan for the ISS-style general, blue-enriched and pre-sleep light settings from the planned sleep and wake times, and sleep tips ranked for the day's data.
+- **Targeted advice:** each flagged body region gets specific steps, for example a knees-to-chest stretch for lower back tension or drinking more when fluid intake is low.
+- **Visual overview:** a radar chart of body systems, a performance gauge and a heat map of every body system over the last 14 days.
 - **Guidance:** every reading shows its reference range, what its unit means, step-by-step measurement instructions, and what to do when it is out of range.
 - **Escalation:** tells the astronaut when to inform the crew medical officer and when to contact the flight surgeon, including the signal delay to Earth.
 - **Weekly morale survey:** opens in its own window with a progress bar. 12 questions on a 1 to 5 scale give four sub-scores (mood and stress, physical and cognitive, social and crew, isolation) and a General Psychological Risk Index from 12 to 60. Green is 12 to 25, Yellow 26 to 40, Red 41 to 60. Constant irritability, intense anxiety or serious crew conflict set the level to Red whatever the total. Two open questions are logged but not scored. Past results are listed in a history table, answers can be cleared before submitting, and the whole survey history can be reset after an on-page confirmation. The index was designed by the team and is not a validated clinical instrument.
@@ -42,6 +49,10 @@ Open `index.html` in any modern browser. No installation or server is needed.
 - [NASA OCHMO-TB-031, Exercise Overview](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-031-exercise-overview.pdf): about 600 minutes of exercise per week on the station.
 - [NASA OCHMO Sleep Accommodations brief](https://www.nasa.gov/wp-content/uploads/2023/03/sleep-accomodations-technical-brief-ochmo.pdf): 7 to 9 hours needed, 6 to 6.5 hours measured on the ISS.
 - [NASA OCHMO-TB-006, Pharmaceuticals](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-006-pharmaceuticals.pdf): inventory tracking requirement [V2 7059], ISS kit packs, 1 to 2 year expiration against 1 to 5 year missions, the Dose Tracker study, formulary medicines.
+- [NASA, Risk of performance decrements from sleep loss, circadian desynchronization and work overload](https://www.nasa.gov/directorates/esdmd/hhp/risk-of-performance-decrements-and-adverse-health-outcomes-resulting-from-sleep-loss-circadian-desynchronization-and-work-overload): the risk behind the performance score.
+- [NASA OCHMO Water technical brief](https://www.nasa.gov/wp-content/uploads/2023/03/water-technical-brief-ochmo.pdf): at least 2.5 L of drinking water per crew member per day (NASA-STD-3001 [V2 6109]).
+
+Other studies used for the new features: [Jones et al., Sleep, 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC8919197) (ISS Reaction Self Test, 355 ms lapse threshold), [Anesthesiology, Back Pain in Outer Space](https://asa2.silverchair.com/anesthesiology/article/135/3/384/115740/Back-Pain-in-Outer-Space) (knees-to-chest relief), [Space.com, ISS LED lighting](https://www.space.com/35997-led-lights-help-astronauts-sleep-better.html), [MedlinePlus, vital signs](https://medlineplus.gov/ency/article/002341.htm) (breathing rate 12 to 18).
 
 Other spaceflight research: [Zhang et al., Science Advances, 2020](https://www.sci.news/space/radiation-dose-rates-lunar-surface-08893.html) (1.369 mSv per day on the lunar surface) and [Optic nerve sheath diameter and spaceflight, npj Microgravity, 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149).
 
@@ -57,6 +68,8 @@ The "Act now" thresholds and the dose warning steps are the team's own proposal;
 ## Limits of this prototype
 
 - Reference ranges are general adult clinical ranges used as placeholders.
+- Live telemetry and sleep stages are simulated; a flight version would read real wearable sensors.
+- The Turkish interface is for the team; the English interface is the one for judging.
 - Reports to the crew and to the ground are simulated. Nothing is transmitted.
 - The page opens with clearly labeled example data.
 - This is not a medical device.
