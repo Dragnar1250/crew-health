@@ -359,6 +359,56 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
 .bristol input{margin:0} .bristol label:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .bristol b{font-size:16px} @media (max-width:560px){ .bristol{grid-template-columns:repeat(4,minmax(0,1fr))} }
 .gutstrip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px} .gutstrip span{display:inline-flex;flex-direction:column;align-items:center;min-width:38px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--bg)} .gutstrip b{font-size:15px;color:var(--s,var(--ink))}
+.ckhead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:-4px 0 16px}
+.ckhead p{margin:0;font-size:14px;color:var(--muted)}
+.ckstatus{display:inline-flex;gap:8px;flex-wrap:wrap}
+#checkin .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+@media (max-width:560px){ #checkin .fields{grid-template-columns:minmax(0,1fr)} }
+.ckcard{border:1px solid var(--line);border-radius:14px;padding:14px 16px 16px;background:var(--bg);min-width:0}
+.ckcard.full{grid-column:1 / -1}
+.ckcard h3{margin:0 0 2px;font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ckcard h3 .btn{margin-left:auto}
+.ckcard .hint{margin:0 0 12px;font-size:12px;color:var(--muted)}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px 14px}
+.mfield{display:flex;flex-direction:column;gap:5px;min-width:0}
+.mfield > label{font-size:12.5px;color:var(--ink);font-weight:500;min-height:2.6em;display:flex;align-items:flex-end;line-height:1.3}
+@media (max-width:560px){ .mfield > label{min-height:0} }
+.minput{display:flex;align-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);transition:border-color .15s, box-shadow .15s}
+.minput:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 22%, transparent)}
+.mfield.st1 .minput, .mfield.st2 .minput{border-color:var(--s)}
+.minput input{flex:1 1 auto;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-family:var(--mono);font-size:16px;padding:9px 4px 9px 11px;outline:none;-moz-appearance:textfield}
+.minput input::-webkit-outer-spin-button,.minput input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.minput .unit{flex:0 0 auto;padding:0 11px 0 4px;font-size:12px;color:var(--muted);white-space:nowrap}
+.mref{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px;min-height:15px}
+.mref i{width:7px;height:7px;border-radius:50%;background:var(--s);flex:0 0 auto}
+.mfield.st1 .mref, .mfield.st2 .mref{color:var(--s);font-weight:500}
+.chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.chips label{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;font-size:11.5px;color:var(--muted);text-align:center;line-height:1.2}
+.chips label b{font-size:17px;color:var(--ink);font-family:var(--mono)}
+.chips input, .segs input{position:absolute;opacity:0;pointer-events:none}
+.chips label:has(input:checked){border-color:var(--accent);background:color-mix(in srgb, var(--accent) 12%, var(--surface));color:var(--ink)}
+.chips label:has(input:focus-visible), .segs label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.symlist{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:8px 22px}
+@media (max-width:560px){ .symlist{grid-template-columns:minmax(0,1fr)} }
+.symrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--line);flex-wrap:wrap}
+.symrow > span{font-size:13.5px;font-weight:500}
+.segs{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--surface);padding:2px;gap:2px}
+.segs label{position:relative;font-size:12px;padding:4px 10px;border-radius:999px;cursor:pointer;color:var(--muted);white-space:nowrap}
+.segs label:has(input:checked){background:var(--s-soft);color:var(--s);font-weight:600}
+.segs label.v0:has(input:checked){background:var(--line);color:var(--ink)}
+.toggles{display:grid;gap:8px}
+.toggle{display:flex;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;font-size:13.5px}
+.toggle input{position:absolute;opacity:0;pointer-events:none}
+.toggle .sw{flex:0 0 auto;width:36px;height:20px;border-radius:99px;background:var(--line);position:relative;transition:background .15s}
+.toggle .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.25);transition:left .15s}
+.toggle:has(input:checked) .sw{background:var(--accent)} .toggle:has(input:checked) .sw::after{left:18px}
+.toggle:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:2px}
+.toggle small{display:block;color:var(--muted);font-size:12px}
+.ckfoot{position:sticky;bottom:0;z-index:5;display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;margin:16px -16px -16px;padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px));background:color-mix(in srgb, var(--surface) 92%, transparent);backdrop-filter:blur(6px);border-top:1px solid var(--line);border-radius:0 0 12px 12px}
+.ckfoot .grow{flex:1 1 auto}
+.ckfoot .btn.primary{padding:10px 20px;font-size:15px}
+.ckfoot .quiet{font-size:12.5px}
+.ckhints p{margin:10px 0 0}
 .tipgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
 .tip{border:1px solid var(--s);border-left-width:4px;border-radius:10px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .tip h3{font-size:14px;color:var(--s)}
@@ -560,16 +610,21 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       <span class="small muted" id="dataTag"></span>
     </div>
     <form id="checkin" novalidate>
+      <div class="ckhead"><p>The values from your last check-in are filled in. Change what you measured today.</p><span class="ckstatus" id="ckStatus" aria-live="polite"></span></div>
       <div class="fields" id="fields"></div>
-      <p class="small muted" id="waterHint" hidden></p>
-      <p class="small muted" id="foodHint" hidden></p>
-      <p class="small muted" id="gutHint" hidden></p>
-      <label class="check" for="useSupplies"><input type="checkbox" id="useSupplies" checked> Count the test supplies this check-in uses: 1 glucose test strip, 2 lancets and 1 blood analyzer cartridge</label>
-      <div class="formfoot">
+      <div class="ckcard full" style="margin-top:14px">
+        <h3>Today</h3>
+        <div class="toggles">
+          <label class="toggle" for="f_eva"><input type="checkbox" id="f_eva"><span class="sw" aria-hidden="true"></span><span>I did a spacewalk or surface excursion today<small>Used by the decompression, heat and radiation checks.</small></span></label>
+          <label class="toggle" for="useSupplies"><input type="checkbox" id="useSupplies" checked><span class="sw" aria-hidden="true"></span><span>Count the test supplies this check-in uses<small>1 glucose test strip, 2 lancets and 1 blood analyzer cartridge</small></span></label>
+        </div>
+        <div class="ckhints"><p class="small muted" id="waterHint" hidden></p><p class="small muted" id="foodHint" hidden></p><p class="small muted" id="gutHint" hidden></p></div>
+      </div>
+      <div class="ckfoot">
         <button class="btn primary" type="submit">Save check-in</button>
-        <button class="btn" type="button" id="clearEx">Remove example data</button>
-        <button class="btn" type="button" id="reset">Reset demo</button>
-        <span class="small" id="formMsg" aria-live="polite"></span>
+        <span class="small grow" id="formMsg" aria-live="polite"></span>
+        <button class="btn quiet" type="button" id="clearEx">Remove example data</button>
+        <button class="btn quiet" type="button" id="reset">Reset demo</button>
       </div>
     </form>
   </section>
@@ -2697,25 +2752,53 @@ if(typeof document!=='undefined'){ (function(){
       return '<article class="tip st'+t.level+'"><h3>'+SYMBOL[t.level]+' '+esc(t.title)+'</h3><ol class="small">'+t.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ol></article>'; }).join('');
     $('detail').innerHTML=html+'</div>';
   }
+  var CK_GROUPS=[
+    {t:'Heart and circulation', h:'Sit still for 5 minutes, then use the arm cuff.', ids:['sys','dia','hr']},
+    {t:'Breathing and air', h:'Pulse oximeter, breath count, blood gas and the cabin air monitor.', ids:['rr','spo2','pco2','cabin']},
+    {t:'Body and metabolism', h:'Temperature at rest, a finger-stick glucose and the day\'s fluid.', ids:['temp','glu','fluid']},
+    {t:'Sleep and activity', h:'Hours actually asleep and minutes of loaded exercise.', ids:['sleep','ex']},
+    {t:'Eyes and radiation', h:'Weekly eye ultrasound and your personal dosimeter.', ids:['onsd','rad']},
+    {t:'Mind and performance', h:'Rate your mood and stress, and save the reaction test result.', ids:['mood','stress','rt','lapses'], rt:true}
+  ];
+  var MOOD_WORDS=['Very low','Low','Neutral','Good','Very good'];
+  function ckField(id, d){
+    var I=IND[id];
+    if(id==='mood') return '<div class="mfield" style="grid-column:1 / -1"><span class="small" style="font-size:12.5px;font-weight:500" id="lbl_mood">Mood</span><input type="hidden" id="f_mood" value="'+d.mood+'">'+
+      '<div class="chips" role="radiogroup" aria-labelledby="lbl_mood">'+MOOD_WORDS.map(function(t,i){ return '<label><input type="radio" name="seg_mood" value="'+(i+1)+'"'+(d.mood===i+1?' checked':'')+'><b>'+(i+1)+'</b>'+t+'</label>'; }).join('')+'</div></div>';
+    var unit=I.unit==='breaths/min' ? '/min' : I.unit;
+    return '<div class="mfield" data-ck="'+id+'"><label for="f_'+id+'">'+I.label+'</label><div class="minput"><input id="f_'+id+'" type="number" inputmode="decimal" required min="'+I.min+'" max="'+I.max+'" step="'+I.step+'" value="'+d[id]+'"><span class="unit">'+unit+'</span></div><span class="mref" id="r_'+id+'"></span></div>';
+  }
+  function ckSymptom(id, d){
+    var I=IND[id], v=d[id]||0;
+    return '<div class="symrow"><span id="lbl_'+id+'">'+I.label+'</span><input type="hidden" id="f_'+id+'" value="'+v+'"><div class="segs" role="radiogroup" aria-labelledby="lbl_'+id+'">'+
+      ['None','Mild','Moderate','Severe'].map(function(w,i){ return '<label class="v'+i+' st'+(i<2?1:2)+'"><input type="radio" name="seg_'+id+'" value="'+i+'"'+(v===i?' checked':'')+'>'+w+'</label>'; }).join('')+'</div></div>';
+  }
+  /* live status of every field while typing */
+  function ckUpdate(){
+    var env=state.env, n1=0, n2=0;
+    ORDER.forEach(function(id){
+      var el=$('f_'+id); if(!el) return; var I=IND[id], v=parseFloat(el.value), st=isNaN(v) || v<I.min || v>I.max ? null : statusOf(id, v, env);
+      if(st===1) n1++; else if(st===2) n2++;
+      var box=el.closest('.mfield'), ref=$('r_'+id); if(!box || !ref) return;
+      box.classList.remove('st0','st1','st2'); if(st!==null) box.classList.add('st'+st);
+      var range=rangeText(id, env)+' '+(I.unit==='breaths/min' ? '/min' : I.unit);
+      ref.innerHTML = st===null ? (el.value==='' ? 'Missing' : 'Outside what the instrument reads') : '<i></i>'+(st===0 ? 'In range' : (st===1 ? 'Watch' : 'Act now'))+' · '+range;
+      if(st===null){ box.classList.add('st2'); }
+    });
+    $('ckStatus').innerHTML = (n2 ? '<span class="pill st2">'+SYMBOL[2]+' '+n2+' act now</span>' : '')+(n1 ? '<span class="pill st1">'+SYMBOL[1]+' '+n1+' to watch</span>' : '')+(!n1 && !n2 ? '<span class="pill st0">'+SYMBOL[0]+' All in range</span>' : '');
+  }
   function renderForm(){
     var d=latest()||sample(state.env)[0];
-    var firstSym=true;
-    $('fields').innerHTML='<p class="fgroup">Measurements</p>'+ORDER.map(function(id){
-      var I=IND[id];
-      var pre = id==='mood' ? '<p class="fgroup">Mind and performance <button class="btn linkbtn" type="button" data-goto="perf">Run the reaction test</button></p>' : '';
-      if(I.scale){
-        var head=firstSym ? '<p class="fgroup">Symptoms in the last 24 hours</p>' : ''; firstSym=false; head=pre+head;
-        return head+'<div class="field"><label for="f_'+id+'">'+I.label+'</label><select id="f_'+id+'">'+
-          SYM_WORD.map(function(w,i){ return '<option value="'+i+'"'+((d[id]||0)===i?' selected':'')+'>'+i+' · '+w+'</option>'; }).join('')+'</select></div>';
-      }
-      if(id==='mood') return pre+'<div class="field"><label for="f_mood">Mood (1 very low – 5 very good)</label><select id="f_mood">'+
-        ['Very low','Low','Neutral','Good','Very good'].map(function(t,i){ return '<option value="'+(i+1)+'"'+(d.mood===i+1?' selected':'')+'>'+(i+1)+' · '+t+'</option>'; }).join('')+'</select></div>';
-      return pre+'<div class="field"><label for="f_'+id+'">'+I.label+' ('+I.unit+')</label><input id="f_'+id+'" type="number" inputmode="decimal" required min="'+I.min+'" max="'+I.max+'" step="'+I.step+'" value="'+d[id]+'"></div>';
-    }).join('')+'<label class="check fwide" for="f_eva"><input type="checkbox" id="f_eva"'+(d.eva?' checked':'')+'> I did a spacewalk or surface excursion today</label>';
+    $('fields').innerHTML=CK_GROUPS.map(function(g){
+      return '<section class="ckcard"><h3>'+g.t+(g.rt ? ' <button class="btn linkbtn" type="button" data-goto="rt">Run the reaction test</button>' : '')+'</h3><p class="hint">'+g.h+'</p><div class="mgrid">'+g.ids.map(function(id){ return ckField(id, d); }).join('')+'</div></section>';
+    }).join('')+'<section class="ckcard full"><h3>Symptoms in the last 24 hours</h3><p class="hint">Choose the worst moment of the day.</p><div class="symlist">'+
+      ORDER.filter(function(id){ return IND[id].scale; }).map(function(id){ return ckSymptom(id, d); }).join('')+'</div></section>';
+    $('f_eva').checked=!!d.eva;
+    ckUpdate();
     var ex=state.days.filter(function(x){return x.example;}).length;
     $('dataTag').textContent=ex? ex+' of '+state.days.length+' days are example data' : state.days.length+' logged day'+(state.days.length===1?'':'s');
     $('clearEx').hidden=!ex;
-    if(typeof water!=='undefined' && water.length && $('f_fluid')) $('f_fluid').value=waterL();
+    if(typeof water!=='undefined' && water.length && $('f_fluid')){ $('f_fluid').value=waterL(); ckUpdate(); }
   }
   function renderChart(){
     var id=state.chart, I=IND[id], days=state.days, svg=$('chart');
@@ -3060,7 +3143,7 @@ if(typeof document!=='undefined'){ (function(){
   function addWater(ml){
     ml=Math.round(ml); if(!(ml>=10 && ml<=2000)) return false;
     var n=new Date(); water.push({t:fmtMin(n.getHours()*60+n.getMinutes()), ml:ml}); saveWater(); renderWater();
-    var f=$('f_fluid'); if(f) f.value=waterL();
+    var f=$('f_fluid'); if(f){ f.value=waterL(); ckUpdate(); }
     return true;
   }
   document.addEventListener('click', function(ev){ var b=ev.target.closest('[data-water]'); if(b) addWater(+b.dataset.water); });
@@ -3079,7 +3162,7 @@ if(typeof document!=='undefined'){ (function(){
             trends:[['charts','Charts'],['radiation','Radiation']],
             report:[['report','Report and PDF'],['profile','Profile']]};
   var SUBNAME={body:['health','map'], analysis:['health','analysis'], checks:['health','checks'], live:['perf','live'], radiation:['trends','radiation'],
-               water:['checkin','water'], food:['checkin','food'], gut:['checkin','gut'], profile:['report','profile'], rt:['perf','rt'], light:['perf','light']};
+               log:['checkin','log'], water:['checkin','water'], food:['checkin','food'], gut:['checkin','gut'], profile:['report','profile'], rt:['perf','rt'], light:['perf','light']};
   var SUBCUR={}, SUBDOT={};
   function initSubs(){ Object.keys(SUBS).forEach(function(g){
     var first=$('tab-'+GROUPS[g][0]), nav=document.createElement('div');
@@ -3371,7 +3454,7 @@ if(typeof document!=='undefined'){ (function(){
       '<div class="formfoot"><button class="btn primary" type="button" id="rtSave">Use in today\'s check-in</button></div></div>';
     $('rtSave').addEventListener('click', function(){
       if(state.sim) endSim();
-      goTab('checkin'); $('f_rt').value=med; $('f_lapses').value=lapses;
+      goTab('log'); $('f_rt').value=med; $('f_lapses').value=lapses; ckUpdate();
       $('formMsg').textContent='Reaction test added: '+med+' ms, '+lapses+' lapses. Fill in the rest and save.'; $('f_rt').focus();
     });
   }
@@ -3462,7 +3545,7 @@ if(typeof document!=='undefined'){ (function(){
     if(state.sim) endSim();
     var avg=function(id){ var b=LIVE.buf[id].slice(-30); return b.reduce(function(a,x){ return a+x; },0)/b.length; };
     goTab('checkin');
-    $('f_hr').value=Math.round(avg('hr')); $('f_spo2').value=Math.round(avg('spo2')); $('f_temp').value=avg('temp').toFixed(1); $('f_rr').value=Math.round(avg('rr'));
+    $('f_hr').value=Math.round(avg('hr')); $('f_spo2').value=Math.round(avg('spo2')); $('f_temp').value=avg('temp').toFixed(1); $('f_rr').value=Math.round(avg('rr')); ckUpdate();
     $('formMsg').textContent='Live averages added for heart rate, blood oxygen, temperature and breathing rate. Fill in the rest and save.';
   });
   var TABS=['overview','checkin','health','perf','trends','morale','medkit','report','sources'];
@@ -3608,6 +3691,10 @@ if(typeof document!=='undefined'){ (function(){
     notice('Earlier career dose saved: '+v.toFixed(1)+' mSv.');
   });
   $('chartSel').addEventListener('change', function(){ state.chart=this.value; renderChart(); });
+  $('fields').addEventListener('change', function(ev){
+    var r=ev.target; if(r.type==='radio' && r.name.indexOf('seg_')===0){ $('f_'+r.name.slice(4)).value=r.value; ckUpdate(); }
+  });
+  $('fields').addEventListener('input', function(ev){ if(ev.target.type==='number') ckUpdate(); });
   $('checkin').addEventListener('submit', function(ev){
     ev.preventDefault();
     endSim(true);
@@ -3759,6 +3846,7 @@ var TR_EXACT = {
 "# L to go today": "Bugün # L kaldı",
 "# NASA Space Apps Challenge": "# NASA Space Apps Challenge",
 "# Sv = # mSv = # rem": "# Sv = # mSv = # rem",
+"# act now": "# hemen müdahale",
 "# ampoule": "# ampul",
 "# ampoule left": "# ampul kaldı",
 "# ampoules": "# ampul",
@@ -4029,6 +4117,7 @@ var TR_EXACT = {
 "Blood pressure can drop sharply when gravity returns": "Yerçekimi geri geldiğinde tansiyon aniden düşebilir",
 "Blue-enriched light": "Mavi ağırlıklı ışık",
 "Blurred vision": "Bulanık görme",
+"Body and metabolism": "Vücut ve metabolizma",
 "Body cooling down": "Vücut soğuyor",
 "Body map": "Vücut haritası",
 "Body mass": "Kilo",
@@ -4054,6 +4143,7 @@ var TR_EXACT = {
 "Brain and behavior": "Beyin ve davranış",
 "Breathe pure oxygen": "Saf oksijen solu",
 "Breathe slowly": "Yavaş nefes alın",
+"Breathing and air": "Solunum ve hava",
 "Breathing changes when you think about it, so a crewmate can count for you without telling you": "Düşündüğünüzde nefesiniz değişir, bu yüzden bir mürettebat arkadaşınız size söylemeden sayabilir",
 "Breathing rate": "Solunum hızı",
 "Breathing rate # /min has been above # /min for # seconds": "Solunum hızı #1 /dk, #3 saniyedir #2 /dk üstünde",
@@ -4101,6 +4191,7 @@ var TR_EXACT = {
 "Catching up after a short night": "Kısa bir gecenin ardından telafi",
 "Cerebrospinal fluid pressure cannot be measured directly in flight, so the optic nerve sheath is scanned by ultrasound instead": "Beyin omurilik sıvısı basıncı uçuşta doğrudan ölçülemez, bu yüzden optik sinir kılıfı ultrasonla taranır",
 "Cerebrospinal fluid pressure is not measured directly": "Beyin omurilik sıvısı basıncı doğrudan ölçülmez",
+"Change what you measured today": "Bugün ölçtüklerinizi değiştirin",
 "Charts": "Grafikler",
 "Check in every day": "Her gün kayıt girin",
 "Check that the sleep station fan is running": "Uyku istasyonu fanının çalıştığını kontrol edin",
@@ -4126,6 +4217,7 @@ var TR_EXACT = {
 "Choose the number that fits the whole day so far, not one moment": "Tek bir anı değil, günün şu ana kadarki tamamını yansıtan sayıyı seçin",
 "Choose the number that fits the worst part of the day": "Günün en kötü anına uyan sayıyı seçin",
 "Choose the stool form, or \"None today\"": "Dışkı biçimini ya da \"Bugün yok\" seçeneğini seçin",
+"Choose the worst moment of the day": "Günün en kötü anını seçin",
 "Circadian rhythm": "Sirkadiyen ritim",
 "Classification of Hypoglycemia (Diabetes Care": "Classification of Hypoglycemia (Diabetes Care",
 "Classification of Hypoglycemia (Diabetes Care, #)": "Classification of Hypoglycemia (Diabetes Care, #)",
@@ -4331,6 +4423,7 @@ var TR_EXACT = {
 "Eye ultrasound": "Göz ultrasonu",
 "Eyes": "Gözler",
 "Eyes and brain fluid pressure": "Gözler ve beyin sıvısı basıncı",
+"Eyes and radiation": "Gözler ve radyasyon",
 "F #": "Y #",
 "Fair": "Orta",
 "Far above usual": "Olağandan çok yüksek",
@@ -4467,6 +4560,7 @@ var TR_EXACT = {
 "Hold on to something stable and move your head slowly": "Sabit bir şeye tutunun ve başınızı yavaş hareket ettirin",
 "Hold on to something stable, check your blood pressure and blood sugar, and drink fluids": "Sabit bir şeye tutunun, tansiyonunuzu ve kan şekerinizi ölçün, sıvı alın",
 "Hostile closed environment": "Zorlu kapalı ortam",
+"Hours actually asleep and minutes of loaded exercise": "Gerçekten uyunan saatler ve yüklenmeli egzersiz dakikaları",
 "How are you this week": "Bu hafta nasılsınız",
 "How are your energy and motivation": "Enerjiniz ve motivasyonunuz nasıl",
 "How emotionally exhausted or withdrawn do you feel": "Kendinizi duygusal olarak ne kadar tükenmiş ya da içine kapanık hissediyorsunuz",
@@ -4705,6 +4799,7 @@ var TR_EXACT = {
 "Minor Treatment": "Küçük Tedavi",
 "Minor Treatment pack": "Küçük Tedavi paketi",
 "Min–max": "Min–maks",
+"Missing": "Eksik",
 "Mission day": "Görev günü",
 "Mission days # to #": "Görev günleri #–#",
 "Mission environment": "Görev ortamı",
@@ -4876,6 +4971,7 @@ var TR_EXACT = {
 "Other spaceflight research": "Diğer uzay uçuşu araştırmaları",
 "Out of stock": "Stokta yok",
 "Outside Earth's magnetic field the dose is higher": "Dünya'nın manyetik alanının dışında doz daha yüksektir",
+"Outside what the instrument reads": "Cihazın okuyabileceği aralığın dışında",
 "Over #% of the career radiation limit used": "Kariyer radyasyon sınırının yüzde # oranından fazlası kullanıldı",
 "Over the last # check-ins the general health score averaged # (lowest #, highest #)": "Son # kayıtta genel sağlık puanı ortalama # oldu (en düşük #, en yüksek #)",
 "Oversleeping that keeps coming back should be checked by the crew medical officer": "Tekrarlayan aşırı uyku mürettebat sağlık görevlisi tarafından kontrol edilmeli",
@@ -4953,6 +5049,7 @@ var TR_EXACT = {
 "Psychological crisis": "Psikolojik kriz",
 "Pull your knees to your chest and hold for # seconds, three times": "Dizlerinizi göğsünüze çekin ve # saniye tutun, üç kez",
 "Pull your knees to your chest and hold for # seconds, three times, and keep up treadmill and cycle sessions": "Dizlerinizi göğsünüze çekin ve # saniye tutun, üç kez; koşu bandı ve bisiklet seanslarını sürdürün",
+"Pulse oximeter, breath count, blood gas and the cabin air monitor": "Nabız oksimetresi, nefes sayımı, kan gazı ve kabin hava monitörü",
 "Put gel on the closed eyelid and place the ultrasound probe on it gently": "Kapalı göz kapağına jel sürün ve ultrason probunu nazikçe üzerine koyun",
 "Put on a breathing mask and sound the alarm": "Solunum maskesi takın ve alarmı çalıştırın",
 "Put on an oxygen mask and warn the crew": "Oksijen maskesi takın ve mürettebatı uyarın",
@@ -4975,6 +5072,7 @@ var TR_EXACT = {
 "Rate how you feel overall today, from # (very low) to # (very good)": "Bugün genel olarak nasıl hissettiğinizi # (çok düşük) ile # (çok iyi) arasında puanlayın",
 "Rate it at the end of the work day": "İş gününün sonunda puanlayın",
 "Rate it for the last # hours from # (none) to # (severe)": "Son # saat için # (yok) ile # (şiddetli) arasında puanlayın",
+"Rate your mood and stress, and save the reaction test result": "Ruh halinizi ve stresinizi puanlayın, reaksiyon testi sonucunu kaydedin",
 "Rate your mood before you start work": "İşe başlamadan önce ruh halinizi puanlayın",
 "Reaction test": "Reaksiyon testi",
 "Reaction test added": "Reaksiyon testi eklendi",
@@ -5131,6 +5229,7 @@ var TR_EXACT = {
 "Sleep # to # h": "# ile # sa uyku",
 "Sleep # to # h on # nights": "#3 gece #1 ile #2 sa uyu",
 "Sleep (h)": "Uyku (sa)",
+"Sleep and activity": "Uyku ve aktivite",
 "Sleep debt": "Uyku borcu",
 "Sleep debt over several nights": "Birkaç gecelik uyku borcu",
 "Sleep debt over the last # nights": "Son # gecedeki uyku borcu",
@@ -5250,6 +5349,7 @@ var TR_EXACT = {
 "Tell the crew medical officer today": "Bugün mürettebat sağlık görevlisine söyleyin",
 "Tell the crew so they can watch for symptoms": "Belirtileri izleyebilmeleri için mürettebata haber verin",
 "Tell the flight surgeon": "Uçuş hekimine söyleyin",
+"Temperature at rest, a finger-stick glucose and the day's fluid": "Dinlenirken ateş, parmak ucu şekeri ve günün sıvısı",
 "Temperature below # °C": "# °C altında vücut ısısı",
 "Temperature of # °C or more and pulse above # after an excursion or with low blood pressure": "Geziden sonra ya da düşük tansiyonla birlikte # °C veya üstü ısı ve # üstü nabız",
 "Tense at times": "Zaman zaman gergin",
@@ -5336,6 +5436,7 @@ var TR_EXACT = {
 "The total is filled in as the fluid intake of your next check-in, and the list is cleared when you save it": "Toplam, sonraki kaydınızın sıvı alımı olarak doldurulur ve kaydı kaydettiğinizde liste temizlenir",
 "The value is the width of the sheath around the optic nerve, measured # mm behind the eyeball": "Değer, optik sinirin çevresindeki kılıfın göz küresinin # mm arkasından ölçülen genişliğidir",
 "The value is used to support you, not to judge you": "Değer sizi yargılamak için değil desteklemek için kullanılır",
+"The values from your last check-in are filled in": "Son kaydınızdaki değerler dolduruldu",
 "The water tracker's pace line spreads the daily target evenly over the waking hours of the light plan, which is also a team choice": "Su takibindeki tempo çizgisi günlük hedefi ışık planındaki uyanık saatlere eşit yayar; bu da takımın tercihidir",
 "The weekly morale survey and its General Psychological Risk Index were designed by the team": "Haftalık moral anketi ve Genel Psikolojik Risk Endeksi takım tarafından tasarlandı",
 "The weights are the team's own proposal": "Ağırlıklar takımın kendi önerisidir",
@@ -5409,6 +5510,7 @@ var TR_EXACT = {
 "Use the same cuff measurement as for the systolic value": "Sistolik değerle aynı manşet ölçümünü kullanın",
 "Use them to judge your treadmill and cycle sessions": "Koşu bandı ve bisiklet seanslarınızı değerlendirmek için kullanın",
 "Used #": "# kullanıldı",
+"Used by the decompression, heat and radiation checks": "Dekompresyon, ısı ve radyasyon kontrollerinde kullanılır",
 "Used for": "Kullanım amacı",
 "Used for check-ins, wound care and eye scans": "Kayıtlar, yara bakımı ve göz taramaları için kullanılır",
 "Usual": "Olağan",
@@ -5444,6 +5546,7 @@ var TR_EXACT = {
 "Wearable sensors": "Giyilebilir sensörler",
 "Week": "Hafta",
 "Weekly": "Haftalık",
+"Weekly eye ultrasound and your personal dosimeter": "Haftalık göz ultrasonu ve kişisel dozimetreniz",
 "Weekly eye ultrasound, guided by the onboard procedure": "Araçtaki prosedürle yönlendirilen haftalık göz ultrasonu",
 "Weekly health report": "Haftalık sağlık raporu",
 "Weekly morale survey": "Haftalık moral anketi",
