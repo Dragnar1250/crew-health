@@ -87,7 +87,6 @@ form .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr
 .chartbox{overflow-x:auto}
 .chartbox svg{display:block;width:100%;min-width:480px;height:auto}
 .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin-bottom:12px}
-.badges{display:flex;flex-wrap:wrap;gap:8px}
 .badge{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--muted)}
 .badge.on{border-style:solid;border-color:var(--ok);color:var(--ink);background:var(--ok-soft)}
 .dose{height:10px;background:var(--bg);border:1px solid var(--line);border-radius:999px;overflow:hidden}
@@ -141,6 +140,25 @@ footer{font-size:12px;color:var(--muted)}
 .sres strong{color:var(--s);font-size:16px}
 .sdims{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 20px}
 .sdims div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:4px}
+.goalsp{border-color:var(--ok)}
+.streaks{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:16px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--bg);min-width:0}
+.tile b{font-size:28px;font-weight:500;line-height:1.1}
+.tile span{color:var(--muted);font-size:13px}
+.tile.on{border-color:var(--ok);background:var(--ok-soft)}
+.tile.on b{color:var(--ok)}
+.gcols{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 24px}
+.gcols h3{margin-bottom:6px}
+.glist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.glist li{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
+.glist i{font-style:normal;color:var(--muted)}
+.glist li.done i{color:var(--ok)}
+.glist li.done .gv{color:var(--ok)}
+.gv{font-size:13px;color:var(--muted)}
+.gbar{grid-column:2/-1;height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.gbar span{display:block;height:100%;background:var(--accent)}
+.glist li.done .gbar span{background:var(--ok)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 </style>
 
 </head>
@@ -162,6 +180,28 @@ footer{font-size:12px;color:var(--muted)}
 
   <section id="banner" class="banner st0" aria-live="polite"></section>
   <p id="notice" class="small muted" aria-live="polite" hidden></p>
+
+  <section class="panel goalsp" aria-labelledby="goalsTitle">
+    <div class="head">
+      <div>
+        <p class="label">Routine · daily and weekly goals</p>
+        <h2 id="goalsTitle">Your goals</h2>
+      </div>
+      <p class="small muted" id="goalsNote"></p>
+    </div>
+    <p class="small muted" style="margin:-4px 0 12px">A streak counts the days in a row on which every daily goal was met, and the weeks in a row on which every weekly goal was met.</p>
+    <div class="streaks" id="streaks"></div>
+    <div class="gcols">
+      <div>
+        <h3 id="todayTitle">Today</h3>
+        <ul class="glist" id="todayGoals" aria-labelledby="todayTitle"></ul>
+      </div>
+      <div>
+        <h3 id="weekTitle">This mission week</h3>
+        <ul class="glist" id="weekGoals" aria-labelledby="weekTitle"></ul>
+      </div>
+    </div>
+  </section>
 
   <section class="panel assist">
     <div class="head">
@@ -241,11 +281,7 @@ footer{font-size:12px;color:var(--muted)}
     <p class="small muted" id="chartNote"></p>
   </section>
 
-  <div class="two">
-    <section class="panel">
-      <div class="head"><h2>Routine and rewards</h2></div>
-      <div class="badges" id="badges"></div>
-    </section>
+  <div>
     <section class="panel">
       <div class="head"><h2>Cumulative radiation dose</h2></div>
       <p><span class="num" id="doseVal"></span> <span class="muted small">of a 600 mSv career limit</span></p>
@@ -293,6 +329,7 @@ footer{font-size:12px;color:var(--muted)}
   <div class="quick">
     <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
     <button type="button" class="chip" data-q="Interpret my day">Interpret my day</button>
+    <button type="button" class="chip" data-q="How are my goals?">How are my goals?</button>
     <button type="button" class="chip" data-q="How is my morale?">How is my morale?</button>
     <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
     <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
@@ -822,6 +859,7 @@ function buildMessages(q, days, env, notes, history, ruleAnswer){
     (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
          'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
        : 'No check-in has been logged yet.\n')+
+    (d ? 'Goals: '+goalsText(days,env).replace(/\n+/g,' ')+'\n' : '')+
     (LAST_SURVEY ? 'Latest morale survey: '+surveyText(LAST_SURVEY)+'\n' : '')+
     'Procedure notes that match the question:\n'+(ruleAnswer||'none')+'\n'+
     ((notes||[]).length ? 'Crew notes:\n'+notes.map(function(n){ return '- '+n.k+': '+n.a; }).join('\n')+'\n' : '');
@@ -873,6 +911,74 @@ function surveyText(r){
 }
 var LAST_SURVEY=null;
 function setSurvey(r){ LAST_SURVEY=(r && r.valid) ? r : null; }
+/* Daily and weekly goals with streaks. A mission week is days 1-7, 8-14 and so on. */
+var DAILY_GOALS = [
+  {id:'checkin', t:'Log today\'s check-in',    ok:function(d){ return !!d; },          v:function(){ return 'Done'; }},
+  {id:'sleep',   t:'Sleep 7 h or more',        ok:function(d){ return d.sleep>=7; },   v:function(d){ return d.sleep+' h'; }},
+  {id:'ex',      t:'Exercise 60 min or more',  ok:function(d){ return d.ex>=60; },     v:function(d){ return d.ex+' min'; }},
+  {id:'green',   t:'Every reading in range',
+   ok:function(d,env){ return ORDER.every(function(id){ return statusOf(id,d[id],env)===0; }); },
+   v:function(d,env){ var n=ORDER.filter(function(id){ return statusOf(id,d[id],env)>0; }).length; return n ? n+' to watch' : 'All in range'; }}
+];
+var WEEK_EX = 600; /* NASA OCHMO-TB-031: station crews average about 600 minutes of exercise per week */
+var SURVEY_DAYS = [];
+function setSurveyDays(a){ SURVEY_DAYS=(a||[]).filter(function(x){ return typeof x==='number' && isFinite(x); }); }
+function weekOf(day){ return Math.ceil(day/7); }
+function dailyGoals(d, env){
+  return DAILY_GOALS.map(function(g){ var ok=!!d && g.ok(d,env); return {id:g.id, t:g.t, done:ok, v:d ? g.v(d,env) : 'Not yet'}; });
+}
+function dayDone(d, env){ return !!d && dailyGoals(d,env).every(function(g){ return g.done; }); }
+function dailyStreak(days, env){
+  var n=0;
+  for(var i=days.length-1;i>=0;i--){
+    if(i<days.length-1 && days[i+1].day!==days[i].day+1) break;
+    if(dayDone(days[i],env)) n++; else break;
+  }
+  return n;
+}
+function bestStreak(days, env){
+  var best=0, run=0;
+  days.forEach(function(d,i){
+    if(i>0 && d.day!==days[i-1].day+1) run=0;
+    run=dayDone(d,env) ? run+1 : 0; if(run>best) best=run; });
+  return best;
+}
+function weeklyGoals(days, env, week){
+  var last=days[days.length-1], w=week || (last ? weekOf(last.day) : 1);
+  var wd=days.filter(function(x){ return weekOf(x.day)===w; });
+  var ex=wd.reduce(function(a,x){ return a+x.ex; },0);
+  var goals=[
+    {id:'log',     t:'Check in every day',                have:wd.length, need:7, unit:'days'},
+    {id:'ex',      t:'Exercise '+WEEK_EX+' min in total', have:Math.round(ex), need:WEEK_EX, unit:'min'},
+    {id:'sleep',   t:'Sleep 7 h or more on 5 nights',     have:wd.filter(function(x){ return x.sleep>=7; }).length, need:5, unit:'nights'},
+    {id:'perfect', t:'Meet every daily goal on 5 days',   have:wd.filter(function(x){ return dayDone(x,env); }).length, need:5, unit:'days'},
+    {id:'survey',  t:'Complete the morale survey',        have:SURVEY_DAYS.some(function(s){ return weekOf(s)===w; }) ? 1 : 0, need:1, unit:''}
+  ];
+  goals.forEach(function(g){ g.done=g.have>=g.need; });
+  return {week:w, daysIn:wd.length, goals:goals, done:goals.every(function(g){ return g.done; })};
+}
+function weeklyStreak(days, env){
+  var last=days[days.length-1]; if(!last) return 0;
+  var cur=weekOf(last.day), n=0;
+  for(var w=cur; w>=1; w--){
+    if(weeklyGoals(days,env,w).done){ n++; continue; }
+    if(w===cur && last.day%7!==0) continue;  /* this week is still running */
+    break;
+  }
+  return n;
+}
+function goalsText(days, env){
+  var d=days[days.length-1];
+  if(!d) return 'There is no check-in yet. Log one to start your daily goals.';
+  var dg=dailyGoals(d,env), open=dg.filter(function(g){ return !g.done; }), W=weeklyGoals(days,env), wopen=W.goals.filter(function(g){ return !g.done; });
+  var ds=dailyStreak(days,env), ws=weeklyStreak(days,env);
+  return 'Today (mission day '+d.day+'): '+(dg.length-open.length)+' of '+dg.length+' daily goals met.'+
+    (open.length ? ' Still open: '+open.map(function(g){ return g.t.toLowerCase()+' ('+g.v+')'; }).join(', ')+'.' : ' Every daily goal is done.')+
+    ' Daily streak: '+ds+' day'+(ds===1?'':'s')+', best '+bestStreak(days,env)+'.\n\n'+
+    'Mission week '+W.week+' (day '+W.daysIn+' of 7): '+(W.goals.length-wopen.length)+' of '+W.goals.length+' weekly goals met.'+
+    (wopen.length ? ' Still open: '+wopen.map(function(g){ return g.t.toLowerCase()+' ('+(g.unit ? g.have+' of '+g.need+' '+g.unit : 'not yet')+')'; }).join(', ')+'.' : ' Every weekly goal is done.')+
+    ' Weekly streak: '+ws+' week'+(ws===1?'':'s')+'.';
+}
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
 function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
@@ -986,6 +1092,7 @@ function core(q, days, env){
   if(kb.length) return kb.map(function(e){ return kbText(e, d, env); }).join('\n\n');
   if(/\b(problems|emergencies|topics|go wrong)\b/.test(q))
     return 'I have first-response steps for: '+KB.map(function(e){ return e.t.toLowerCase(); }).join(', ')+'.';
+  if(/\b(goal|goals|streak|streaks|target|targets)\b/.test(q)) return goalsText(days, env);
   if(/\b(morale|survey|gpri|psychological|psychology|wellbeing)\b/.test(q))
     return LAST_SURVEY ? surveyText(LAST_SURVEY) : 'No morale survey has been completed yet. Fill in the weekly morale survey on the page to get your General Psychological Risk Index.';
   if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
@@ -1048,7 +1155,7 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,dailyGoals:dailyGoals,dayDone:dayDone,dailyStreak:dailyStreak,bestStreak:bestStreak,weeklyGoals:weeklyGoals,weeklyStreak:weeklyStreak,goalsText:goalsText,setSurveyDays:setSurveyDays,WEEK_EX:WEEK_EX,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -1160,17 +1267,35 @@ if(typeof document!=='undefined'){ (function(){
   }
   function renderExtras(){
     var days=state.days, env=state.env, d=latest();
-    var sS=streak(days,function(x){return x.sleep>=7;}), sE=streak(days,function(x){return x.ex>=60;});
-    var green=d && ORDER.every(function(id){return statusOf(id,d[id],env)===0;});
-    var list=[
-      {on:days.length>=7, t:'Check-in streak', s:days.length+' day'+(days.length===1?'':'s')+' logged in a row'},
-      {on:sS>=7, t:'Well rested', s:sS+' of 7 nights with 7 h sleep or more'},
-      {on:sE>=7, t:'Flight fit', s:sE+' of 7 days with 60 min exercise or more'},
-      {on:!!green, t:'All green', s:green?'Every reading in range today':'Get every reading in range today'}];
-    $('badges').innerHTML=list.map(function(b){ return '<div class="badge'+(b.on?' on':'')+'"><strong>'+(b.on?'● ':'○ ')+b.t+'</strong><br>'+b.s+'</div>'; }).join('');
+    renderGoals();
     var total=days.reduce(function(a,x){return a+x.rad;},0);
     $('doseVal').textContent=total.toFixed(2)+' mSv';
     $('doseBar').style.width=Math.min(100,total/600*100).toFixed(2)+'%';
+  }
+  function renderGoals(){
+    var days=state.days, env=state.env, d=latest(), dg=dailyGoals(d,env), W=weeklyGoals(days,env);
+    var ds=dailyStreak(days,env), best=bestStreak(days,env), ws=weeklyStreak(days,env);
+    var met=dg.filter(function(g){ return g.done; }).length, wmet=W.goals.filter(function(g){ return g.done; }).length;
+    function tile(n, unit, label, on){
+      return '<div class="tile'+(on?' on':'')+'"><b class="num">'+n+'</b> <span>'+unit+(n===1?'':'s')+'</span><p class="small muted">'+label+'</p></div>'; }
+    $('streaks').innerHTML=
+      tile(ds,'day','Daily streak', ds>0)+
+      tile(best,'day','Best daily streak', false)+
+      tile(ws,'week','Weekly streak', ws>0)+
+      '<div class="tile"><b class="num">'+met+'/'+dg.length+'</b> <span>today</span><p class="small muted">Week: '+wmet+'/'+W.goals.length+' goals</p></div>';
+    $('todayTitle').textContent=d ? 'Today · mission day '+d.day : 'Today';
+    $('todayGoals').innerHTML=dg.map(function(g){
+      return '<li class="'+(g.done?'st0 done':'open')+'"><i aria-hidden="true">'+(g.done?'●':'○')+'</i><span>'+g.t+'</span><span class="num gv">'+g.v+'</span>'+
+        '<span class="sr">'+(g.done?'Done':'Not done')+'</span></li>'; }).join('');
+    $('weekTitle').textContent='Mission week '+W.week+' · day '+W.daysIn+' of 7';
+    $('weekGoals').innerHTML=W.goals.map(function(g){
+      var pct=Math.min(100, Math.round(g.have/g.need*100));
+      return '<li class="'+(g.done?'st0 done':'open')+'"><i aria-hidden="true">'+(g.done?'●':'○')+'</i><span>'+g.t+'</span>'+
+        '<span class="num gv">'+(g.unit ? g.have+' / '+g.need : (g.done?'Done':'Not yet'))+'</span>'+
+        '<span class="gbar" role="progressbar" aria-label="'+g.t+'" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'"><span style="width:'+pct+'%"></span></span></li>'; }).join('');
+    $('goalsNote').textContent = !d ? 'Log a check-in to start.' :
+      met===dg.length ? 'Every daily goal is done today.' :
+      (ds===0 && best>0 ? 'Your streak restarts today. Your best run was '+best+' day'+(best===1?'':'s')+'.' : (dg.length-met)+' daily goal'+(dg.length-met===1?'':'s')+' left today.');
   }
   function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); renderInsights(); }
   function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
@@ -1271,7 +1396,7 @@ if(typeof document!=='undefined'){ (function(){
   /* Weekly morale survey */
   var SKEY='kuasar-crew-survey-v1', surveys=[];
   try{ var ss=JSON.parse(localStorage.getItem(SKEY)||'[]'); if(Array.isArray(ss)) surveys=ss.filter(function(x){ return x && x.valid && x.dims; }); }catch(e){}
-  setSurvey(surveys[surveys.length-1]);
+  setSurvey(surveys[surveys.length-1]); setSurveyDays(surveys.map(function(x){ return x.day; }));
   function renderSurvey(){
     $('surveyQs').innerHTML=SURVEY.map(function(s,i){
       return '<fieldset class="sq"><legend><span class="label">'+s.cat+'</span><br>'+(i+1)+'. '+s.q+'</legend><div class="scale">'+
@@ -1301,7 +1426,7 @@ if(typeof document!=='undefined'){ (function(){
     var d=latest(); r.day=d?d.day:null; r.ans=ans;
     r.q13=$('sv_q13').value.trim(); r.q14=$('sv_q14').value.trim(); r.hasNotes=!!(r.q13||r.q14);
     surveys.push(r); try{ localStorage.setItem(SKEY, JSON.stringify(surveys)); }catch(e){}
-    setSurvey(r); $('surveyForm').reset(); renderSurveyResult(); renderInsights();
+    setSurvey(r); setSurveyDays(surveys.map(function(x){ return x.day; })); $('surveyForm').reset(); renderSurveyResult(); renderInsights(); renderGoals();
     $('surveyMsg').textContent='Survey saved.';
     $('surveyResult').scrollIntoView({block:'nearest'});
   });
