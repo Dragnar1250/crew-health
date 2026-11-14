@@ -403,7 +403,7 @@ var TERMS = {
   sys:['blood pressure','bp','systolic'], dia:['blood pressure','bp','diastolic'],
   hr:['heart rate','pulse','heartbeat','bpm'], spo2:['oxygen','spo2','o2','saturation'],
   pco2:['carbon dioxide','co2','pco2'], cabin:['cabin co2','cabin carbon dioxide','cabin air','air quality'], glu:['glucose','sugar'],
-  temp:['temperature','fever','temp'], sleep:['sleep','slept','tired','insomnia'],
+  temp:['temperature','fever','temp'], sleep:['sleep','slept','asleep'],
   mood:['mood','sad','stress','stressed','lonely','anxious'],
   onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid'],
   ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar']
@@ -420,18 +420,23 @@ function trendText(id, days){
 }
 /* Problem knowledge base: first-response summaries for likely health and technical problems.
    k = search terms, t = title, s = severity (0 info, 1 caution, 2 emergency), c = related readings, a = steps. */
+/* "my heart aches", "pain in my chest": a body part near a symptom word, in either order. */
+var SYM='ache|aches|aching|ached|hurt|hurts|hurting|pain|pains|painful|sore|pressure|tight|tightness|burning|burns|cramp|cramps|throbbing|stinging|numb|numbness|tingling|stiff';
+function bs(parts){
+  return new RegExp('\\b('+parts+')s?\\b.{0,40}\\b('+SYM+')\\b|\\b('+SYM+')\\b.{0,40}\\b('+parts+')s?\\b');
+}
 var KB = [
-  {k:['nausea','nauseous','vomit','vomiting','motion sickness','space sickness'], t:'Space motion sickness', s:1, c:['rad'], a:[
+  {k:['throwing up','threw up','sick to my stomach','nausea','nauseous','vomit','vomiting','motion sickness','space sickness'], t:'Space motion sickness', s:1, c:['rad'], a:[
     'This is common in the first 2 to 3 days in a new gravity level.',
     'Keep head movements slow and keep a sickness bag within reach.',
     'Sip fluids and take the anti-nausea medication from the medical kit as the procedure allows.',
     'If nausea starts together with a high radiation dose, treat it as possible radiation sickness and report it.']},
-  {k:['headache','head hurts','migraine'], t:'Headache', s:1, c:['cabin','pco2','onsd','sleep'], a:[
+  {k:['headache','head hurts','migraine'], r:bs('head'), t:'Headache', s:1, c:['cabin','pco2','onsd','sleep'], a:[
     'Check the cabin CO2 level and move to a well-ventilated place.',
     'Drink water and rest.',
     'Take a pain reliever from the medical kit as the procedure allows.',
     'Report a headache that comes with blurred vision or lasts more than a day.']},
-  {k:['back pain','backache','back hurts'], t:'Back pain', s:0, c:['ex'], a:[
+  {k:['back pain','backache','back hurts'], r:bs('back'), t:'Back pain', s:0, c:['ex'], a:[
     'The spine lengthens in low gravity, so back pain is common early in a mission.',
     'Curl into a knees-to-chest position for a few minutes.',
     'Keep up resistance exercise.',
@@ -440,7 +445,7 @@ var KB = [
     'Fluid shifts toward the head in low gravity and causes a puffy face and a blocked nose.',
     'It usually eases in the first weeks.',
     'Drink enough water and use the decongestant from the medical kit as the procedure allows.']},
-  {k:['kidney','kidney stone','flank pain','pain when urinating'], t:'Possible kidney stone', s:2, c:['temp'], a:[
+  {k:['kidney','kidney stone','flank pain','pain when urinating'], r:bs('kidney|flank'), t:'Possible kidney stone', s:2, c:['temp'], a:[
     'Bone loss raises calcium in urine, which raises the risk of stones.',
     'Drink plenty of water.',
     'Take pain relief from the medical kit as the procedure allows.',
@@ -449,7 +454,7 @@ var KB = [
     'Thirst is weaker in low gravity, so drink on a schedule.',
     'Drink water with electrolytes now.',
     'Recheck heart rate and blood pressure in 1 hour.']},
-  {k:['infection','sore throat','cough','sick','flu','runny nose'], t:'Possible infection', s:1, c:['temp','spo2'], a:[
+  {k:['common cold','caught a cold','infection','sore throat','cough','sick','flu','runny nose'], r:bs('throat'), t:'Possible infection', s:1, c:['temp','spo2'], a:[
     'Immunity is weaker in spaceflight, and a closed cabin spreads germs fast.',
     'Wear a mask, clean shared surfaces and keep distance from crewmates.',
     'Rest and drink fluids.',
@@ -464,24 +469,24 @@ var KB = [
     'Cover it with a sterile non-stick dressing.',
     'Do not break blisters.',
     'Contact the flight surgeon for a burn larger than your palm, or on the face or hands.']},
-  {k:['rash','itch','itchy','skin'], t:'Skin rash or irritation', s:0, c:['temp'], a:[
+  {k:['rash','itch','itchy','skin'], r:bs('skin'), t:'Skin rash or irritation', s:0, c:['temp'], a:[
     'Skin gets dry and irritated easily in the cabin.',
     'Keep the area clean and dry and use the skin cream from the medical kit.',
     'Report a rash that spreads or comes with fever.']},
-  {k:['eye irritation','something in my eye','foreign body','red eye'], t:'Eye irritation', s:1, c:['onsd'], a:[
+  {k:['eye irritation','something in my eye','foreign body','red eye'], r:bs('eye'), t:'Eye irritation', s:1, c:['onsd'], a:[
     'Dust and particles float in low gravity and reach the eyes easily.',
     'Do not rub. Rinse with the eye wash from the medical kit.',
     'Report pain, lasting redness or a change in vision.']},
-  {k:['tooth','toothache','dental','teeth'], t:'Toothache', s:1, c:[], a:[
+  {k:['tooth','toothache','dental','teeth'], r:bs('tooth|teeth|gum|jaw'), t:'Toothache', s:1, c:[], a:[
     'Rinse and clean around the tooth.',
     'Take pain relief from the medical kit as the procedure allows.',
     'Report it to the flight surgeon. A temporary filling may be placed under ground guidance.']},
-  {k:['dizzy','dizziness','faint','fainting','lightheaded'], t:'Dizziness or fainting', s:1, c:['sys','dia','hr','glu'], a:[
+  {k:['vertigo','spinning','dizzy','dizziness','faint','fainting','lightheaded'], t:'Dizziness or fainting', s:1, c:['sys','dia','hr','glu'], a:[
     'Sit down or hold on to something stable at once.',
     'Drink fluids, and eat something if you have not eaten.',
     'After moving to a new gravity level, stand up slowly.',
     'Report fainting or dizziness that does not pass.']},
-  {k:['chest pain','heart attack','cardiac','not breathing','unconscious','collapsed','unresponsive'], t:'Chest pain or collapse', s:2, c:['hr','spo2','sys'], a:[
+  {k:['palpitations','heart racing','heart is racing','heart pounding','chest pain','heart attack','cardiac','not breathing','unconscious','collapsed','unresponsive'], r:bs('heart|chest'), t:'Chest pain or collapse', s:2, c:['hr','spo2','sys'], a:[
     'Call the whole crew now.',
     'If the person is unresponsive and not breathing, start CPR using the onboard restraint method and bring the defibrillator.',
     'If the person is awake with chest pain, stop all activity, give oxygen and follow the cardiac procedure in the medical kit.',
@@ -495,12 +500,12 @@ var KB = [
     'Keep your dosimeter on and log the dose. NASA limits the dose from a single event to 250 mSv.',
     'Nausea, vomiting and tiredness in the hours after exposure can be radiation sickness. Report them.',
     'Postpone any spacewalk or surface excursion.']},
-  {k:['panic','conflict','argument','fight','homesick','angry'], t:'Stress and crew conflict', s:1, c:['mood','sleep'], a:[
+  {k:['panic','conflict','argument','fight','homesick','angry','bored','boredom','go home','miss my family','missing my family'], t:'Stress, loneliness and crew conflict', s:1, c:['mood','sleep'], a:[
     'Pause and take slow breaths for a few minutes.',
     'Talk to a crewmate you trust, or ask for a private conference with the ground.',
     'Protect your sleep and free time this week.',
     'Bring repeated conflicts to the commander early.']},
-  {k:['cramp','sprain','strain','injury','injured','pulled muscle','twisted'], t:'Muscle or joint injury', s:1, c:['ex'], a:[
+  {k:['cramp','sprain','strain','injury','injured','pulled muscle','twisted'], r:bs('leg|arm|knee|ankle|shoulder|wrist|elbow|foot|feet|hip|hand|finger|neck|muscle|joint'), t:'Muscle or joint injury', s:1, c:['ex'], a:[
     'Stop the exercise.',
     'Cool the area, wrap it and rest it.',
     'Restart exercise gently when pain allows. Stopping completely speeds up muscle loss.',
@@ -592,10 +597,129 @@ var KB = [
     'Appetite and taste are weaker in space, so eat by schedule, not by hunger.',
     'Do not eat food from a damaged or swollen package.',
     'Take vitamin D as planned, because there is no sunlight exposure.',
-    'Report steady weight loss.']}
+    'Report steady weight loss.']},
+  {k:['short of breath','shortness of breath','cannot breathe','breathless','hard to breathe','trouble breathing','difficulty breathing','wheezing'], t:'Shortness of breath', s:2, c:['spo2','pco2','cabin','hr'], a:[
+    'Stop what you are doing and tell a crewmate.',
+    'Measure blood oxygen now.',
+    'Move to a module with good airflow and check the cabin CO2 and oxygen levels.',
+    'If blood oxygen is low or breathing does not ease in a few minutes, start oxygen and contact the flight surgeon.']},
+  {k:['indigestion','heartburn','acid reflux','reflux','bloated','bloating','stomach ache','stomachache'], r:bs('stomach|belly|abdomen|tummy'), t:'Stomach pain or indigestion', s:1, c:['temp'], a:[
+    'Without gravity the stomach contents float, so reflux and bloating are common.',
+    'Eat smaller meals and eat slowly.',
+    'Use the antacid from the medical kit as the procedure allows.',
+    'Report severe pain, pain with fever, or pain that settles in the lower right side.']},
+  {k:['constipation','constipated'], t:'Constipation', s:0, c:['ex'], a:[
+    'Bowel movement slows in low gravity, so this is common.',
+    'Drink more water and eat the fibre-rich items on the menu.',
+    'Keep up daily exercise.',
+    'Use the laxative from the medical kit as the procedure allows, and report it if it lasts more than 3 days.']},
+  {k:['diarrhea','diarrhoea','loose stool'], t:'Diarrhea', s:1, c:['hr','temp'], a:[
+    'Drink water with electrolytes after every episode to replace the fluid.',
+    'Wash your hands carefully and clean the toilet area so it does not spread.',
+    'Eat plain food until it settles.',
+    'Report it if it lasts more than a day, or comes with fever or blood.']},
+  {k:['insomnia','cannot sleep','trouble sleeping','sleep problems','wake up at night','waking up'], t:'Trouble sleeping', s:1, c:['sleep','cabin','mood'], a:[
+    'Keep the same bedtime and wake time every day, including rest days.',
+    'Dim the lights and stop screen work 1 hour before sleep. Use the eye mask and earplugs.',
+    'Avoid caffeine in the 6 hours before sleep.',
+    'Check the airflow and CO2 level in your sleep station.',
+    'Report it if poor sleep lasts more than 3 nights.']},
+  {k:['tired','fatigue','fatigued','exhausted','no energy','weak','weakness','sleepy','drowsy'], t:'Tiredness and low energy', s:1, c:['sleep','glu','pco2','cabin'], a:[
+    'Check last night\'s sleep, your blood glucose and the cabin CO2 level. All three cause tiredness.',
+    'Eat and drink if your last meal was more than 4 hours ago.',
+    'Take a 20-minute nap if the schedule allows.',
+    'Tell the commander before any safety-critical task.']},
+  {k:['allergy','allergic','sneezing','sneeze','hives','itchy eyes'], t:'Allergy', s:1, c:['spo2'], a:[
+    'Dust and particles do not settle in low gravity, so they irritate the nose and eyes more easily.',
+    'Clean the air filters near you and wipe surfaces.',
+    'Use the antihistamine from the medical kit as the procedure allows.',
+    'Swelling of the lips, tongue or face, or trouble breathing, is an emergency. Call the crew and use the emergency injector as the procedure directs.']},
+  {k:['nosebleed','nose bleed','bleeding nose','nose is bleeding'], t:'Nosebleed', s:1, c:[], a:[
+    'Pinch the soft part of the nose firmly for 10 minutes without letting go.',
+    'Hold a cloth under the nose so blood does not float into the cabin.',
+    'Do not blow your nose for a few hours afterwards.',
+    'Report it if the bleeding continues after 20 minutes.']},
+  {k:['choking','choke','choked'], t:'Choking', s:2, c:['spo2'], a:[
+    'If the person can cough or speak, encourage strong coughing.',
+    'If they cannot breathe or speak, call the crew, anchor yourself and give abdominal thrusts as trained.',
+    'If the person becomes unresponsive, start CPR.',
+    'Contact the flight surgeon after any choking event.']},
+  {k:['head injury','hit my head','bumped my head','banged my head','concussion'], t:'Head injury', s:2, c:['onsd'], a:[
+    'Stop work and have a crewmate watch you for the next hours.',
+    'Cool the area and check for bleeding.',
+    'Warning signs are confusion, repeated vomiting, unequal pupils, a growing headache or unusual sleepiness.',
+    'Contact the flight surgeon, and at once if any warning sign appears.']},
+  {k:['cannot urinate','cannot pee','unable to urinate','urinary retention'], t:'Unable to pass urine', s:2, c:[], a:[
+    'Trouble passing urine is known in the first days of spaceflight.',
+    'Do not wait until it becomes painful.',
+    'Contact the flight surgeon. The catheter kit is used only under ground guidance.']},
+  {k:['earache','ear pain','blocked ear'], r:bs('ear'), t:'Ear pain or blocked ear', s:1, c:['temp'], a:[
+    'Swallow, yawn or gently blow with your nose pinched to equalize the pressure.',
+    'Do not put anything into the ear.',
+    'Report pain with fever, discharge or a drop in hearing.']},
+  {k:['fan','fans','ventilation','airflow','air circulation'], t:'Ventilation fan failure', s:1, c:['cabin','pco2'], a:[
+    'Without fans, exhaled CO2 collects around your head, especially while you sleep.',
+    'Do not sleep or work for long in the affected area.',
+    'Use a portable fan and keep the hatches open to move air.',
+    'Check the cabin CO2 reading there and start the repair with ground guidance.']},
+  {k:['humidity','humid','condensation','mold','mould','damp'], t:'Humidity and mold', s:1, c:['spo2'], a:[
+    'Wipe up condensation, because floating water reaches electronics and feeds mold.',
+    'Check the dehumidifier and the airflow in that area.',
+    'Clean visible mold with disinfectant wipes while wearing a mask and gloves.',
+    'Report a cough or eye irritation.']},
+  {k:['computer','laptop','tablet','screen','frozen','software'], t:'Computer or tablet problem', s:0, c:[], a:[
+    'Restart the device and check its power cable or battery.',
+    'Switch to a backup device. Procedures are also kept on paper cards.',
+    'If this health tool is unavailable, log your readings on paper and enter them later.',
+    'Report the fault to the ground.']},
+  {k:['lights','lighting','lamp'], t:'Lighting failure', s:0, c:['sleep'], a:[
+    'Use a headlamp and move slowly so you do not hit equipment.',
+    'Replace the lamp unit or switch to the backup circuit.',
+    'Lighting also sets your body clock, so restore the day and night light schedule as soon as you can.']},
+  {k:['hatch','door','stuck'], t:'Hatch will not open or close', s:1, c:[], a:[
+    'Do not force it. First check that the pressure is equal on both sides.',
+    'Check the seal for objects or damage.',
+    'If a crew member is cut off, keep voice contact and tell the commander.',
+    'Start the repair with ground guidance.']},
+  {k:['battery','batteries','charger'], t:'Battery overheating or swelling', s:2, c:['spo2'], a:[
+    'Stop charging and unplug it. Do not touch a hot or swollen battery with bare hands.',
+    'Move it to the fire-safe containment bag.',
+    'Keep a breathing mask and the extinguisher ready. Battery fires release toxic smoke.',
+    'Report it to the ground.']}
 ];
 function findKB(q){
-  return KB.filter(function(e){ return e.k.some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); }).slice(0,2);
+  return KB.filter(function(e){
+    return e.k.some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }) || (e.r ? e.r.test(q) : false);
+  }).slice(0,2);
+}
+/* Closest topic: when no phrase matches, score every problem by the rare words it shares with the question. */
+var STOP=' i my me the a an is are am do does did what should how why can could would to of in on at it and or have has had feel feeling feels with for very really there that this be been was were when we our you your not no get got some any bit little too now today please help need want so just about from im ive its if will ';
+function stem(w){
+  if(w.length>5 && /ing$/.test(w)) return w.slice(0,-3);
+  if(w.length>4 && /ed$/.test(w)) return w.slice(0,-2);
+  if(w.length>4 && /es$/.test(w)) return w.slice(0,-2);
+  if(w.length>3 && /s$/.test(w) && !/ss$/.test(w)) return w.slice(0,-1);
+  return w;
+}
+function words(s){
+  return (String(s).toLowerCase().match(/[a-z0-9]+/g)||[]).filter(function(w){ return w.length>2 && STOP.indexOf(' '+w+' ')<0; }).map(stem);
+}
+var KBX=null;
+function kbIndex(){
+  if(KBX) return KBX;
+  var df={}, docs=KB.map(function(e){
+    var set={}; words(e.k.join(' ')+' '+e.t).forEach(function(w){ set[w]=1; });
+    Object.keys(set).forEach(function(w){ df[w]=(df[w]||0)+1; });
+    return set; });
+  var titles=KB.map(function(e){ var t={}; words(e.t).forEach(function(w){ t[w]=1; }); return t; });
+  KBX={docs:docs, df:df, titles:titles}; return KBX;
+}
+function closest(q){
+  var ix=kbIndex(), toks=words(q), best=null, top=0;
+  ix.docs.forEach(function(set,i){
+    var s=0; toks.forEach(function(w){ if(set[w]) s+=Math.log(KB.length/ix.df[w])+0.5+(ix.titles[i][w]?1:0); });
+    if(s>top){ top=s; best=KB[i]; } });
+  return top>=2 ? best : null;
 }
 function kbText(e, d, env){
   var s=e.t+(e.s===2?' (emergency)':'')+'\n'+e.a.map(function(x,i){ return (i+1)+'. '+x; }).join('\n');
@@ -752,7 +876,7 @@ function vocab(){
   return VOCAB;
 }
 function correct(q){
-  var V=vocab();
+  var V=vocab().concat(['should','contact','measure','interpret','status','summary','problems']);
   return q.replace(/[a-z0-9]{5,}/g, function(w){
     if(V.indexOf(w)>=0) return w;
     for(var i=0;i<V.length;i++) if(lev1(w,V[i])) return V[i];
@@ -808,11 +932,12 @@ function core(q, days, env){
       (flagged.length ? flagged.length+' of '+ORDER.length+' readings need attention: '+names+'. Ask "what should I do now" for guidance.'
                       : 'All '+ORDER.length+' readings are in range.')+(top.l>0?'\n\nMy reading: '+top.t:'');
   }
+  if(has(/\b(thanks|thank you|thx)\b/)) return 'You are welcome. Log your next check-in tomorrow.';
   if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, a problem, or who to contact.';
   return null;
 }
 function answer(q, days, env, notes){
-  q=String(q||'').toLowerCase();
+  q=String(q||'').toLowerCase().replace(/[\u2018\u2019]/g,"'").replace(/\bcan('?t| not)\b/g,'cannot');
   var mine=(notes||[]).filter(function(n){ return new RegExp('(^|[^a-z0-9])'+escRe(n.k)+'(?![a-z0-9])').test(q); })
                       .map(function(n){ return 'Crew note: '+n.a; }).join('\n');
   var r=core(q, days, env);
@@ -820,11 +945,12 @@ function answer(q, days, env, notes){
     var fixed=correct(q);
     if(fixed!==q){ var r2=core(fixed, days, env); if(r2!==null) r='I read that as "'+fixed+'".\n\n'+r2; }
   }
+  if(r===null || r.indexOf('There is no check-in yet')===0){ var near=closest(q); if(near) r='Closest topic I know:\n\n'+kbText(near, days[days.length-1], env); }
   if(mine) return r===null ? mine : mine+'\n\n'+r;
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -1028,7 +1154,7 @@ if(typeof document!=='undefined'){ (function(){
     var rule=answer(q, state.days, state.env, notes);
     if(!AI.engine){ say(rule,'bot'); return; }
     var bubble=say('Thinking...','bot ai'); AI.busy=true;
-    AI.engine.chat.completions.create({messages:buildMessages(q, state.days, state.env, notes, AI.history, rule), temperature:0.3, max_tokens:300, stream:true})
+    AI.engine.chat.completions.create({messages:buildMessages(q, state.days, state.env, notes, AI.history, rule.indexOf('I did not understand')===0 ? 'none' : rule), temperature:0.3, max_tokens:300, stream:true})
       .then(async function(chunks){
         var r='';
         for await (var c of chunks){
