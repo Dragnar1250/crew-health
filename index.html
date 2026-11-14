@@ -96,6 +96,13 @@ form .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr
 ul{margin:0;padding-left:18px}
 a{color:var(--accent)}
 footer{font-size:12px;color:var(--muted)}
+.chat{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;padding:2px}
+.msg{padding:8px 12px;border-radius:10px;max-width:88%;font-size:14px;white-space:pre-line;overflow-wrap:anywhere}
+.msg.me{align-self:flex-end;background:var(--accent);color:var(--surface)}
+.msg.bot{align-self:flex-start;background:var(--bg);border:1px solid var(--line)}
+.quick{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.ask{display:flex;flex-wrap:wrap;gap:8px}
+.ask input{flex:1 1 220px;min-width:0;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 </style>
 
 </head>
@@ -126,6 +133,27 @@ footer{font-size:12px;color:var(--muted)}
     </section>
     <section class="panel detail" id="detail" aria-live="polite"></section>
   </div>
+
+  <section class="panel">
+    <div class="head">
+      <h2>Onboard assistant</h2>
+      <span class="small muted">Rule-based. Runs on this device with no internet and reads only your logged values.</span>
+    </div>
+    <div class="chat" id="chat" aria-live="polite"></div>
+    <div class="quick">
+      <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
+      <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
+      <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
+      <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
+      <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
+      <button type="button" class="chip" data-q="Why does space affect my eyes?">Why does space affect my eyes?</button>
+    </div>
+    <form class="ask" id="askForm">
+      <label for="askInput" hidden>Ask a question</label>
+      <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading, for example: sleep, blood pressure, CO2">
+      <button class="btn primary" type="submit">Ask</button>
+    </form>
+  </section>
 
   <section class="panel">
     <div class="head">
@@ -299,7 +327,67 @@ function regionStatus(key, day, env){
 function streak(days, test){
   var n=0; for(var i=days.length-1;i>=0;i--){ if(test(days[i])) n++; else break; } return n;
 }
-if(typeof module!=='undefined') module.exports={ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+/* Onboard assistant: keyword rules over the logged readings. No network, no language model. */
+var TERMS = {
+  sys:['blood pressure','bp','systolic'], dia:['blood pressure','bp','diastolic'],
+  hr:['heart rate','pulse','heartbeat','bpm'], spo2:['oxygen','spo2','o2','saturation'],
+  pco2:['carbon dioxide','co2','pco2','headache'], glu:['glucose','sugar'],
+  temp:['temperature','fever','temp'], sleep:['sleep','slept','tired','insomnia'],
+  mood:['mood','sad','stress','stressed','lonely','anxious'],
+  onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid','headache'],
+  ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar']
+};
+function findIds(q){
+  return ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
+}
+function regionOf(id){ return Object.keys(REGIONS).filter(function(k){ return REGIONS[k].ids.indexOf(id)>=0; })[0]; }
+function trendText(id, days){
+  var w=days.slice(-7); if(w.length<2) return 'There are not enough check-ins for a trend yet.';
+  var a=w[0][id], b=w[w.length-1][id], rel=Math.abs(b-a)/(Math.abs(a)||1);
+  var dir=rel<0.03?'held steady':(b>a?'risen':'fallen');
+  return 'Over the last '+w.length+' check-ins it has '+dir+' (from '+a+' to '+b+' '+IND[id].unit+').';
+}
+function answer(q, days, env){
+  q=String(q||'').toLowerCase();
+  var d=days[days.length-1];
+  if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
+  function has(re){ return re.test(q); }
+  function st(id){ return statusOf(id, d[id], env); }
+  var flagged=ORDER.filter(function(id){ return st(id)>0; });
+  var worst=flagged.reduce(function(m,id){ return Math.max(m, st(id)); }, 0);
+  var names=flagged.map(function(id){ return IND[id].label.toLowerCase()+' ('+WORD[st(id)].toLowerCase()+')'; }).join(', ');
+  var wantHow=has(/\b(measure|how do i|how to|reading)\b/), wantWhy=has(/\b(why|affect|affects|cause|causes|hazard|hazards|space)\b/),
+      wantTrend=has(/\b(trend|worse|better|changing|change|changed|week|lately|history)\b/);
+  var ids=findIds(q);
+  if(ids.length) return ids.map(function(id){
+    var I=IND[id], v=d[id], s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
+    if(st(id)>0) s+=' '+adviceFor(id,v,env);
+    if(wantHow) s+=' How to measure: '+I.how;
+    if(wantWhy) s+=' '+REGIONS[regionOf(id)].why;
+    if(wantTrend) s+=' '+trendText(id,days);
+    return s; }).join('\n\n');
+  if(has(/\b(contact|surgeon|doctor|call|earth|ground|report|emergency)\b/)){
+    if(worst===0) return 'No reading needs a report today.';
+    if(worst===1) return 'Tell the crew medical officer about: '+names+'. Measure again later today. If a reading moves to "Act now", contact the flight surgeon.';
+    return 'Contact the flight surgeon now about: '+names+'. Signal delay from the '+ENV[env].full.toLowerCase()+': '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
+  }
+  if(has(/\b(what should i do|do now|advice|recommend|next step|help me|fix|improve)\b/)){
+    if(!flagged.length) return 'Nothing is flagged. Keep your exercise, sleep and meal routine and log the next check-in tomorrow.';
+    return flagged.map(function(id){ return IND[id].label+': '+adviceFor(id,d[id],env); }).join('\n\n');
+  }
+  if(wantTrend){
+    if(!flagged.length) return 'All readings are in range. Name a reading, for example "sleep trend", to see how it has changed.';
+    return flagged.map(function(id){ return IND[id].label+': '+trendText(id,days); }).join('\n\n');
+  }
+  if(wantWhy) return 'Spaceflight has five main hazards: space radiation, isolation and confinement, distance from Earth, gravity fields, and hostile closed environments. Name a reading or body part to see how it is affected.';
+  if(has(/\b(how am i|status|summary|today|overall|healthy|health|ok|okay|fine)\b/))
+    return 'Mission day '+d.day+' at the '+ENV[env].full.toLowerCase()+'. '+
+      (flagged.length ? flagged.length+' of '+ORDER.length+' readings need attention: '+names+'. Ask "what should I do now" for guidance.'
+                      : 'All '+ORDER.length+' readings are in range.');
+  if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, or who to contact.';
+  return 'I can answer from your logged readings. Try "how am I today", "what should I do now", "who should I contact", or name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation.';
+}
+if(typeof module!=='undefined') module.exports={answer:answer,TERMS:TERMS,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v2';
@@ -426,7 +514,8 @@ if(typeof document!=='undefined'){ (function(){
   function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
 
   document.addEventListener('click', function(ev){
-    var t=ev.target.closest('[data-env],[data-region],[data-act]'); if(!t) return;
+    var t=ev.target.closest('[data-env],[data-region],[data-act],[data-q]'); if(!t) return;
+    if(t.dataset.q){ ask(t.dataset.q); return; }
     if(t.dataset.env){
       state.env=t.dataset.env; var s=sample(state.env);
       state.days.forEach(function(d){ if(d.example && s[d.day-1]) d.rad=s[d.day-1].rad; });
@@ -456,7 +545,14 @@ if(typeof document!=='undefined'){ (function(){
     state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
   $('reset').addEventListener('click', function(){
     state.days=sample(state.env); save(); notice(''); render(); $('formMsg').textContent='Demo data restored.'; });
+  function say(text, who){
+    var m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
+    $('chat').appendChild(m); $('chat').scrollTop=$('chat').scrollHeight;
+  }
+  function ask(q){ q=String(q).trim(); if(!q) return; say(q,'me'); say(answer(q, state.days, state.env),'bot'); }
+  $('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); ask($('askInput').value); $('askInput').value=''; });
   render();
+  say(answer('summary', state.days, state.env),'bot');
 })(); }
 </script>
 </body>
