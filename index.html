@@ -44,7 +44,8 @@ p{margin:0}
 .small{font-size:13px}
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
-.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 24px;align-items:start}
+.top > div:first-child{min-width:0}
 .seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .seg button{font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:none;border:0;border-radius:7px;padding:6px 12px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
@@ -319,7 +320,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .pdfbtn{white-space:nowrap}
 .tabpanel .head .label{display:none}
 .envline{margin:2px 0 0;font-size:13px;color:var(--muted)}
-.envline b{font-weight:500;color:var(--ink)}
+.envline b{font-weight:500;color:var(--ink)} .envline .nw{white-space:nowrap}
 .tabpanel > section + section, .tabpanel + .tabpanel.joined{margin-top:16px}
 .hero{display:grid;grid-template-columns:minmax(0,220px) minmax(0,1fr);gap:18px 24px;align-items:start}
 @media (max-width:760px){ .hero{grid-template-columns:minmax(0,1fr)} }
@@ -395,9 +396,9 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
 .alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:260px;overflow-y:auto}
 .alerts li{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;font-size:14px;padding:6px 0;border-top:1px solid var(--line)}
 .alerts li span:last-child{color:var(--s)}
-.topright{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:auto}
+.topright{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .seg.lang{margin:0} .toprow{display:flex;gap:8px;align-items:center;margin-bottom:6px}
-@media (max-width:560px){ .topright{align-items:flex-start;margin-left:0} }
+@media (max-width:980px){ .top{grid-template-columns:minmax(0,1fr)} .topright{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 12px} .topright .toprow{margin:0} .topright > .label{display:none} }
 </style>
 
 </head>
@@ -407,7 +408,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <div>
       <p class="label">Team Kuasar Selçuklu · 2026 NASA Space Apps Challenge</p>
       <h1>Kuasar Crew Health</h1>
-      <p class="envline">Mission day <b class="num" id="missionDay">–</b> · <span id="envFacts"></span></p>
+      <p class="envline"><span class="nw">Mission day <b class="num" id="missionDay">–</b></span> · <span id="envFacts"></span></p>
     </div>
     <div class="topright"><div class="toprow"><button class="btn pdfbtn" type="button" id="hdrPdf" title="Export a PDF report">⇩ Export PDF</button>
       <div class="seg lang" role="group" aria-label="Language">
@@ -2631,7 +2632,7 @@ if(typeof document!=='undefined'){ (function(){
     $('envSeg').innerHTML=Object.keys(ENV).map(function(k){
       return '<button type="button" data-env="'+k+'" aria-pressed="'+(k===state.env)+'">'+ENV[k].name+'</button>'; }).join('');
     var e=ENV[state.env];
-    $('envFacts').innerHTML='<b>'+e.full+'</b> · '+e.g+' · '+'<span>Signal delay to Earth</span>: '+e.delay;
+    $('envFacts').innerHTML='<b class="nw">'+e.full+'</b> · <span class="nw">'+e.g+'</span> · <span class="nw"><span>Signal delay to Earth</span>: '+e.delay+'</span>';
   }
   function renderBanner(){
     var d=latest(), b=$('banner');
