@@ -204,10 +204,15 @@ footer{font-size:12px;color:var(--muted)}
   <section class="panel">
     <div class="head"><h2>Sources and limits of this prototype</h2></div>
     <ul class="small">
-      <li>Hazard model: NASA Human Research Program, the five hazards of human spaceflight (<a href="https://www.nasa.gov/hrp/risks/">nasa.gov/hrp/risks</a>, <a href="https://www.nasa.gov/hrp/radiation/">nasa.gov/hrp/radiation</a>).</li>
-      <li>Reference ranges are general adult clinical ranges used as placeholders. A flight version would use each crew member's preflight baseline and NASA-STD-3001 limits.</li>
-      <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign, with a ground clinical threshold as a placeholder.</li>
-      <li>Environment dose rates are approximate published averages (ISS, lunar surface, Mars surface) and must be checked against the challenge resources.</li>
+      <li><a href="https://www.nasa.gov/hrp/hazards">NASA Human Research Program, 5 Hazards of Human Spaceflight</a>: the hazard model behind every body region.</li>
+      <li><a href="https://www.nasa.gov/humans-in-space/the-human-body-in-space/">NASA, The Human Body in Space</a>: bone loss of 1% to 1.5% per month, one-way signal delay of up to 20 minutes from Mars.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-004-carbon-dioxide.pdf">NASA OCHMO-TB-004, Carbon Dioxide</a> (NASA-STD-3001 [V2 6004]): cabin limit of 3 mmHg as a 1-hour average, symptoms reported from 2.8 to 4.5 mmHg.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf">NASA OCHMO Radiation Protection technical brief</a>: 600 mSv career limit, 250 mSv per solar particle event, about 1.5 mSv per day in Mars transit.</li>
+      <li><a href="https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-031-exercise-overview.pdf">NASA OCHMO-TB-031, Exercise Overview</a>: station crews average about 600 minutes of exercise per week, with 60 to 90 minutes prescribed per day.</li>
+      <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149">Optic nerve sheath diameter and spaceflight, npj Microgravity 2022</a>: no single cut-off exists (5.0 to 6.4 mm on Earth) and astronaut values without eye changes average about 5.8 mm, so the personal preflight value matters most.</li>
+      <li>Not yet confirmed from NASA documents: the expected daily dose for the ISS (0.5 mSv), the lunar surface (1.4 mSv, from published lander measurements) and the Mars surface (0.64 mSv, from published Curiosity RAD results).</li>
+      <li>Blood pressure, heart rate, oxygen, blood CO2, glucose, temperature, sleep and mood use general adult clinical ranges. A flight version would use each crew member's preflight baseline.</li>
+      <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign.</li>
       <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
@@ -264,8 +269,10 @@ var ENV = {
          reply:'Ground can answer within minutes.'},
   moon: {name:'Moon base', full:'Lunar surface base', g:'0.17 g', delay:'About 1.3 s one way', dose:1.4,
          reply:'Ground can answer within minutes.'},
-  mars: {name:'Mars base', full:'Mars surface base', g:'0.38 g', delay:'3 to 22 min one way', dose:0.7,
-         reply:'A reply can take up to 44 minutes. Start the onboard protocol while you wait.'}
+  mars: {name:'Mars base', full:'Mars surface base', g:'0.38 g', delay:'Up to 20 min one way', dose:0.64,
+         reply:'A reply can take 40 minutes or more. Start the onboard protocol while you wait.'},
+  transit:{name:'Mars transit', full:'Deep-space transit vehicle', g:'Microgravity', delay:'Seconds to 20 min one way', dose:1.5,
+         reply:'The delay grows as you travel. Far from Earth a reply can take 40 minutes or more, so start the onboard protocol while you wait.'}
 };
 var IND = {
   sys:  {label:'Systolic blood pressure', unit:'mmHg', ok:[90,129], cau:[80,179], min:50, max:260, step:1,
@@ -288,8 +295,12 @@ var IND = {
          how:'Run a finger-stick sample in the portable blood analyzer.',
          lo:'Low carbon dioxide. You may be breathing too fast. Slow your breathing and measure again.',
          hi:'High carbon dioxide. Check the cabin CO2 level and airflow where you work and sleep, and move to a well-ventilated module.'},
-  onsd: {label:'Optic nerve sheath diameter', unit:'mm', ok:[0,5.0], cau:[0,6.0], min:2, max:10, step:0.1,
-         how:'Weekly eye ultrasound, guided by the onboard procedure. It is an indirect sign of fluid pressure around the brain.',
+  cabin:{label:'Cabin carbon dioxide', unit:'mmHg', ok:[0,3.0], cau:[0,4.5], min:0, max:20, step:0.1,
+         how:'Read the 1-hour average from the cabin air monitor nearest to you.',
+         lo:'',
+         hi:'Above the 3 mmHg limit. Headache, tiredness and poor sleep become more likely. Increase airflow, move to another module and check the CO2 removal system.'},
+  onsd: {label:'Optic nerve sheath diameter', unit:'mm', ok:[0,6.4], cau:[0,7.1], min:2, max:10, step:0.1,
+         how:'Weekly eye ultrasound, guided by the onboard procedure. It is an indirect sign of fluid pressure around the brain. Compare it with your preflight value.',
          lo:'',
          hi:'Wider than the reference. Fluid pressure around the brain may be raised. Run the vision test, note any headache or blurred vision and repeat the scan.'},
   glu:  {label:'Blood glucose', unit:'mg/dL', ok:[70,140], cau:[54,199], min:20, max:500, step:1,
@@ -308,7 +319,7 @@ var IND = {
          how:'Rate how you feel overall today, from 1 (very low) to 5 (very good).',
          lo:'Low mood. Talk to a crewmate, schedule a family call and take your planned free time.',
          hi:''},
-  ex:   {label:'Exercise today', unit:'min', ok:[90,Infinity], cau:[45,Infinity], min:0, max:600, step:1,
+  ex:   {label:'Exercise today', unit:'min', ok:[60,Infinity], cau:[30,Infinity], min:0, max:600, step:1,
          how:'Add up resistance and cardio minutes from the exercise devices.',
          lo:'Too little exercise. Without loading, bone and muscle are lost every week. Schedule a resistance session today.',
          hi:''},
@@ -324,16 +335,16 @@ var REGIONS = {
          why:'Without normal gravity, body fluid shifts toward the head and the heart works differently. Blood pressure can drop sharply when gravity returns.'},
   eyes: {title:'Eyes and brain fluid pressure', ids:['onsd'], hazard:'Gravity fields',
          why:'In low gravity, blood and cerebrospinal fluid shift toward the head. This can raise pressure behind the eyes and change vision (spaceflight-associated neuro-ocular syndrome). Cerebrospinal fluid pressure cannot be measured directly in flight, so the optic nerve sheath is scanned by ultrasound instead.'},
-  lungs:{title:'Lungs and blood gases', ids:['spo2','pco2'], hazard:'Hostile closed environment',
+  lungs:{title:'Lungs and blood gases', ids:['spo2','pco2','cabin'], hazard:'Hostile closed environment',
          why:'Cabin air is recycled, and without convection exhaled carbon dioxide can collect around the head. Raised carbon dioxide causes headache and poor concentration.'},
   core: {title:'Metabolism and core temperature', ids:['glu','temp'], hazard:'Hostile closed environment',
          why:'A closed habitat changes immunity, appetite and nutrition. Fever can be the first sign of infection far from any hospital.'},
   limbs:{title:'Bones and muscles', ids:['ex'], hazard:'Gravity fields',
-         why:'Unloaded bones and muscles weaken quickly in low gravity. Daily exercise is the main countermeasure.'},
+         why:'Weight-bearing bones lose about 1% to 1.5% of their mineral density per month in space, and muscles weaken too. Daily exercise is the main countermeasure.'},
   rad:  {title:'Whole-body radiation', ids:['rad'], hazard:'Space radiation',
          why:'Outside Earth\'s magnetic field the dose is higher. Radiation is not flushed out of the body. The damage adds up, so the total dose is tracked.'}
 };
-var ORDER = ['sys','dia','hr','spo2','pco2','glu','temp','sleep','mood','onsd','ex','rad'];
+var ORDER = ['sys','dia','hr','spo2','pco2','cabin','glu','temp','sleep','mood','onsd','ex','rad'];
 var SYMBOL = ['●','▲','■'], WORD = ['In range','Watch','Act now'];
 
 function ranges(id, env){
@@ -363,7 +374,7 @@ function sample(env){
       sys:Math.round(112+r()*14), dia:Math.round(68+r()*10), hr:Math.round(58+r()*14),
       glu:Math.round(84+r()*30), temp:+(36.5+r()*0.6).toFixed(1), sleep:+(7+r()*1.3).toFixed(1),
       mood:3+Math.floor(r()*3), ex:Math.round(95+r()*50), rad:+(d*(0.8+r()*0.5)).toFixed(2),
-      spo2:97+Math.floor(r()*3), pco2:Math.round(38+r()*5), onsd:+(4.2+r()*0.6).toFixed(1)});
+      spo2:97+Math.floor(r()*3), pco2:Math.round(38+r()*5), onsd:+(5.6+r()*0.6).toFixed(1), cabin:+(1.8+r()*1.0).toFixed(1)});
   }
   var last=days[13]; last.sleep=5.6; last.hr=104;
   return days;
@@ -378,7 +389,7 @@ function streak(days, test){
 var TERMS = {
   sys:['blood pressure','bp','systolic'], dia:['blood pressure','bp','diastolic'],
   hr:['heart rate','pulse','heartbeat','bpm'], spo2:['oxygen','spo2','o2','saturation'],
-  pco2:['carbon dioxide','co2','pco2'], glu:['glucose','sugar'],
+  pco2:['carbon dioxide','co2','pco2'], cabin:['cabin co2','cabin carbon dioxide','cabin air','air quality'], glu:['glucose','sugar'],
   temp:['temperature','fever','temp'], sleep:['sleep','slept','tired','insomnia'],
   mood:['mood','sad','stress','stressed','lonely','anxious'],
   onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid'],
@@ -402,7 +413,7 @@ var KB = [
     'Keep head movements slow and keep a sickness bag within reach.',
     'Sip fluids and take the anti-nausea medication from the medical kit as the procedure allows.',
     'If nausea starts together with a high radiation dose, treat it as possible radiation sickness and report it.']},
-  {k:['headache','head hurts','migraine'], t:'Headache', s:1, c:['pco2','onsd','sleep'], a:[
+  {k:['headache','head hurts','migraine'], t:'Headache', s:1, c:['cabin','pco2','onsd','sleep'], a:[
     'Check the cabin CO2 level and move to a well-ventilated place.',
     'Drink water and rest.',
     'Take a pain reliever from the medical kit as the procedure allows.',
@@ -468,7 +479,7 @@ var KB = [
     'Contact the flight surgeon immediately.']},
   {k:['radiation sickness','solar storm','solar flare','solar particle','storm','flare'], t:'Solar particle event', s:2, c:['rad'], a:[
     'Move to the most shielded area and stay there until the event ends.',
-    'Keep your dosimeter on and log the dose.',
+    'Keep your dosimeter on and log the dose. NASA limits the dose from a single event to 250 mSv.',
     'Nausea, vomiting and tiredness in the hours after exposure can be radiation sickness. Report them.',
     'Postpone any spacewalk or surface excursion.']},
   {k:['panic','conflict','argument','fight','homesick','angry'], t:'Stress and crew conflict', s:1, c:['mood','sleep'], a:[
@@ -505,8 +516,8 @@ var KB = [
     'Move away from the source and close the hatch behind you.',
     'Follow the toxic atmosphere procedure and wait until the air is cleared.',
     'Rinse exposed skin and eyes and report any breathing trouble.']},
-  {k:['scrubber','co2 removal','carbon dioxide removal','stale air'], t:'CO2 removal failure', s:2, c:['pco2','spo2'], a:[
-    'Raised CO2 causes headache, sleepiness and poor concentration before it becomes dangerous.',
+  {k:['scrubber','co2 removal','carbon dioxide removal','stale air'], t:'CO2 removal failure', s:2, c:['cabin','pco2','spo2'], a:[
+    'Raised CO2 causes headache, sleepiness and poor concentration before it becomes dangerous. The cabin limit is 3 mmHg averaged over 1 hour.',
     'Switch to the backup CO2 removal unit or canisters.',
     'Increase airflow and avoid crowding in one module.',
     'Reduce heavy exercise until the level is back to normal.']},
@@ -624,6 +635,8 @@ var PATTERNS = [
    t:'Low blood pressure with a fast pulse is a typical sign of dehydration. Drink fluids with electrolytes and measure again in 1 hour.'},
   {ids:['glu','hr'], on:function(d,e){ return isLow('glu',d,e)&&isHigh('hr',d,e); },
    t:'Low blood sugar with a fast pulse. Eat fast carbohydrate now, before any other task.'},
+  {ids:['cabin','pco2'], on:function(d,e){ return isHigh('cabin',d,e)&&isHigh('pco2',d,e); },
+   t:'Cabin CO2 and your blood CO2 are both high, so the cabin air is the likely cause. Improve airflow where you work and sleep and check the CO2 removal system.'},
   {ids:['pco2','onsd'], on:function(d,e){ return isHigh('pco2',d,e)&&isHigh('onsd',d,e); },
    t:'High carbon dioxide and a wider optic nerve sheath appear together. Carbon dioxide widens blood vessels in the head and may add to pressure behind the eyes, so lowering CO2 exposure is the first step.'},
   {ids:['pco2','sleep'], on:function(d,e){ return isHigh('pco2',d,e)&&isLow('sleep',d,e); },
@@ -646,7 +659,7 @@ function insights(days, env){
     if(p) out.push({l:1, t:I.label+' has '+(p.dir>0?'risen':'fallen')+' '+p.n+' check-ins in a row and may leave the reference range in about '+
       p.days+' day'+(p.days===1?'':'s')+'.'});
   });
-  var lowEx=days.slice(-7).filter(function(x){ return x.ex<90; }).length;
+  var lowEx=days.slice(-7).filter(function(x){ return x.ex<60; }).length;
   if(lowEx>=3) out.push({l:1, t:'Exercise was below target on '+lowEx+' of the last '+Math.min(7,days.length)+' days. Bone and muscle loss speeds up without daily loading.'});
   if(!out.length) out.push({l:0, t:baseline('hr',days)?'No unusual pattern today. Your readings match your personal baseline.':'No unusual pattern today.'});
   return out.slice(0,5);
@@ -748,7 +761,7 @@ function answer(q, days, env, notes){
 if(typeof module!=='undefined') module.exports={answer:answer,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
-  var KEY='kuasar-crew-health-v2';
+  var KEY='kuasar-crew-health-v3';
   var state={env:'iss', days:sample('iss'), sel:'heart', chart:'sleep'};
   try{ var saved=JSON.parse(localStorage.getItem(KEY)||'null');
        if(saved && ENV[saved.env] && Array.isArray(saved.days)){ state.env=saved.env; state.days=saved.days; } }catch(e){}
@@ -855,12 +868,12 @@ if(typeof document!=='undefined'){ (function(){
   }
   function renderExtras(){
     var days=state.days, env=state.env, d=latest();
-    var sS=streak(days,function(x){return x.sleep>=7;}), sE=streak(days,function(x){return x.ex>=90;});
+    var sS=streak(days,function(x){return x.sleep>=7;}), sE=streak(days,function(x){return x.ex>=60;});
     var green=d && ORDER.every(function(id){return statusOf(id,d[id],env)===0;});
     var list=[
       {on:days.length>=7, t:'Check-in streak', s:days.length+' day'+(days.length===1?'':'s')+' logged in a row'},
       {on:sS>=7, t:'Well rested', s:sS+' of 7 nights with 7 h sleep or more'},
-      {on:sE>=7, t:'Flight fit', s:sE+' of 7 days with 90 min exercise or more'},
+      {on:sE>=7, t:'Flight fit', s:sE+' of 7 days with 60 min exercise or more'},
       {on:!!green, t:'All green', s:green?'Every reading in range today':'Get every reading in range today'}];
     $('badges').innerHTML=list.map(function(b){ return '<div class="badge'+(b.on?' on':'')+'"><strong>'+(b.on?'● ':'○ ')+b.t+'</strong><br>'+b.s+'</div>'; }).join('');
     var total=days.reduce(function(a,x){return a+x.rad;},0);

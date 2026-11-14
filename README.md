@@ -7,16 +7,26 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 ## What it does
 
 - **Body map:** a clickable astronaut figure. Each region shows its status by color and symbol.
-- **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise and daily radiation dose.
+- **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise, cabin carbon dioxide and daily radiation dose.
 - **Guidance:** every reading shows its reference range, how to measure it, and what to do when it is out of range.
 - **Escalation:** tells the astronaut when to inform the crew medical officer and when to contact the flight surgeon, including the signal delay to Earth.
 - **Onboard assistant:** a rule-based helper that runs fully offline. It learns each astronaut's personal baseline from earlier check-ins, flags readings that are unusual for that person, interprets readings together (for example fever with a fast pulse), tolerates typos, and can be taught crew notes. It answers questions about the logged readings and gives first-response steps for 36 likely health and technical problems, such as headache, nausea, fire, cabin pressure loss and power loss.
-- **Environments:** ISS, Moon base and Mars base, each with its own gravity, signal delay and expected radiation dose.
+- **Environments:** ISS, Moon base, Mars base and Mars transit, each with its own gravity, signal delay and expected radiation dose.
 - **Trends and routine:** a chart for each indicator, streak badges and a cumulative radiation dose bar.
 
 ## How to run
 
 Open `index.html` in any modern browser. No installation or server is needed.
+
+## NASA data and resources used
+
+- [NASA Human Research Program, 5 Hazards of Human Spaceflight](https://www.nasa.gov/hrp/hazards): the hazard model behind every body region.
+- [NASA, The Human Body in Space](https://www.nasa.gov/humans-in-space/the-human-body-in-space/): bone loss of 1% to 1.5% per month, one-way signal delay of up to 20 minutes from Mars.
+- [NASA OCHMO-TB-004, Carbon Dioxide](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-004-carbon-dioxide.pdf): cabin CO2 limit of 3 mmHg as a 1-hour average (NASA-STD-3001 [V2 6004]).
+- [NASA OCHMO Radiation Protection technical brief](https://www.nasa.gov/wp-content/uploads/2023/03/radiation-protection-technical-brief-ochmo.pdf): 600 mSv career limit, 250 mSv per solar particle event, about 1.5 mSv per day in Mars transit.
+- [NASA OCHMO-TB-031, Exercise Overview](https://www.nasa.gov/wp-content/uploads/2023/12/ochmo-tb-031-exercise-overview.pdf): about 600 minutes of exercise per week on the station.
+
+Other reference: [Optic nerve sheath diameter and spaceflight, npj Microgravity 2022](https://pmc.ncbi.nlm.nih.gov/articles/PMC9537149).
 
 ## Limits of this prototype
 
