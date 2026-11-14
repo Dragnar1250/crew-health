@@ -8,7 +8,7 @@ Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 
 - **Body map:** a clickable astronaut figure. Each region shows its status by color and symbol.
 - **Daily check-in:** blood pressure, heart rate, blood oxygen, blood carbon dioxide, blood glucose, body temperature, sleep, mood, optic nerve sheath diameter, exercise, cabin carbon dioxide and daily radiation dose.
-- **Guidance:** every reading shows its reference range, how to measure it, and what to do when it is out of range.
+- **Guidance:** every reading shows its reference range, what its unit means, step-by-step measurement instructions, and what to do when it is out of range.
 - **Escalation:** tells the astronaut when to inform the crew medical officer and when to contact the flight surgeon, including the signal delay to Earth.
 - **Onboard assistant:** a rule-based helper that runs fully offline. It learns each astronaut's personal baseline from earlier check-ins, flags readings that are unusual for that person, interprets readings together (for example fever with a fast pulse), tolerates typos, and can be taught crew notes. It answers questions about the logged readings and gives first-response steps for 36 likely health and technical problems, such as headache, nausea, fire, cabin pressure loss and power loss.
 - **Environments:** ISS, Moon base, Mars base and Mars transit, each with its own gravity, signal delay and expected radiation dose.
@@ -34,6 +34,10 @@ Other reference: [Optic nerve sheath diameter and spaceflight, npj Microgravity 
 - Reports to the crew and to the ground are simulated. Nothing is transmitted.
 - The page opens with clearly labeled example data.
 - This is not a medical device.
+
+## Optional on-device AI model
+
+The assistant works without any AI model. On request ("Load AI model" in the assistant window) the page loads the open-source [WebLLM](https://github.com/mlc-ai/web-llm) library and an open language model (for example Llama 3.2 1B Instruct), downloads it once and runs it in the browser through WebGPU. No server or API key is used. The model receives the astronaut's logged readings, reference ranges, the assistant's insights and the matching procedure notes, and its answers are labeled in the chat. If the model is missing or fails, the rule-based answer is shown instead. It needs a recent Chrome or Edge on a computer with WebGPU.
 
 ## Use of AI
 

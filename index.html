@@ -117,6 +117,13 @@ footer{font-size:12px;color:var(--muted)}
 .drawer .quick{margin:0;max-height:66px;overflow-y:auto;flex:0 0 auto}
 .teach summary{cursor:pointer;font-size:13px;color:var(--muted)}
 .teach form{margin-top:8px}
+.info{grid-column:1/-1;font-size:13px}
+.info summary{cursor:pointer;color:var(--accent);font-weight:500}
+.info p{margin-top:6px}
+.info ol{margin:6px 0 0;padding-left:20px}
+.airow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;border:1px dashed var(--line);border-radius:10px;padding:8px 10px}
+.airow span{flex:1 1 200px;min-width:0}
+.msg.ai::before{content:"AI model answer. Check it against your procedures.";display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
 </style>
 
 </head>
@@ -214,6 +221,7 @@ footer{font-size:12px;color:var(--muted)}
       <li>Blood pressure, heart rate, oxygen, blood CO2, glucose, temperature, sleep and mood use general adult clinical ranges. A flight version would use each crew member's preflight baseline.</li>
       <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign.</li>
       <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
+      <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
@@ -230,6 +238,10 @@ footer{font-size:12px;color:var(--muted)}
     </div>
     <button class="btn" type="button" id="closeChat" aria-label="Close assistant">Close</button>
   </div>
+  <div class="airow">
+    <span class="small" id="aiStatus">AI model: not loaded. Answers come from the offline rule engine.</span>
+    <button class="btn" type="button" id="aiLoad" title="Downloads an open language model once (about 0.5 to 1 GB), then runs it on this device. Needs Chrome or Edge on a computer with WebGPU.">Load AI model</button>
+  </div>
   <div class="chat" id="chat" aria-live="polite"></div>
   <div class="quick">
     <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
@@ -238,6 +250,7 @@ footer{font-size:12px;color:var(--muted)}
     <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
     <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
     <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
+    <button type="button" class="chip" data-q="What does mSv mean?">What does mSv mean?</button>
     <button type="button" class="chip" data-q="I have a headache">I have a headache</button>
     <button type="button" class="chip" data-q="There is smoke in the module">There is smoke in the module</button>
     <button type="button" class="chip" data-q="We lost power">We lost power</button>
@@ -591,6 +604,56 @@ function kbText(e, d, env){
   if(e.s===2) s+='\nReport to the ground. Signal delay: '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
   return s;
 }
+/* Unit explanations (u) and step-by-step measurement instructions (m) for every indicator. */
+var INFO = {
+  sys:  {u:'mmHg means millimetres of mercury, the classic unit of pressure. Systolic is the upper number: the pressure in your arteries at the moment the heart beats.',
+         m:['Rest for 5 minutes with your body still and the arm at heart level.','Wrap the cuff around the bare upper arm, about two finger widths above the elbow.','Do not talk or move while the cuff inflates.','Take two readings one minute apart and log the average.']},
+  dia:  {u:'mmHg means millimetres of mercury. Diastolic is the lower number: the pressure in your arteries while the heart rests between beats.',
+         m:['Use the same cuff measurement as for the systolic value.','Read the second, lower number on the display.','Log it together with the systolic value from the same reading.']},
+  hr:   {u:'bpm means beats per minute: how many times the heart beats in 60 seconds while you are at rest.',
+         m:['Rest for 5 minutes before measuring, and measure before exercise or caffeine.','Read the value from the pulse oximeter, or count the pulse at your wrist for 60 seconds.','Measure at the same time each day so the values can be compared.']},
+  spo2: {u:'% here is the share of the hemoglobin in your blood that is carrying oxygen. 100% means fully loaded.',
+         m:['Warm the finger first. A cold finger gives a falsely low value.','Clip the pulse oximeter on the fingertip and keep the hand still.','Wait about 30 seconds until the number stops changing, then log it.']},
+  pco2: {u:'pCO2 is the partial pressure of carbon dioxide dissolved in the blood, in millimetres of mercury (mmHg). It shows how well your breathing removes carbon dioxide.',
+         m:['Clean and dry a fingertip.','Prick the side of the fingertip and fill the test cartridge without air bubbles, keeping the drop contained.','Insert the cartridge into the portable blood analyzer and wait for the result.','Put the lancet and cartridge in the sharps container.']},
+  cabin:{u:'This is the partial pressure of carbon dioxide in the cabin air, in millimetres of mercury (mmHg). 3 mmHg is about 0.4% of normal sea-level air pressure.',
+         m:['Read the value from the air monitor nearest to where you work or sleep.','Use the 1-hour average, not a momentary peak.','Without airflow, exhaled air stays around your head, so also check the fan in your sleep station.']},
+  glu:  {u:'mg/dL means milligrams of glucose in one decilitre (a tenth of a litre) of blood. Divide by 18 to get mmol/L.',
+         m:['Clean and dry a fingertip.','Prick the side of the fingertip and touch the test strip to the drop.','Read the meter after a few seconds.','Log whether you measured before or after a meal.']},
+  temp: {u:'°C means degrees Celsius. To convert to Fahrenheit, multiply by 1.8 and add 32.',
+         m:['Rest for 10 minutes. Do not measure right after exercise or a hot drink.','Use the ear or forehead thermometer as its instructions show.','Always measure at the same place on the body so the values can be compared.']},
+  sleep:{u:'h means hours of actual sleep, not the time spent in the sleep station.',
+         m:['Wear the wrist activity monitor at night, or note the times you fell asleep and woke up.','Subtract the time you lay awake.','Log the value soon after waking, while you still remember the night.']},
+  mood: {u:'This is a self-rating from 1 (very low) to 5 (very good). It has no physical unit, but the change from day to day is what matters.',
+         m:['Rate your mood before you start work.','Choose the number that fits the whole day so far, not one moment.','Be honest. The value is used to support you, not to judge you.']},
+  onsd: {u:'mm means millimetres. The value is the width of the sheath around the optic nerve, measured 3 mm behind the eyeball. The sheath widens when fluid pressure around the brain rises.',
+         m:['Put gel on the closed eyelid and place the ultrasound probe on it gently.','Find the dark band of the optic nerve behind the eyeball.','Measure the sheath width 3 mm behind the eyeball.','Measure both eyes and log the average. Ask the ground to guide the scan if you are unsure.']},
+  ex:   {u:'min means minutes of loaded exercise today: resistance training plus treadmill or cycle time.',
+         m:['Add up the session times from the exercise device logs.','Count only real loading time, not setup or rest.','Log resistance and cardio together as one total.']},
+  rad:  {u:'mSv means millisievert, the unit for the biological effect of radiation on the body. On Earth a person receives roughly 2 to 3 mSv in a whole year from natural sources.',
+         m:['Keep your personal dosimeter on your body all day.','Read the daily value at the same time each day.','During a solar particle event, also note where you sheltered and for how long.']}
+};
+var UNIT_WORDS = {'mmhg':'sys','mm hg':'sys','bpm':'hr','mg/dl':'glu','msv':'rad','millisievert':'rad','millisieverts':'rad','celsius':'temp'};
+/* Prompt for the optional on-device language model. Everything the model may say about the astronaut is in this text. */
+function buildMessages(q, days, env, notes, history, ruleAnswer){
+  var d=days[days.length-1], E=ENV[env], lines=[];
+  if(d) ORDER.forEach(function(id){
+    var I=IND[id], b=baseline(id,days);
+    lines.push('- '+I.label+': '+d[id]+' '+I.unit+', status '+WORD[statusOf(id,d[id],env)].toLowerCase()+', reference '+rangeText(id,env)+' '+I.unit+
+      (b?', personal usual '+fx(id,b.mean)+' '+I.unit:''));
+  });
+  var sys='You are the onboard health assistant on a space mission and you are talking to an astronaut. '+
+    'Answer in plain English in at most 120 words. Base every statement about the astronaut on the DATA below. '+
+    'Do not invent readings, limits or procedures. If something is urgent or not covered by the DATA, tell the astronaut to contact the crew medical officer or the flight surgeon. '+
+    'You are not a doctor and you do not diagnose.\n\nDATA\n'+
+    'Location: '+E.full+'. Gravity: '+E.g+'. Signal delay to Earth: '+E.delay+'. Expected radiation dose: '+E.dose+' mSv per day.\n'+
+    (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
+         'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
+       : 'No check-in has been logged yet.\n')+
+    'Procedure notes that match the question:\n'+(ruleAnswer||'none')+'\n'+
+    ((notes||[]).length ? 'Crew notes:\n'+notes.map(function(n){ return '- '+n.k+': '+n.a; }).join('\n')+'\n' : '');
+  return [{role:'system', content:sys}].concat((history||[]).slice(-6)).concat([{role:'user', content:String(q)}]);
+}
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
 function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
@@ -712,11 +775,14 @@ function core(q, days, env){
   var wantHow=has(/\b(measure|how do i|how to|reading)\b/), wantWhy=has(/\b(why|affect|affects|cause|causes|hazard|hazards|space)\b/),
       wantTrend=has(/\b(trend|worse|better|changing|change|changed|week|lately|history)\b/);
   var ids=ORDER.filter(function(id){ return TERMS[id].some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); });
+  var wantUnit=has(/\b(unit|units|mean|means|stand for|stands for)\b/);
+  Object.keys(UNIT_WORDS).forEach(function(w){ if(q.indexOf(w)>=0){ wantUnit=true; if(!ids.length) ids=[UNIT_WORDS[w]]; } });
   if(ids.length) return ids.map(function(id){
     var I=IND[id], v=d[id], b=baseline(id,days), s=I.label+': '+v+' '+I.unit+' ('+WORD[st(id)]+'). Reference '+rangeText(id,env)+' '+I.unit+'.';
     if(b) s+=' Your usual is '+fx(id,b.mean)+' '+I.unit+', learned from your last '+b.n+' check-ins.';
     if(st(id)>0) s+=' '+adviceFor(id,v,env);
-    if(wantHow) s+=' How to measure: '+I.how;
+    if(wantUnit) s+=' Unit: '+INFO[id].u;
+    if(wantHow) s+=' How to measure: '+INFO[id].m.map(function(x,i){ return (i+1)+'. '+x; }).join(' ');
     if(wantWhy) s+=' '+REGIONS[regionOf(id)].why;
     if(wantTrend) s+=' '+trendText(id,days);
     return s; }).join('\n\n');
@@ -758,7 +824,7 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I can answer from your logged readings. Try "how am I today", "interpret my day", "what should I do now", "who should I contact", name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation, or describe a problem such as headache, nausea, fire, air leak or power loss. Ask "what problems do you cover" for the full list. You can also teach me a crew note below.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -821,7 +887,9 @@ if(typeof document!=='undefined'){ (function(){
       if(!d){ html+='<div class="row"><span>'+I.label+'</span><span class="muted">no data</span></div>'; return; }
       var v=d[id], st=statusOf(id,v,state.env);
       html+='<div class="row"><span>'+I.label+'</span><span class="num val">'+v+' <span class="muted small">'+I.unit+'</span></span>'+pill(st)+
-        '<span class="note muted">Reference '+rangeText(id,state.env)+' '+I.unit+'. '+I.how+'</span>'+
+        '<span class="note muted">Reference '+rangeText(id,state.env)+' '+I.unit+'.</span>'+
+        '<details class="info"><summary>What the unit means and how to measure</summary><p>'+INFO[id].u+'</p><ol>'+
+        INFO[id].m.map(function(x){ return '<li>'+x+'</li>'; }).join('')+'</ol></details>'+
         (st>0?'<span class="advice st'+st+'">'+adviceFor(id,v,state.env)+(st===2?' Report this reading to the flight surgeon.':'')+'</span>':'')+'</div>';
     });
     $('detail').innerHTML=html+'</div>';
@@ -919,9 +987,62 @@ if(typeof document!=='undefined'){ (function(){
     state.days=sample(state.env); save(); notice(''); render(); $('formMsg').textContent='Demo data restored.'; });
   function say(text, who){
     var m=document.createElement('div'); m.className='msg '+who; m.textContent=text;
-    $('chat').appendChild(m); $('chat').scrollTop=$('chat').scrollHeight;
+    $('chat').appendChild(m); $('chat').scrollTop=$('chat').scrollHeight; return m;
   }
-  function ask(q){ q=String(q).trim(); if(!q) return; say(q,'me'); say(answer(q, state.days, state.env, notes),'bot'); }
+  /* Optional language model, loaded on request with WebLLM and run on this device through WebGPU.
+     The rule engine stays the fallback: if the model is missing or fails, its answer is shown instead. */
+  var AI={engine:null, busy:false, history:[]};
+  var AI_LIB='https://esm.run/@mlc-ai/web-llm@0.2.84';
+  var AI_MODELS=['Llama-3.2-1B-Instruct-q4f16_1-MLC','Llama-3.2-1B-Instruct-q4f32_1-MLC','Qwen2.5-1.5B-Instruct-q4f16_1-MLC',
+                 'Qwen2.5-0.5B-Instruct-q4f16_1-MLC','SmolLM2-360M-Instruct-q4f16_1-MLC'];
+  function aiStatus(t){ $('aiStatus').textContent=t; }
+  function cleanAI(t){ return t.replace(/<think>[\s\S]*?(<\/think>|$)/g,'').trim(); }
+  function loadAI(){
+    if(!navigator.gpu){ aiStatus('This browser has no WebGPU, so the AI model cannot run here. The rule engine keeps working.'); return; }
+    $('aiLoad').disabled=true; aiStatus('Loading the AI library...');
+    import(AI_LIB).then(async function(webllm){
+      var list=webllm.prebuiltAppConfig.model_list, have=list.map(function(m){ return m.model_id; });
+      var cands=AI_MODELS.filter(function(id){ return have.indexOf(id)>=0; });
+      if(!cands.length) cands=list.filter(function(m){ return /instruct|chat/i.test(m.model_id) && m.vram_required_MB; })
+        .sort(function(a,b){ return a.vram_required_MB-b.vram_required_MB; }).slice(0,2).map(function(m){ return m.model_id; });
+      var last=new Error('no model available');
+      for(var i=0;i<cands.length && i<3 && !AI.engine;i++){
+        try{
+          aiStatus('Downloading '+cands[i]+'...');
+          AI.engine=await webllm.CreateMLCEngine(cands[i], {initProgressCallback:function(p){ aiStatus(p.text||'Loading the AI model...'); }});
+          AI.model=cands[i];
+        }catch(e){ last=e; }
+      }
+      if(!AI.engine) throw last;
+      aiStatus('AI model ready: '+AI.model+'. It runs on this device.'); $('aiLoad').hidden=true;
+      say('The AI model is loaded. I can now answer free questions using your readings. Each AI answer is labeled.','bot');
+    }).catch(function(e){
+      aiStatus('The AI model could not be loaded here ('+String(e && e.message || e).slice(0,80)+'). The rule engine keeps working.');
+      $('aiLoad').disabled=false;
+    });
+  }
+  function ask(q){
+    q=String(q).trim(); if(!q) return;
+    if(AI.busy){ say('I am still answering the previous question.','bot'); return; }
+    say(q,'me');
+    var rule=answer(q, state.days, state.env, notes);
+    if(!AI.engine){ say(rule,'bot'); return; }
+    var bubble=say('Thinking...','bot ai'); AI.busy=true;
+    AI.engine.chat.completions.create({messages:buildMessages(q, state.days, state.env, notes, AI.history, rule), temperature:0.3, max_tokens:300, stream:true})
+      .then(async function(chunks){
+        var r='';
+        for await (var c of chunks){
+          r+=(c.choices[0] && c.choices[0].delta && c.choices[0].delta.content) || '';
+          bubble.textContent=cleanAI(r)||'Thinking...'; $('chat').scrollTop=$('chat').scrollHeight;
+        }
+        r=cleanAI(r);
+        if(!r) throw new Error('empty answer');
+        AI.history.push({role:'user', content:q}, {role:'assistant', content:r});
+      })
+      .catch(function(){ bubble.className='msg bot'; bubble.textContent=rule; })
+      .then(function(){ AI.busy=false; });
+  }
+  $('aiLoad').addEventListener('click', loadAI);
   $('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); ask($('askInput').value); $('askInput').value=''; });
   var NKEY='kuasar-crew-notes-v1', notes=[];
   try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
