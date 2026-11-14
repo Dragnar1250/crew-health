@@ -124,6 +124,23 @@ footer{font-size:12px;color:var(--muted)}
 .airow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;border:1px dashed var(--line);border-radius:10px;padding:8px 10px}
 .airow span{flex:1 1 200px;min-width:0}
 .msg.ai::before{content:"AI model answer. Check it against your procedures.";display:block;font-size:11px;color:var(--muted);margin-bottom:4px}
+.sq{border:0;border-top:1px solid var(--line);padding:12px 0;margin:0;min-width:0}
+.sq legend{float:left;width:100%;padding:0;margin-bottom:8px;font-weight:500}
+.scale{clear:both;display:flex;gap:8px}
+.scale label{flex:1 1 0;cursor:pointer;position:relative}
+.scale input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.scale span{display:block;text-align:center;font-family:var(--mono);border:1px solid var(--line);border-radius:8px;padding:8px 0;background:var(--bg)}
+.scale input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:500}
+.scale input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.anchors{display:flex;gap:8px;margin-top:6px}
+.anchors span{flex:1 1 0;min-width:0}
+.anchors span:nth-child(2){text-align:center}
+.anchors span:nth-child(3){text-align:right}
+.field textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-height:64px;resize:vertical}
+.sres{border:1px solid var(--s);background:var(--s-soft);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.sres strong{color:var(--s);font-size:16px}
+.sdims{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px 20px}
+.sdims div{display:flex;justify-content:space-between;gap:10px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:4px}
 </style>
 
 </head>
@@ -185,6 +202,34 @@ footer{font-size:12px;color:var(--muted)}
 
   <section class="panel">
     <div class="head">
+      <div>
+        <p class="label">Behavioral health · team-designed index</p>
+        <h2>Weekly morale survey</h2>
+      </div>
+      <span class="small muted" id="surveyTag"></span>
+    </div>
+    <div id="surveyResult" aria-live="polite"></div>
+    <form id="surveyForm" novalidate>
+      <div id="surveyQs"></div>
+      <div class="two" style="margin-top:12px">
+        <div class="field">
+          <label for="sv_q13">13. What was the hardest moment of this week? (logged, not scored)</label>
+          <textarea id="sv_q13"></textarea>
+        </div>
+        <div class="field">
+          <label for="sv_q14">14. What would help you most right now? (logged, not scored)</label>
+          <textarea id="sv_q14"></textarea>
+        </div>
+      </div>
+      <div class="formfoot">
+        <button class="btn primary" type="submit">Submit survey</button>
+        <span class="small" id="surveyMsg" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="head">
       <h2>Trend over the mission</h2>
       <div class="field" style="flex:0 1 240px">
         <label for="chartSel">Indicator</label>
@@ -222,6 +267,7 @@ footer{font-size:12px;color:var(--muted)}
       <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign.</li>
       <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
       <li>Optional AI model: the <a href="https://github.com/mlc-ai/web-llm">WebLLM</a> library loads an open language model on request and runs it in the browser. Its answers are built from the logged readings and are labeled in the chat.</li>
+      <li>The weekly morale survey and its General Psychological Risk Index were designed by the team. It is not a validated clinical instrument, and its thresholds are a first proposal.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
@@ -246,6 +292,7 @@ footer{font-size:12px;color:var(--muted)}
   <div class="quick">
     <button type="button" class="chip" data-q="How am I today?">How am I today?</button>
     <button type="button" class="chip" data-q="Interpret my day">Interpret my day</button>
+    <button type="button" class="chip" data-q="How is my morale?">How is my morale?</button>
     <button type="button" class="chip" data-q="What should I do now?">What should I do now?</button>
     <button type="button" class="chip" data-q="Who should I contact?">Who should I contact?</button>
     <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
@@ -774,10 +821,57 @@ function buildMessages(q, days, env, notes, history, ruleAnswer){
     (d ? 'Mission day '+d.day+'. Latest readings:\n'+lines.join('\n')+'\n'+
          'Assistant insights:\n'+insights(days,env).map(function(x){ return '- '+x.t; }).join('\n')+'\n'
        : 'No check-in has been logged yet.\n')+
+    (LAST_SURVEY ? 'Latest morale survey: '+surveyText(LAST_SURVEY)+'\n' : '')+
     'Procedure notes that match the question:\n'+(ruleAnswer||'none')+'\n'+
     ((notes||[]).length ? 'Crew notes:\n'+notes.map(function(n){ return '- '+n.k+': '+n.a; }).join('\n')+'\n' : '');
   return [{role:'system', content:sys}].concat((history||[]).slice(-6)).concat([{role:'user', content:String(q)}]);
 }
+/* Weekly morale survey, designed by team Kuasar Selçuklu.
+   12 scored questions on a 1-5 scale (higher = more risk; q05 is reverse coded), 2 open questions that are logged but not scored.
+   General Psychological Risk Index (GPRI) = mood + physical + social + isolation, range 12-60. */
+var SURVEY = [
+  {id:'q01', dim:'mood',   cat:'Mood',        q:'How are your energy and motivation?',                    a1:'Very high',          a3:'Medium',          a5:'Very low'},
+  {id:'q02', dim:'mood',   cat:'Stress',      q:'How often are you irritable or impatient?',              a1:'Never',              a3:'Sometimes',       a5:'Constantly'},
+  {id:'q03', dim:'mood',   cat:'Stress',      q:'How strong is your anxiety or sense of emergency pressure?', a1:'None',           a3:'Sometimes',       a5:'Intense'},
+  {id:'q04', dim:'mood',   cat:'Mood',        q:'Do you feel emotionally exhausted or withdrawn?',        a1:'Not at all',         a3:'Partly',          a5:'Completely'},
+  {id:'q05', dim:'mood',   cat:'Motivation',  q:'How meaningful do your tasks and experiments feel?',     a1:'Meaningless, empty', a3:'Medium',          a5:'Very meaningful', rev:true},
+  {id:'q06', dim:'phys',   cat:'Sleep',       q:'How are your sleep quality and feeling of rest?',        a1:'Very good',          a3:'Medium',          a5:'Very poor'},
+  {id:'q07', dim:'phys',   cat:'Cognitive',   q:'How often are you distracted or forgetful?',             a1:'Never',              a3:'Rarely',          a5:'Constantly'},
+  {id:'q08', dim:'phys',   cat:'Environment', q:'How much do the noise and light of the habitat bother you?', a1:'Not at all',     a3:'Moderately',      a5:'Unbearably'},
+  {id:'q09', dim:'social', cat:'Social',      q:'How are communication and harmony within the crew?',     a1:'Very harmonious',    a3:'Tense at times',  a5:'Serious conflict'},
+  {id:'q10', dim:'social', cat:'Social',      q:'Do you have enough personal space and privacy?',         a1:'Fully enough',       a3:'Partly enough',   a5:'None, suffocating'},
+  {id:'q11', dim:'social', cat:'Social',      q:'How are coordination with and support from ground control?', a1:'Full support',   a3:'Partial',         a5:'Disconnected, no support'},
+  {id:'q12', dim:'iso',    cat:'Isolation',   q:'How does missing Earth affect you?',                     a1:'It motivates me',    a3:'Manageable',      a5:'It stops me from focusing'}
+];
+var SURVEY_DIMS = {mood:['Mood and stress',25], phys:['Physical and cognitive',15], social:['Social and crew',15], iso:['Isolation',5]};
+var SURVEY_FLAGS = {q02:'constant irritability', q03:'intense anxiety', q09:'serious crew conflict'};
+var SURVEY_LEVELS = [
+  {name:'Green',  state:'Normal, stable',              action:'Saved. It goes into the standard weekly report.', next:'Next survey in 7 days.'},
+  {name:'Yellow', state:'Moderate stress, attention',  action:'The flight psychologist is informed automatically.', next:'Next survey in 3 days.'},
+  {name:'Red',    state:'High risk, critical',         action:'ALERT: mission control and the flight psychologist are notified.', next:'A mandatory one-to-one session is scheduled.'}
+];
+function scoreSurvey(ans){
+  var dims={mood:0, phys:0, social:0, iso:0}, total=0, valid=true, missing=[];
+  SURVEY.forEach(function(s,i){
+    var a=ans?ans[s.id]:undefined;
+    if(!(a===1||a===2||a===3||a===4||a===5)){ valid=false; missing.push(i+1); return; }
+    var v=s.rev ? 6-a : a;
+    dims[s.dim]+=v; total+=v;
+  });
+  if(!valid) return {valid:false, missing:missing};
+  var byScore=total<=25 ? 0 : (total<=40 ? 1 : 2);
+  var flags=Object.keys(SURVEY_FLAGS).filter(function(id){ return ans[id]===5; });
+  return {valid:true, dims:dims, total:total, byScore:byScore, level:flags.length ? 2 : byScore, flags:flags};
+}
+function surveyText(r){
+  var L=SURVEY_LEVELS[r.level];
+  return 'Morale survey'+(r.day?' (mission day '+r.day+')':'')+': General Psychological Risk Index '+r.total+' of 60, '+L.name+' ('+L.state.toLowerCase()+'). '+
+    Object.keys(SURVEY_DIMS).map(function(k){ return SURVEY_DIMS[k][0]+' '+r.dims[k]+'/'+SURVEY_DIMS[k][1]; }).join(', ')+'.'+
+    (r.flags.length ? ' Red flag: '+r.flags.map(function(id){ return SURVEY_FLAGS[id]; }).join(', ')+'. This sets the level to Red whatever the total.' : '')+
+    ' '+L.action+' '+L.next;
+}
+var LAST_SURVEY=null;
+function setSurvey(r){ LAST_SURVEY=(r && r.valid) ? r : null; }
 /* Learning and interpretation. Still fully offline: statistics and rules, no language model. */
 function fx(id, v){ var s=IND[id].step, dec=s<1?(s<0.1?2:1):0; return (+v).toFixed(dec); }
 function isHigh(id, d, env){ return d[id]>ranges(id,env).ok[1]; }
@@ -848,6 +942,7 @@ function insights(days, env){
   });
   var lowEx=days.slice(-7).filter(function(x){ return x.ex<60; }).length;
   if(lowEx>=3) out.push({l:1, t:'Exercise was below target on '+lowEx+' of the last '+Math.min(7,days.length)+' days. Bone and muscle loss speeds up without daily loading.'});
+  if(LAST_SURVEY && LAST_SURVEY.level>0) out.unshift({l:LAST_SURVEY.level, t:surveyText(LAST_SURVEY)});
   if(!out.length) out.push({l:0, t:baseline('hr',days)?'No unusual pattern today. Your readings match your personal baseline.':'No unusual pattern today.'});
   return out.slice(0,5);
 }
@@ -890,6 +985,8 @@ function core(q, days, env){
   if(kb.length) return kb.map(function(e){ return kbText(e, d, env); }).join('\n\n');
   if(/\b(problems|emergencies|topics|go wrong)\b/.test(q))
     return 'I have first-response steps for: '+KB.map(function(e){ return e.t.toLowerCase(); }).join(', ')+'.';
+  if(/\b(morale|survey|gpri|psychological|psychology|wellbeing)\b/.test(q))
+    return LAST_SURVEY ? surveyText(LAST_SURVEY) : 'No morale survey has been completed yet. Fill in the weekly morale survey on the page to get your General Psychological Risk Index.';
   if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
   function has(re){ return re.test(q); }
   function st(id){ return statusOf(id, d[id], env); }
@@ -950,7 +1047,7 @@ function answer(q, days, env, notes){
   if(r!==null) return r;
   return 'I did not understand that question. Without the AI model I only recognize English keywords. Try a button below, name a reading (sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise, radiation) or a problem (headache, nausea, fire, air leak, power loss). For free questions, press "Load AI model" at the top of this window.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,SURVEY:SURVEY,scoreSurvey:scoreSurvey,setSurvey:setSurvey,surveyText:surveyText,closest:closest,INFO:INFO,buildMessages:buildMessages,insights:insights,baseline:baseline,learnedText:learnedText,correct:correct,vocab:vocab,PATTERNS:PATTERNS,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v3';
@@ -1170,6 +1267,45 @@ if(typeof document!=='undefined'){ (function(){
   }
   $('aiLoad').addEventListener('click', loadAI);
   $('askForm').addEventListener('submit', function(ev){ ev.preventDefault(); ask($('askInput').value); $('askInput').value=''; });
+  /* Weekly morale survey */
+  var SKEY='kuasar-crew-survey-v1', surveys=[];
+  try{ var ss=JSON.parse(localStorage.getItem(SKEY)||'[]'); if(Array.isArray(ss)) surveys=ss.filter(function(x){ return x && x.valid && x.dims; }); }catch(e){}
+  setSurvey(surveys[surveys.length-1]);
+  function renderSurvey(){
+    $('surveyQs').innerHTML=SURVEY.map(function(s,i){
+      return '<fieldset class="sq"><legend><span class="label">'+s.cat+'</span><br>'+(i+1)+'. '+s.q+'</legend><div class="scale">'+
+        [1,2,3,4,5].map(function(v){ return '<label><input type="radio" name="sv_'+s.id+'" id="sv_'+s.id+'_'+v+'" value="'+v+'"><span>'+v+'</span></label>'; }).join('')+
+        '</div><div class="anchors small muted"><span>1 · '+s.a1+'</span><span>3 · '+s.a3+'</span><span>5 · '+s.a5+'</span></div></fieldset>'; }).join('');
+  }
+  function renderSurveyResult(){
+    var r=surveys[surveys.length-1];
+    $('surveyTag').textContent=surveys.length ? surveys.length+' survey'+(surveys.length===1?'':'s')+' completed' : '';
+    if(!r){ $('surveyResult').innerHTML='<p class="small muted" style="margin-bottom:12px">No survey completed yet. Answer the 12 questions below to get your General Psychological Risk Index (12 to 60). Lower is better.</p>'; return; }
+    var L=SURVEY_LEVELS[r.level];
+    $('surveyResult').innerHTML='<div class="sres st'+r.level+'"><div><strong>'+SYMBOL[r.level]+' '+L.name+': '+L.state+'</strong>'+
+      '<p>General Psychological Risk Index <span class="num">'+r.total+'</span> of 60'+(r.day?', mission day '+r.day:'')+'</p></div>'+
+      '<div class="sdims">'+Object.keys(SURVEY_DIMS).map(function(k){
+        return '<div><span>'+SURVEY_DIMS[k][0]+'</span><span class="num">'+r.dims[k]+' / '+SURVEY_DIMS[k][1]+'</span></div>'; }).join('')+'</div>'+
+      (r.flags.length ? '<p class="small"><strong>Red flag:</strong> '+r.flags.map(function(id){ return SURVEY_FLAGS[id]; }).join(', ')+
+        '. This sets the level to Red whatever the total score is.</p>' : '')+
+      '<p class="small">'+L.action+' '+L.next+' (Notifications are simulated in this prototype.)</p>'+
+      (r.hasNotes ? '<p class="small muted">Your written answers were saved for review by the flight psychologist. They are not scored.</p>' : '')+'</div>';
+  }
+  $('surveyForm').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var ans={};
+    SURVEY.forEach(function(s){ var c=document.querySelector('input[name="sv_'+s.id+'"]:checked'); if(c) ans[s.id]=parseInt(c.value,10); });
+    var r=scoreSurvey(ans);
+    if(!r.valid){ $('surveyMsg').textContent='Answer all 12 questions. Still missing: '+r.missing.join(', ')+'.'; return; }
+    var d=latest(); r.day=d?d.day:null; r.ans=ans;
+    r.q13=$('sv_q13').value.trim(); r.q14=$('sv_q14').value.trim(); r.hasNotes=!!(r.q13||r.q14);
+    surveys.push(r); try{ localStorage.setItem(SKEY, JSON.stringify(surveys)); }catch(e){}
+    setSurvey(r); $('surveyForm').reset(); renderSurveyResult(); renderInsights();
+    $('surveyMsg').textContent='Survey saved.';
+    $('surveyResult').scrollIntoView({block:'nearest'});
+  });
+  renderSurvey(); renderSurveyResult();
+
   var NKEY='kuasar-crew-notes-v1', notes=[];
   try{ var sn=JSON.parse(localStorage.getItem(NKEY)||'[]');
        if(Array.isArray(sn)) notes=sn.filter(function(n){ return n && typeof n.k==='string' && typeof n.a==='string'; }); }catch(e){}
