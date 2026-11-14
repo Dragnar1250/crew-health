@@ -137,7 +137,7 @@ footer{font-size:12px;color:var(--muted)}
   <section class="panel">
     <div class="head">
       <h2>Onboard assistant</h2>
-      <span class="small muted">Rule-based. Runs on this device with no internet and reads only your logged values.</span>
+      <span class="small muted">Rule-based. Runs on this device with no internet. Gives first-response summaries for health and technical problems. Official mission procedures come first.</span>
     </div>
     <div class="chat" id="chat" aria-live="polite"></div>
     <div class="quick">
@@ -147,10 +147,14 @@ footer{font-size:12px;color:var(--muted)}
       <button type="button" class="chip" data-q="How do I measure blood oxygen?">How do I measure blood oxygen?</button>
       <button type="button" class="chip" data-q="Is my radiation dose changing?">Is my radiation dose changing?</button>
       <button type="button" class="chip" data-q="Why does space affect my eyes?">Why does space affect my eyes?</button>
+      <button type="button" class="chip" data-q="I have a headache">I have a headache</button>
+      <button type="button" class="chip" data-q="There is smoke in the module">There is smoke in the module</button>
+      <button type="button" class="chip" data-q="We lost power">We lost power</button>
+      <button type="button" class="chip" data-q="What problems do you cover?">What problems do you cover?</button>
     </div>
     <form class="ask" id="askForm">
       <label for="askInput" hidden>Ask a question</label>
-      <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading, for example: sleep, blood pressure, CO2">
+      <input id="askInput" type="text" autocomplete="off" placeholder="Ask about a reading or a problem: sleep, CO2, nausea, air leak">
       <button class="btn primary" type="submit">Ask</button>
     </form>
   </section>
@@ -203,6 +207,7 @@ footer{font-size:12px;color:var(--muted)}
       <li>Reference ranges are general adult clinical ranges used as placeholders. A flight version would use each crew member's preflight baseline and NASA-STD-3001 limits.</li>
       <li>Cerebrospinal fluid pressure is not measured directly. Optic nerve sheath diameter from eye ultrasound is used as an indirect sign, with a ground clinical threshold as a placeholder.</li>
       <li>Environment dose rates are approximate published averages (ISS, lunar surface, Mars surface) and must be checked against the challenge resources.</li>
+      <li>The assistant's steps for health and technical problems are short first-response summaries written for this prototype. They do not replace official flight rules and medical checklists.</li>
       <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
     </ul>
   </section>
@@ -331,10 +336,10 @@ function streak(days, test){
 var TERMS = {
   sys:['blood pressure','bp','systolic'], dia:['blood pressure','bp','diastolic'],
   hr:['heart rate','pulse','heartbeat','bpm'], spo2:['oxygen','spo2','o2','saturation'],
-  pco2:['carbon dioxide','co2','pco2','headache'], glu:['glucose','sugar'],
+  pco2:['carbon dioxide','co2','pco2'], glu:['glucose','sugar'],
   temp:['temperature','fever','temp'], sleep:['sleep','slept','tired','insomnia'],
   mood:['mood','sad','stress','stressed','lonely','anxious'],
-  onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid','headache'],
+  onsd:['eye','eyes','vision','optic','csf','cerebrospinal','intracranial','brain fluid'],
   ex:['exercise','workout','muscle','muscles','bone','bones'], rad:['radiation','dose','dosimeter','solar']
 };
 function findIds(q){
@@ -347,9 +352,199 @@ function trendText(id, days){
   var dir=rel<0.03?'held steady':(b>a?'risen':'fallen');
   return 'Over the last '+w.length+' check-ins it has '+dir+' (from '+a+' to '+b+' '+IND[id].unit+').';
 }
+/* Problem knowledge base: first-response summaries for likely health and technical problems.
+   k = search terms, t = title, s = severity (0 info, 1 caution, 2 emergency), c = related readings, a = steps. */
+var KB = [
+  {k:['nausea','nauseous','vomit','vomiting','motion sickness','space sickness'], t:'Space motion sickness', s:1, c:['rad'], a:[
+    'This is common in the first 2 to 3 days in a new gravity level.',
+    'Keep head movements slow and keep a sickness bag within reach.',
+    'Sip fluids and take the anti-nausea medication from the medical kit as the procedure allows.',
+    'If nausea starts together with a high radiation dose, treat it as possible radiation sickness and report it.']},
+  {k:['headache','head hurts','migraine'], t:'Headache', s:1, c:['pco2','onsd','sleep'], a:[
+    'Check the cabin CO2 level and move to a well-ventilated place.',
+    'Drink water and rest.',
+    'Take a pain reliever from the medical kit as the procedure allows.',
+    'Report a headache that comes with blurred vision or lasts more than a day.']},
+  {k:['back pain','backache','back hurts'], t:'Back pain', s:0, c:['ex'], a:[
+    'The spine lengthens in low gravity, so back pain is common early in a mission.',
+    'Curl into a knees-to-chest position for a few minutes.',
+    'Keep up resistance exercise.',
+    'Report pain that spreads into a leg or comes with numbness.']},
+  {k:['congestion','congested','blocked nose','puffy','stuffy nose'], t:'Head congestion', s:0, c:[], a:[
+    'Fluid shifts toward the head in low gravity and causes a puffy face and a blocked nose.',
+    'It usually eases in the first weeks.',
+    'Drink enough water and use the decongestant from the medical kit as the procedure allows.']},
+  {k:['kidney','kidney stone','flank pain','pain when urinating'], t:'Possible kidney stone', s:2, c:['temp'], a:[
+    'Bone loss raises calcium in urine, which raises the risk of stones.',
+    'Drink plenty of water.',
+    'Take pain relief from the medical kit as the procedure allows.',
+    'Contact the flight surgeon, especially with fever or blood in urine.']},
+  {k:['dehydrated','dehydration','thirsty','dark urine'], t:'Dehydration', s:1, c:['hr','sys'], a:[
+    'Thirst is weaker in low gravity, so drink on a schedule.',
+    'Drink water with electrolytes now.',
+    'Recheck heart rate and blood pressure in 1 hour.']},
+  {k:['infection','sore throat','cough','sick','flu','runny nose'], t:'Possible infection', s:1, c:['temp','spo2'], a:[
+    'Immunity is weaker in spaceflight, and a closed cabin spreads germs fast.',
+    'Wear a mask, clean shared surfaces and keep distance from crewmates.',
+    'Rest and drink fluids.',
+    'Report a fever or breathing difficulty.']},
+  {k:['cut','wound','bleeding'], t:'Cut or bleeding wound', s:1, c:[], a:[
+    'Press a clean dressing on the wound until bleeding stops. The dressing also keeps blood from floating away.',
+    'Clean with antiseptic and cover.',
+    'Wounds can heal more slowly in space, so check daily for redness or swelling.',
+    'Contact the flight surgeon for a deep wound or bleeding that does not stop.']},
+  {k:['burn','burned','burnt','scald'], t:'Burn', s:1, c:[], a:[
+    'Cool the burn with a wet cloth for 10 to 20 minutes.',
+    'Cover it with a sterile non-stick dressing.',
+    'Do not break blisters.',
+    'Contact the flight surgeon for a burn larger than your palm, or on the face or hands.']},
+  {k:['rash','itch','itchy','skin'], t:'Skin rash or irritation', s:0, c:['temp'], a:[
+    'Skin gets dry and irritated easily in the cabin.',
+    'Keep the area clean and dry and use the skin cream from the medical kit.',
+    'Report a rash that spreads or comes with fever.']},
+  {k:['eye irritation','something in my eye','foreign body','red eye'], t:'Eye irritation', s:1, c:['onsd'], a:[
+    'Dust and particles float in low gravity and reach the eyes easily.',
+    'Do not rub. Rinse with the eye wash from the medical kit.',
+    'Report pain, lasting redness or a change in vision.']},
+  {k:['tooth','toothache','dental','teeth'], t:'Toothache', s:1, c:[], a:[
+    'Rinse and clean around the tooth.',
+    'Take pain relief from the medical kit as the procedure allows.',
+    'Report it to the flight surgeon. A temporary filling may be placed under ground guidance.']},
+  {k:['dizzy','dizziness','faint','fainting','lightheaded'], t:'Dizziness or fainting', s:1, c:['sys','dia','hr','glu'], a:[
+    'Sit down or hold on to something stable at once.',
+    'Drink fluids, and eat something if you have not eaten.',
+    'After moving to a new gravity level, stand up slowly.',
+    'Report fainting or dizziness that does not pass.']},
+  {k:['chest pain','heart attack','cardiac','not breathing','unconscious','collapsed','unresponsive'], t:'Chest pain or collapse', s:2, c:['hr','spo2','sys'], a:[
+    'Call the whole crew now.',
+    'If the person is unresponsive and not breathing, start CPR using the onboard restraint method and bring the defibrillator.',
+    'If the person is awake with chest pain, stop all activity, give oxygen and follow the cardiac procedure in the medical kit.',
+    'Contact the flight surgeon immediately.']},
+  {k:['joint pain','bends','decompression sickness'], t:'Possible decompression sickness', s:2, c:['spo2'], a:[
+    'Joint pain, tingling or breathing trouble after a spacewalk can be decompression sickness.',
+    'Stop activity and breathe pure oxygen.',
+    'Contact the flight surgeon immediately.']},
+  {k:['radiation sickness','solar storm','solar flare','solar particle','storm','flare'], t:'Solar particle event', s:2, c:['rad'], a:[
+    'Move to the most shielded area and stay there until the event ends.',
+    'Keep your dosimeter on and log the dose.',
+    'Nausea, vomiting and tiredness in the hours after exposure can be radiation sickness. Report them.',
+    'Postpone any spacewalk or surface excursion.']},
+  {k:['panic','conflict','argument','fight','homesick','angry'], t:'Stress and crew conflict', s:1, c:['mood','sleep'], a:[
+    'Pause and take slow breaths for a few minutes.',
+    'Talk to a crewmate you trust, or ask for a private conference with the ground.',
+    'Protect your sleep and free time this week.',
+    'Bring repeated conflicts to the commander early.']},
+  {k:['cramp','sprain','strain','injury','injured','pulled muscle','twisted'], t:'Muscle or joint injury', s:1, c:['ex'], a:[
+    'Stop the exercise.',
+    'Cool the area, wrap it and rest it.',
+    'Restart exercise gently when pain allows. Stopping completely speeds up muscle loss.',
+    'Report severe pain, deformity or a joint you cannot move.']},
+  {k:['swelling','swollen','clot'], t:'Swelling in the neck or a limb', s:2, c:[], a:[
+    'Blood flow in the neck veins changes in low gravity, and clots have been found in astronauts.',
+    'Do not massage the area.',
+    'Contact the flight surgeon and prepare the ultrasound for a guided scan.']},
+  {k:['hearing','noise','ringing','ears'], t:'Noise and hearing', s:0, c:[], a:[
+    'Fans and pumps run all the time, so the cabin is noisy.',
+    'Wear hearing protection in loud modules and when sleeping.',
+    'Report ringing or a drop in hearing.']},
+  {k:['fire','smoke','burning smell','flames'], t:'Fire or smoke', s:2, c:['spo2'], a:[
+    'Warn the crew and sound the alarm.',
+    'Put on a breathing mask.',
+    'Cut power to the affected equipment and stop ventilation in that module so the fire is not fed.',
+    'Use the extinguisher. If the fire is not out, leave and close the hatch.',
+    'Check everyone for smoke inhalation afterwards.']},
+  {k:['depressurization','depressurisation','pressure drop','air leak','cabin leak','hull','hissing','losing air'], t:'Cabin pressure loss', s:2, c:['spo2'], a:[
+    'Warn the crew and gather at the escape vehicle or safe module.',
+    'Check how fast pressure is falling to know how much time you have.',
+    'Find the leaking module by closing hatches one by one, then isolate it.',
+    'Watch for signs of low oxygen: confusion, blue lips, fast breathing.']},
+  {k:['ammonia','toxic','chemical','fumes','smell'], t:'Toxic atmosphere', s:2, c:['spo2'], a:[
+    'Put on a breathing mask at once and warn the crew.',
+    'Move away from the source and close the hatch behind you.',
+    'Follow the toxic atmosphere procedure and wait until the air is cleared.',
+    'Rinse exposed skin and eyes and report any breathing trouble.']},
+  {k:['scrubber','co2 removal','carbon dioxide removal','stale air'], t:'CO2 removal failure', s:2, c:['pco2','spo2'], a:[
+    'Raised CO2 causes headache, sleepiness and poor concentration before it becomes dangerous.',
+    'Switch to the backup CO2 removal unit or canisters.',
+    'Increase airflow and avoid crowding in one module.',
+    'Reduce heavy exercise until the level is back to normal.']},
+  {k:['oxygen generator','oxygen supply','oxygen system'], t:'Oxygen system failure', s:2, c:['spo2'], a:[
+    'Switch to the backup oxygen supply.',
+    'Check the cabin oxygen level and everyone\'s blood oxygen.',
+    'Reduce heavy exercise to lower oxygen use.',
+    'Start the repair with ground guidance.']},
+  {k:['power','blackout','electricity','lights out'], t:'Power loss', s:2, c:[], a:[
+    'Switch off non-essential equipment to protect life support.',
+    'Confirm that air circulation and CO2 removal are still running.',
+    'Use handheld lights and charge battery devices in turns.',
+    'Take critical measurements with battery instruments and log them on paper if needed.']},
+  {k:['communication','communications','comms','signal','radio','lost contact','no contact'], t:'Loss of communication with Earth', s:1, c:[], a:[
+    'Switch to the backup communication channel.',
+    'Continue with the onboard procedures. This tool keeps working without a link.',
+    'Save your reports so they can be sent when the link returns.',
+    'In a medical emergency, the crew medical officer leads treatment from the onboard procedures.']},
+  {k:['water'], t:'Water system problem', s:1, c:['hr'], a:[
+    'Switch to stored water and ration it by the procedure.',
+    'Drinking water comes first, hygiene second.',
+    'Watch for dehydration: dark urine, fast pulse, dizziness.',
+    'Start the repair with ground guidance.']},
+  {k:['toilet','waste system'], t:'Toilet failure', s:0, c:[], a:[
+    'Switch to the backup collection bags.',
+    'Keep strict hand and surface hygiene to prevent infection.',
+    'Do not drink less to avoid using it. That raises the risk of kidney stones.',
+    'Start the repair with ground guidance.']},
+  {k:['too hot','too cold','overheating','cooling','heating','thermal','freezing'], t:'Cabin temperature problem', s:1, c:['temp'], a:[
+    'Too hot: reduce exercise and equipment heat, drink more and cool down with wet cloths.',
+    'Too cold: add clothing layers, gather in one module and use sleeping bags.',
+    'Measure body temperature every few hours.',
+    'Start the repair of the thermal control system with ground guidance.']},
+  {k:['suit','helmet','eva','spacewalk','excursion'], t:'Suit problem during a spacewalk', s:2, c:['spo2'], a:[
+    'Tell your partner and the crew at once.',
+    'End the spacewalk and return to the airlock by the shortest route.',
+    'Water in the helmet, a pressure drop or a CO2 warning each mean stop now.',
+    'After repressurization, check breathing and blood oxygen.']},
+  {k:['debris','meteoroid','micrometeoroid','impact','collision'], t:'Debris or micrometeoroid impact', s:2, c:[], a:[
+    'If a warning comes in advance, shelter in the escape vehicle.',
+    'After an impact, check cabin pressure first.',
+    'If pressure is falling, follow the cabin pressure loss steps.',
+    'Inspect the damage and report it.']},
+  {k:['dust','regolith'], t:'Lunar or Martian dust exposure', s:1, c:['spo2'], a:[
+    'Surface dust is sharp and irritates eyes, skin and lungs.',
+    'Brush and vacuum suits in the airlock before entering the cabin.',
+    'Rinse eyes and wash exposed skin.',
+    'Report a cough or breathing trouble.']},
+  {k:['sensor','not working','broken','cuff','oximeter','thermometer','analyzer','meter'], t:'Measuring device not working', s:0, c:[], a:[
+    'Check the battery and connection, then restart the device.',
+    'Use the backup device from the medical kit.',
+    'If none works, count your pulse by hand for 60 seconds and describe symptoms in words.',
+    'Log that the reading was taken manually.']},
+  {k:['treadmill','exercise device','exercise machine','bike'], t:'Exercise device failure', s:1, c:['ex'], a:[
+    'Switch to another device or to resistance bands.',
+    'Keep the daily exercise time. Bone and muscle loss does not pause.',
+    'Start the repair with ground guidance.']},
+  {k:['food','hungry','spoiled','appetite','eating'], t:'Food and appetite', s:0, c:['glu'], a:[
+    'Appetite and taste are weaker in space, so eat by schedule, not by hunger.',
+    'Do not eat food from a damaged or swollen package.',
+    'Take vitamin D as planned, because there is no sunlight exposure.',
+    'Report steady weight loss.']}
+];
+function findKB(q){
+  return KB.filter(function(e){ return e.k.some(function(t){ return new RegExp('\\b'+t+'\\b').test(q); }); }).slice(0,2);
+}
+function kbText(e, d, env){
+  var s=e.t+(e.s===2?' (emergency)':'')+'\n'+e.a.map(function(x,i){ return (i+1)+'. '+x; }).join('\n');
+  if(d && e.c.length) s+='\nYour related readings: '+e.c.map(function(id){
+    return IND[id].label.toLowerCase()+' '+d[id]+' '+IND[id].unit+' ('+WORD[statusOf(id,d[id],env)].toLowerCase()+')'; }).join(', ')+'.';
+  if(e.s===2) s+='\nReport to the ground. Signal delay: '+ENV[env].delay.toLowerCase()+'. '+ENV[env].reply;
+  return s;
+}
 function answer(q, days, env){
   q=String(q||'').toLowerCase();
   var d=days[days.length-1];
+  var kb=findKB(q);
+  if(kb.length) return kb.map(function(e){ return kbText(e, d, env); }).join('\n\n');
+  if(/\b(problems|emergencies|topics|go wrong)\b/.test(q))
+    return 'I have first-response steps for: '+KB.map(function(e){ return e.t.toLowerCase(); }).join(', ')+'.';
   if(!d) return 'There is no check-in yet. Log today\'s measurements and ask me again.';
   function has(re){ return re.test(q); }
   function st(id){ return statusOf(id, d[id], env); }
@@ -385,9 +580,9 @@ function answer(q, days, env){
       (flagged.length ? flagged.length+' of '+ORDER.length+' readings need attention: '+names+'. Ask "what should I do now" for guidance.'
                       : 'All '+ORDER.length+' readings are in range.');
   if(has(/\b(hello|hi|hey)\b/)) return 'Hello. Ask me about your status, a specific reading, or who to contact.';
-  return 'I can answer from your logged readings. Try "how am I today", "what should I do now", "who should I contact", or name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation.';
+  return 'I can answer from your logged readings. Try "how am I today", "what should I do now", "who should I contact", name a reading such as sleep, blood pressure, oxygen, CO2, glucose, temperature, mood, eyes, exercise or radiation, or describe a problem such as headache, nausea, fire, air leak or power loss. Ask "what problems do you cover" for the full list.';
 }
-if(typeof module!=='undefined') module.exports={answer:answer,TERMS:TERMS,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+if(typeof module!=='undefined') module.exports={answer:answer,TERMS:TERMS,KB:KB,findKB:findKB,ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
 
 if(typeof document!=='undefined'){ (function(){
   var KEY='kuasar-crew-health-v2';
