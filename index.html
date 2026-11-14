@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--
+  Kuasar Crew Health — astronaut self-assessment prototype
+  Team: Kuasar Selçuklu · 2026 NASA Space Apps Challenge
+  SI/AI DISCLOSURE: The code in this file was generated with the assistance of an AI
+  large language model (Claude, Anthropic), directed and reviewed by the team.
+  The project concept is the team's own. Not a medical device.
+-->
+<title>Kuasar Crew Health</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="generator" content="Code generated with AI assistance (Claude, Anthropic); concept and review by team Kuasar Selçuklu">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: flight-medical console. Status banner on top, body map left, readings right, then check-in, trend, sources. */
+:root{
+  --bg:#f2f4f8; --surface:#ffffff; --ink:#121a27; --muted:#566275; --line:#d7dee8; --accent:#1f52c4;
+  --ok:#18734a; --ok-soft:#dff3e8; --warn:#9a5b00; --warn-soft:#fdefd2; --crit:#bd2626; --crit-soft:#fde3e1;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0d121b; --surface:#151c28; --ink:#e7ecf4; --muted:#9ba7b9; --line:#2a3446; --accent:#8db2ff;
+  --ok:#4fc68d; --ok-soft:#12301f; --warn:#f1b24a; --warn-soft:#3a2a0c; --crit:#ff8078; --crit-soft:#401816;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --bg:#0d121b; --surface:#151c28; --ink:#e7ecf4; --muted:#9ba7b9; --line:#2a3446; --accent:#8db2ff;
+  --ok:#4fc68d; --ok-soft:#12301f; --warn:#f1b24a; --warn-soft:#3a2a0c; --crit:#ff8078; --crit-soft:#401816;
+  color-scheme:dark }
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 var(--sans)}
+.wrap{max-width:1080px;margin:0 auto;padding-block:20px 40px;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));
+  display:flex;flex-direction:column;gap:16px}
+h1{font-size:22px;margin:0;font-weight:600;letter-spacing:-.01em}
+h2{font-size:16px;margin:0;font-weight:600;text-wrap:balance}
+h3{font-size:14px;margin:0;font-weight:600}
+p{margin:0}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+.top{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.seg button{font:inherit;font-size:13px;font-weight:500;color:var(--muted);background:none;border:0;border-radius:7px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+button:focus-visible,input:focus-visible,select:focus-visible,.region:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:16px;min-width:0}
+.envfacts{display:flex;flex-wrap:wrap;gap:6px 24px;font-size:13px}
+.st0{--s:var(--ok);--s-soft:var(--ok-soft)} .st1{--s:var(--warn);--s-soft:var(--warn-soft)} .st2{--s:var(--crit);--s-soft:var(--crit-soft)}
+.banner{border:1px solid var(--s);background:var(--s-soft);border-radius:12px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between}
+.banner .msg{flex:1 1 320px;min-width:0}
+.banner strong{color:var(--s);font-size:16px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:inherit;font-size:13px;font-weight:600;border-radius:8px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--surface)}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:var(--s);background:var(--s-soft);border:1px solid var(--s);border-radius:999px;padding:1px 9px;white-space:nowrap}
+.grid{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:16px}
+@media (max-width:760px){.grid{grid-template-columns:minmax(0,1fr)}}
+.figure{display:flex;flex-direction:column;gap:12px;align-items:center}
+.figure svg{width:100%;max-width:240px;height:auto}
+.region{cursor:pointer}
+.region .shape{fill:var(--s-soft);stroke:var(--s);stroke-width:2}
+.region .ring{fill:none;stroke:var(--s);stroke-width:7;stroke-dasharray:3 9;stroke-linecap:round}
+.region.sel .shape{stroke-width:4.5}
+.region.sel .ring{stroke-dasharray:none;stroke-width:5}
+.region text{fill:var(--s);font:600 15px var(--sans);text-anchor:middle;pointer-events:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.chip{font:inherit;font-size:12px;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--accent);color:var(--accent)}
+.chip i{font-style:normal;color:var(--s)}
+.detail{display:flex;flex-direction:column;gap:12px}
+.rows{display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:4px 14px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
+.row .val{font-size:17px}
+.row .note{grid-column:1/-1;font-size:13px}
+.row .advice{grid-column:1/-1;font-size:13px;border-left:3px solid var(--s);padding-left:10px}
+form .fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field label,.field legend{font-size:12px;color:var(--muted);font-weight:500;padding:0}
+.field input,.field select{font:inherit;font-family:var(--mono);color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:7px 9px;width:100%}
+.formfoot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-top:14px}
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;width:100%;min-width:480px;height:auto}
+.head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.badges{display:flex;flex-wrap:wrap;gap:8px}
+.badge{border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:13px;color:var(--muted)}
+.badge.on{border-style:solid;border-color:var(--ok);color:var(--ink);background:var(--ok-soft)}
+.dose{height:10px;background:var(--bg);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.dose span{display:block;height:100%;background:var(--accent)}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+ul{margin:0;padding-left:18px}
+a{color:var(--accent)}
+footer{font-size:12px;color:var(--muted)}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="label">Team Kuasar Selçuklu · 2026 NASA Space Apps Challenge</p>
+      <h1>Kuasar Crew Health</h1>
+      <p class="muted small">Daily self-assessment for astronauts. Mission day <span class="num" id="missionDay">–</span>.</p>
+    </div>
+    <div>
+      <p class="label" id="envLabel">Mission environment</p>
+      <div class="seg" role="group" aria-labelledby="envLabel" id="envSeg"></div>
+    </div>
+  </header>
+
+  <div class="panel envfacts" id="envFacts"></div>
+
+  <section id="banner" class="banner st0" aria-live="polite"></section>
+  <p id="notice" class="small muted" aria-live="polite" hidden></p>
+
+  <div class="grid">
+    <section class="panel figure" aria-label="Body map">
+      <p class="label">Body map · select a region</p>
+      <svg viewBox="0 0 240 400" role="group" aria-label="Astronaut body map" id="figure"></svg>
+      <div class="chips" id="chips"></div>
+    </section>
+    <section class="panel detail" id="detail" aria-live="polite"></section>
+  </div>
+
+  <section class="panel">
+    <div class="head">
+      <h2>Log today's check-in</h2>
+      <span class="small muted" id="dataTag"></span>
+    </div>
+    <form id="checkin" novalidate>
+      <div class="fields" id="fields"></div>
+      <div class="formfoot">
+        <button class="btn primary" type="submit">Save check-in</button>
+        <button class="btn" type="button" id="clearEx">Remove example data</button>
+        <button class="btn" type="button" id="reset">Reset demo</button>
+        <span class="small" id="formMsg" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="head">
+      <h2>Trend over the mission</h2>
+      <div class="field" style="flex:0 1 240px">
+        <label for="chartSel">Indicator</label>
+        <select id="chartSel"></select>
+      </div>
+    </div>
+    <div class="chartbox"><svg id="chart" viewBox="0 0 640 230" role="img" aria-label="Trend chart"></svg></div>
+    <p class="small muted" id="chartNote"></p>
+  </section>
+
+  <div class="two">
+    <section class="panel">
+      <div class="head"><h2>Routine and rewards</h2></div>
+      <div class="badges" id="badges"></div>
+    </section>
+    <section class="panel">
+      <div class="head"><h2>Cumulative radiation dose</h2></div>
+      <p><span class="num" id="doseVal"></span> <span class="muted small">of a 600 mSv career limit</span></p>
+      <div class="dose" style="margin:8px 0"><span id="doseBar"></span></div>
+      <p class="small muted">Sum of the logged daily dosimeter readings for this mission.</p>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="head"><h2>Sources and limits of this prototype</h2></div>
+    <ul class="small">
+      <li>Hazard model: NASA Human Research Program, the five hazards of human spaceflight (<a href="https://www.nasa.gov/hrp/risks/">nasa.gov/hrp/risks</a>, <a href="https://www.nasa.gov/hrp/radiation/">nasa.gov/hrp/radiation</a>).</li>
+      <li>Reference ranges are general adult clinical ranges used as placeholders. A flight version would use each crew member's preflight baseline and NASA-STD-3001 limits.</li>
+      <li>Environment dose rates are approximate published averages (ISS, lunar surface, Mars surface) and must be checked against the challenge resources.</li>
+      <li>Reports are simulated. Nothing is transmitted. This is not a medical device.</li>
+    </ul>
+  </section>
+
+  <footer>Code generated with AI assistance (Claude, Anthropic); concept, design decisions and review by team Kuasar Selçuklu. No NASA branding is used.</footer>
+</div>
+
+<script>
+/* SI/AI disclosure: this script was generated with AI assistance (Claude, Anthropic). */
+var ENV = {
+  iss:  {name:'ISS', full:'Low Earth orbit station', g:'Microgravity', delay:'Near real-time', dose:0.5,
+         reply:'Ground can answer within minutes.'},
+  moon: {name:'Moon base', full:'Lunar surface base', g:'0.17 g', delay:'About 1.3 s one way', dose:1.4,
+         reply:'Ground can answer within minutes.'},
+  mars: {name:'Mars base', full:'Mars surface base', g:'0.38 g', delay:'3 to 22 min one way', dose:0.7,
+         reply:'A reply can take up to 44 minutes. Start the onboard protocol while you wait.'}
+};
+var IND = {
+  sys:  {label:'Systolic blood pressure', unit:'mmHg', ok:[90,129], cau:[80,179], min:50, max:260, step:1,
+         how:'Sit still for 5 minutes, then use the arm cuff.',
+         lo:'Low pressure. Drink fluids, add salt to your next meal and avoid standing up fast.',
+         hi:'High pressure. Rest 10 minutes and measure again. Cut salt and caffeine today.'},
+  dia:  {label:'Diastolic blood pressure', unit:'mmHg', ok:[60,84], cau:[50,119], min:30, max:160, step:1,
+         how:'Read the lower number from the same cuff measurement.',
+         lo:'Low pressure. Drink fluids and recheck in 30 minutes.',
+         hi:'High pressure. Rest 10 minutes and measure again.'},
+  hr:   {label:'Resting heart rate', unit:'bpm', ok:[50,100], cau:[40,120], min:25, max:220, step:1,
+         how:'Measure after 5 minutes of rest, before exercise.',
+         lo:'Slow pulse. If you feel dizzy or weak, stop work and tell the crew.',
+         hi:'Fast pulse. Rest, drink water and check your temperature for fever.'},
+  glu:  {label:'Blood glucose', unit:'mg/dL', ok:[70,140], cau:[54,199], min:20, max:500, step:1,
+         how:'Use the finger-stick meter before a meal.',
+         lo:'Low sugar. Eat 15 g of fast carbohydrate and recheck in 15 minutes.',
+         hi:'High sugar. Drink water, take a light walk or cycle session and recheck in 2 hours.'},
+  temp: {label:'Body temperature', unit:'°C', ok:[36.1,37.5], cau:[35.0,38.4], min:32, max:42, step:0.1,
+         how:'Use the forehead or ear thermometer at rest.',
+         lo:'Low temperature. Add clothing layers and take a warm drink.',
+         hi:'Raised temperature. Rest, drink fluids and recheck in 1 hour. Fever can signal infection.'},
+  sleep:{label:'Sleep last night', unit:'h', ok:[7,9], cau:[5,24], min:0, max:24, step:0.1,
+         how:'Count the hours you actually slept, not time in the sleep station.',
+         lo:'Short sleep. Avoid critical tasks if you can, dim lights 1 hour before sleep and keep a fixed bedtime.',
+         hi:'Long sleep. Note how rested you feel. Constant tiredness should be reported.'},
+  mood: {label:'Mood', unit:'/ 5', ok:[3,5], cau:[2,5], min:1, max:5, step:1,
+         how:'Rate how you feel overall today, from 1 (very low) to 5 (very good).',
+         lo:'Low mood. Talk to a crewmate, schedule a family call and take your planned free time.',
+         hi:''},
+  ex:   {label:'Exercise today', unit:'min', ok:[90,Infinity], cau:[45,Infinity], min:0, max:600, step:1,
+         how:'Add up resistance and cardio minutes from the exercise devices.',
+         lo:'Too little exercise. Without loading, bone and muscle are lost every week. Schedule a resistance session today.',
+         hi:''},
+  rad:  {label:'Radiation dose today', unit:'mSv', min:0, max:1000, step:0.01,
+         how:'Read the daily value from your personal dosimeter.',
+         lo:'',
+         hi:'Dose above the expected level for this environment. Move to the most shielded area and check for a solar particle event.'}
+};
+var REGIONS = {
+  brain:{title:'Brain and behavior', ids:['sleep','mood'], hazard:'Isolation and confinement',
+         why:'Isolation, workload and a disturbed day-night cycle reduce sleep and mood, which lowers attention and decision quality.'},
+  heart:{title:'Heart and circulation', ids:['sys','dia','hr'], hazard:'Gravity fields',
+         why:'Without normal gravity, body fluid shifts toward the head and the heart works differently. Blood pressure can drop sharply when gravity returns.'},
+  core: {title:'Metabolism and core temperature', ids:['glu','temp'], hazard:'Hostile closed environment',
+         why:'A closed habitat changes immunity, appetite and nutrition. Fever can be the first sign of infection far from any hospital.'},
+  limbs:{title:'Bones and muscles', ids:['ex'], hazard:'Gravity fields',
+         why:'Unloaded bones and muscles weaken quickly in low gravity. Daily exercise is the main countermeasure.'},
+  rad:  {title:'Whole-body radiation', ids:['rad'], hazard:'Space radiation',
+         why:'Outside Earth\'s magnetic field the dose is higher. Radiation is not flushed out of the body. The damage adds up, so the total dose is tracked.'}
+};
+var ORDER = ['sys','dia','hr','glu','temp','sleep','mood','ex','rad'];
+var SYMBOL = ['●','▲','■'], WORD = ['In range','Watch','Act now'];
+
+function ranges(id, env){
+  if(id==='rad'){ var d=ENV[env].dose; return {ok:[0, +(1.5*d).toFixed(2)], cau:[0, +(5*d).toFixed(2)]}; }
+  return {ok:IND[id].ok, cau:IND[id].cau};
+}
+function statusOf(id, v, env){
+  var r=ranges(id, env);
+  if(v>=r.ok[0] && v<=r.ok[1]) return 0;
+  if(v>=r.cau[0] && v<=r.cau[1]) return 1;
+  return 2;
+}
+function rangeText(id, env){
+  var r=ranges(id, env).ok;
+  if(id==='rad') return '≤ '+r[1];
+  return isFinite(r[1]) ? r[0]+'–'+r[1] : '≥ '+r[0];
+}
+function adviceFor(id, v, env){
+  var r=ranges(id, env).ok;
+  return v<r[0] ? IND[id].lo : IND[id].hi;
+}
+function sample(env){
+  var s=7, days=[], d=ENV[env].dose;
+  function r(){ s=(s*16807)%2147483647; return s/2147483647; }
+  for(var i=0;i<14;i++){
+    days.push({day:i+1, example:true,
+      sys:Math.round(112+r()*14), dia:Math.round(68+r()*10), hr:Math.round(58+r()*14),
+      glu:Math.round(84+r()*30), temp:+(36.5+r()*0.6).toFixed(1), sleep:+(7+r()*1.3).toFixed(1),
+      mood:3+Math.floor(r()*3), ex:Math.round(95+r()*50), rad:+(d*(0.8+r()*0.5)).toFixed(2)});
+  }
+  var last=days[13]; last.sleep=5.6; last.hr=104;
+  return days;
+}
+function regionStatus(key, day, env){
+  return Math.max.apply(null, REGIONS[key].ids.map(function(id){ return statusOf(id, day[id], env); }));
+}
+function streak(days, test){
+  var n=0; for(var i=days.length-1;i>=0;i--){ if(test(days[i])) n++; else break; } return n;
+}
+if(typeof module!=='undefined') module.exports={ENV:ENV,IND:IND,REGIONS:REGIONS,ORDER:ORDER,ranges:ranges,statusOf:statusOf,rangeText:rangeText,adviceFor:adviceFor,sample:sample,regionStatus:regionStatus,streak:streak};
+
+if(typeof document!=='undefined'){ (function(){
+  var KEY='kuasar-crew-health-v1';
+  var state={env:'iss', days:sample('iss'), sel:'heart', chart:'sleep'};
+  try{ var saved=JSON.parse(localStorage.getItem(KEY)||'null');
+       if(saved && ENV[saved.env] && Array.isArray(saved.days)){ state.env=saved.env; state.days=saved.days; } }catch(e){}
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify({env:state.env, days:state.days})); }catch(e){} }
+  function $(id){ return document.getElementById(id); }
+  function latest(){ return state.days[state.days.length-1]; }
+  function pill(st){ return '<span class="pill st'+st+'">'+SYMBOL[st]+' '+WORD[st]+'</span>'; }
+
+  function renderEnv(){
+    $('envSeg').innerHTML=Object.keys(ENV).map(function(k){
+      return '<button type="button" data-env="'+k+'" aria-pressed="'+(k===state.env)+'">'+ENV[k].name+'</button>'; }).join('');
+    var e=ENV[state.env];
+    $('envFacts').innerHTML='<span><span class="label">Location</span> '+e.full+'</span>'+
+      '<span><span class="label">Gravity</span> '+e.g+'</span>'+
+      '<span><span class="label">Signal delay to Earth</span> '+e.delay+'</span>'+
+      '<span><span class="label">Expected dose</span> <span class="num">'+e.dose+'</span> mSv/day</span>';
+  }
+  function renderBanner(){
+    var d=latest(), b=$('banner');
+    $('missionDay').textContent=d?d.day:'–';
+    if(!d){ b.className='banner st0'; b.innerHTML='<div class="msg"><strong>No check-in yet</strong><p class="small">Log today\'s measurements below to see your status.</p></div>'; return; }
+    var sts=ORDER.map(function(id){ return statusOf(id, d[id], state.env); });
+    var worst=Math.max.apply(null, sts), nC=sts.filter(function(s){return s===2;}).length, nW=sts.filter(function(s){return s===1;}).length;
+    var title, text;
+    if(worst===0){ title='● All indicators in range'; text='Keep your routine. Next check-in is due in 24 hours.'; }
+    else if(worst===1){ title='▲ '+nW+' indicator'+(nW>1?'s':'')+' to watch'; text='Follow the guidance for each flagged reading, tell the crew medical officer and measure again later today.'; }
+    else { title='■ '+nC+' reading'+(nC>1?'s':'')+' need action now'; text='Contact the flight surgeon. '+ENV[state.env].reply; }
+    b.className='banner st'+worst;
+    b.innerHTML='<div class="msg"><strong>'+title+'</strong><p class="small">'+text+'</p></div>'+
+      '<div class="actions">'+(worst>0?'<button class="btn" type="button" data-act="crew">Notify crew medical officer</button>':'')+
+      (worst===2?'<button class="btn primary" type="button" data-act="ground">Send report to flight surgeon</button>':'')+'</div>';
+  }
+  function renderFigure(){
+    var d=latest(), st={};
+    Object.keys(REGIONS).forEach(function(k){ st[k]=d?regionStatus(k,d,state.env):0; });
+    function g(k, inner, tx, ty){
+      return '<g class="region st'+st[k]+(state.sel===k?' sel':'')+'" data-region="'+k+'" tabindex="0" role="button" aria-label="'+
+        REGIONS[k].title+': '+WORD[st[k]]+'">'+inner+(tx?'<text x="'+tx+'" y="'+ty+'">'+SYMBOL[st[k]]+'</text>':'')+'</g>';
+    }
+    $('figure').innerHTML=
+      g('rad','<ellipse class="ring" cx="120" cy="200" rx="110" ry="190" pointer-events="stroke"/>')+
+      g('limbs','<rect class="shape" x="50" y="116" width="26" height="100" rx="13"/><rect class="shape" x="164" y="116" width="26" height="100" rx="13"/>'+
+                '<rect class="shape" x="86" y="238" width="30" height="124" rx="14"/><rect class="shape" x="124" y="238" width="30" height="124" rx="14"/>',101,306)+
+      g('brain','<circle class="shape" cx="120" cy="68" r="36"/>',120,73)+
+      g('heart','<rect class="shape" x="82" y="112" width="76" height="60" rx="14"/>',120,147)+
+      g('core','<rect class="shape" x="86" y="178" width="68" height="54" rx="12"/>',120,210);
+    $('chips').innerHTML=Object.keys(REGIONS).map(function(k){
+      return '<button type="button" class="chip st'+st[k]+'" data-region="'+k+'" aria-pressed="'+(state.sel===k)+'"><i>'+SYMBOL[st[k]]+'</i> '+REGIONS[k].title+'</button>'; }).join('');
+  }
+  function renderDetail(){
+    var R=REGIONS[state.sel], d=latest();
+    var html='<div><p class="label">Hazard: '+R.hazard+'</p><h2>'+R.title+'</h2></div><p class="small">'+R.why+'</p><div class="rows">';
+    R.ids.forEach(function(id){
+      var I=IND[id];
+      if(!d){ html+='<div class="row"><span>'+I.label+'</span><span class="muted">no data</span></div>'; return; }
+      var v=d[id], st=statusOf(id,v,state.env);
+      html+='<div class="row"><span>'+I.label+'</span><span class="num val">'+v+' <span class="muted small">'+I.unit+'</span></span>'+pill(st)+
+        '<span class="note muted">Reference '+rangeText(id,state.env)+' '+I.unit+'. '+I.how+'</span>'+
+        (st>0?'<span class="advice st'+st+'">'+adviceFor(id,v,state.env)+(st===2?' Report this reading to the flight surgeon.':'')+'</span>':'')+'</div>';
+    });
+    $('detail').innerHTML=html+'</div>';
+  }
+  function renderForm(){
+    var d=latest()||sample(state.env)[0];
+    $('fields').innerHTML=ORDER.map(function(id){
+      var I=IND[id];
+      if(id==='mood') return '<div class="field"><label for="f_mood">Mood (1 very low – 5 very good)</label><select id="f_mood">'+
+        ['Very low','Low','Neutral','Good','Very good'].map(function(t,i){ return '<option value="'+(i+1)+'"'+(d.mood===i+1?' selected':'')+'>'+(i+1)+' · '+t+'</option>'; }).join('')+'</select></div>';
+      return '<div class="field"><label for="f_'+id+'">'+I.label+' ('+I.unit+')</label><input id="f_'+id+'" type="number" inputmode="decimal" required min="'+I.min+'" max="'+I.max+'" step="'+I.step+'" value="'+d[id]+'"></div>';
+    }).join('');
+    var ex=state.days.filter(function(x){return x.example;}).length;
+    $('dataTag').textContent=ex? ex+' of '+state.days.length+' days are example data' : state.days.length+' logged day'+(state.days.length===1?'':'s');
+    $('clearEx').hidden=!ex;
+  }
+  function renderChart(){
+    var id=state.chart, I=IND[id], days=state.days, svg=$('chart');
+    $('chartSel').innerHTML=ORDER.map(function(k){ return '<option value="'+k+'"'+(k===id?' selected':'')+'>'+IND[k].label+'</option>'; }).join('');
+    if(days.length<2){ svg.innerHTML='<text x="320" y="115" text-anchor="middle" fill="var(--muted)" font-size="14">Log at least two days to see a trend.</text>'; $('chartNote').textContent=''; return; }
+    var W=640,H=230,L=50,Rm=18,T=14,B=30, vals=days.map(function(x){return x[id];}), ok=ranges(id,state.env).ok;
+    var vmin=Math.min.apply(null,vals), vmax=Math.max.apply(null,vals);
+    var okHi=isFinite(ok[1])?ok[1]:Math.max(vmax,ok[0]);
+    var lo=Math.min(vmin,ok[0]), hi=Math.max(vmax,okHi), pad=(hi-lo)*0.1||1; lo-=pad; hi+=pad; if(id==='rad'||id==='ex'||id==='sleep') lo=Math.max(lo,0);
+    function x(i){ return L+(W-L-Rm)*i/(days.length-1); }
+    function y(v){ return T+(H-T-B)*(1-(v-lo)/(hi-lo)); }
+    var top=isFinite(ok[1])?y(ok[1]):T, bot=y(ok[0]);
+    var dec=I.step<1?(I.step<0.1?2:1):0;
+    var out='<rect x="'+L+'" y="'+top+'" width="'+(W-L-Rm)+'" height="'+Math.max(bot-top,0)+'" fill="var(--ok-soft)"/>'+
+      '<line x1="'+L+'" x2="'+(W-Rm)+'" y1="'+bot+'" y2="'+bot+'" stroke="var(--ok)" stroke-dasharray="4 4"/>'+
+      (isFinite(ok[1])?'<line x1="'+L+'" x2="'+(W-Rm)+'" y1="'+top+'" y2="'+top+'" stroke="var(--ok)" stroke-dasharray="4 4"/>':'')+
+      '<line x1="'+L+'" x2="'+(W-Rm)+'" y1="'+(H-B)+'" y2="'+(H-B)+'" stroke="var(--line)"/>';
+    var ticks=[ok[0]]; if(isFinite(ok[1])) ticks.push(ok[1]);
+    ticks.forEach(function(t){ out+='<text x="'+(L-8)+'" y="'+(y(t)+4)+'" text-anchor="end" font-size="12" fill="var(--muted)" font-family="var(--mono)">'+t+'</text>'; });
+    out+='<polyline fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" points="'+vals.map(function(v,i){return x(i).toFixed(1)+','+y(v).toFixed(1);}).join(' ')+'"/>';
+    vals.forEach(function(v,i){ var st=statusOf(id,v,state.env), last=i===vals.length-1;
+      out+='<circle cx="'+x(i).toFixed(1)+'" cy="'+y(v).toFixed(1)+'" r="'+(last?5.5:3.5)+'" fill="var('+['--ok','--warn','--crit'][st]+')" stroke="var(--surface)" stroke-width="1.5"><title>Day '+days[i].day+': '+v+' '+I.unit+'</title></circle>'; });
+    out+='<text x="'+L+'" y="'+(H-9)+'" font-size="12" fill="var(--muted)">Day '+days[0].day+'</text>'+
+      '<text x="'+(W-Rm)+'" y="'+(H-9)+'" text-anchor="end" font-size="12" fill="var(--muted)">Day '+days[days.length-1].day+'</text>';
+    svg.innerHTML=out;
+    var lastV=vals[vals.length-1];
+    $('chartNote').textContent='Latest: '+lastV.toFixed(dec)+' '+I.unit+'. Shaded band is the reference range ('+rangeText(id,state.env)+' '+I.unit+'). Dot color and the status label show the reading\'s status.';
+  }
+  function renderExtras(){
+    var days=state.days, env=state.env, d=latest();
+    var sS=streak(days,function(x){return x.sleep>=7;}), sE=streak(days,function(x){return x.ex>=90;});
+    var green=d && ORDER.every(function(id){return statusOf(id,d[id],env)===0;});
+    var list=[
+      {on:days.length>=7, t:'Check-in streak', s:days.length+' day'+(days.length===1?'':'s')+' logged in a row'},
+      {on:sS>=7, t:'Well rested', s:sS+' of 7 nights with 7 h sleep or more'},
+      {on:sE>=7, t:'Flight fit', s:sE+' of 7 days with 90 min exercise or more'},
+      {on:!!green, t:'All green', s:green?'Every reading in range today':'Get every reading in range today'}];
+    $('badges').innerHTML=list.map(function(b){ return '<div class="badge'+(b.on?' on':'')+'"><strong>'+(b.on?'● ':'○ ')+b.t+'</strong><br>'+b.s+'</div>'; }).join('');
+    var total=days.reduce(function(a,x){return a+x.rad;},0);
+    $('doseVal').textContent=total.toFixed(2)+' mSv';
+    $('doseBar').style.width=Math.min(100,total/600*100).toFixed(2)+'%';
+  }
+  function render(){ renderEnv(); renderBanner(); renderFigure(); renderDetail(); renderForm(); renderChart(); renderExtras(); }
+  function notice(t){ var n=$('notice'); n.textContent=t; n.hidden=!t; }
+  function pick(k){ state.sel=k; renderFigure(); renderDetail(); }
+
+  document.addEventListener('click', function(ev){
+    var t=ev.target.closest('[data-env],[data-region],[data-act]'); if(!t) return;
+    if(t.dataset.env){
+      state.env=t.dataset.env; var s=sample(state.env);
+      state.days.forEach(function(d){ if(d.example && s[d.day-1]) d.rad=s[d.day-1].rad; });
+      notice(''); save(); render();
+    } else if(t.dataset.region){ pick(t.dataset.region); }
+    else if(t.dataset.act==='crew'){ notice('Summary shared with the crew medical officer (simulated in this prototype).'); }
+    else if(t.dataset.act==='ground'){ notice('Report queued for the flight surgeon (simulated in this prototype). Signal delay: '+ENV[state.env].delay.toLowerCase()+'. '+ENV[state.env].reply); }
+  });
+  $('figure').addEventListener('keydown', function(ev){
+    var t=ev.target.closest('[data-region]');
+    if(t && (ev.key==='Enter'||ev.key===' ')){ ev.preventDefault(); pick(t.dataset.region);
+      var again=$('figure').querySelector('[data-region="'+t.dataset.region+'"]'); if(again) again.focus(); }
+  });
+  $('chartSel').addEventListener('change', function(){ state.chart=this.value; renderChart(); });
+  $('checkin').addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var day={day:(latest()?latest().day:0)+1, example:false}, bad=null;
+    ORDER.forEach(function(id){
+      var el=$('f_'+id), v=parseFloat(el.value), I=IND[id];
+      if(isNaN(v)||v<I.min||v>I.max){ if(!bad) bad=el; } else day[id]=v;
+    });
+    if(bad){ $('formMsg').textContent='Check the highlighted value: it is missing or outside what the instrument can read.'; bad.focus(); return; }
+    state.days.push(day); save(); notice(''); render();
+    $('formMsg').textContent='Saved as mission day '+day.day+'.';
+  });
+  $('clearEx').addEventListener('click', function(){
+    state.days=state.days.filter(function(d){return !d.example;}); save(); render(); $('formMsg').textContent='Example data removed.'; });
+  $('reset').addEventListener('click', function(){
+    state.days=sample(state.env); save(); notice(''); render(); $('formMsg').textContent='Demo data restored.'; });
+  render();
+})(); }
+</script>
+</body>
+</html>
