@@ -4,6 +4,8 @@ A visual self-assessment tool that helps astronauts check their own health durin
 
 Built by team **Kuasar Selçuklu** for the 2026 NASA Space Apps Challenge.
 
+**Try it:** https://dragnar1250.github.io/crew-health/ (runs in any browser, no install; data stays on the device)
+
 ## What it does
 
 The page is split into nine tabs: Today (score, the three most useful next steps, quick tiles, water tracker, goals), Check-in, Health (targeted advice, body map, analysis, emergency checks and live telemetry), Performance (risk, reaction test, light plan, sleep tips), Trends (charts and radiation), Morale, Med kit, Report (health report, profile, PDF export) and Sources. Longer explanations are folded under "How this works" links. Check-in, Health, Performance, Trends and Report have sub-tabs (for example Check-in: Measurements / Water / Nutrition / Digestion), so each screen shows one thing at a time. A day bar at the top of Check-in shows which mission day is being logged, when the last day was saved, and warns when a day was already saved today; water, nutrition and digestion entries belong to that same day. An EN / TR button in the header switches the whole interface between English and Turkish; the choice is remembered on the device. Arrow buttons on both sides of the tab bar and a Previous / Next pager at the bottom of every tab move between tabs; with a tab focused, the arrow keys move too. The status banner stays above the tabs, and a small mark on a tab shows when something there needs attention. Each tab has its own link (for example `#radiation`).
