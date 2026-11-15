@@ -359,6 +359,19 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
 .bristol input{margin:0} .bristol label:has(input:checked){border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .bristol b{font-size:16px} @media (max-width:560px){ .bristol{grid-template-columns:repeat(4,minmax(0,1fr))} }
 .gutstrip{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px} .gutstrip span{display:inline-flex;flex-direction:column;align-items:center;min-width:38px;padding:4px 6px;border-radius:8px;border:1px solid var(--line);font-size:11px;color:var(--muted);background:var(--bg)} .gutstrip b{font-size:15px;color:var(--s,var(--ink))}
+.daybar{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 18px;align-items:center;border:1px solid color-mix(in srgb, var(--accent) 45%, var(--line));background:color-mix(in srgb, var(--accent) 7%, var(--surface));border-radius:14px;padding:12px 16px;margin:0 0 14px}
+.daybar .dnow{display:flex;flex-direction:column;gap:2px;padding-right:18px;border-right:1px solid var(--line);min-width:0}
+.daybar .dnow span{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.daybar .dnow b{font-size:22px;line-height:1.15;color:var(--accent);white-space:nowrap}
+.daybar .dinfo{min-width:0}
+.daybar .dinfo p{margin:0 0 4px;font-size:13.5px}
+.daybar .dinfo p.dlast{font-size:12.5px;color:var(--muted)}
+.daybar .dwarn{margin:6px 0 0;font-size:12.5px;font-weight:500;color:var(--warn, #9a5b00)}
+.daybar ol{grid-column:1 / -1;display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:2px 0 0;padding:0}
+.daybar ol li{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);white-space:nowrap}
+.daybar ol li.cur{border:1.5px dashed var(--accent);color:var(--accent);font-weight:600}
+.daybar ol li.ex{font-style:italic}
+@media (max-width:520px){ .daybar{grid-template-columns:minmax(0,1fr)} .daybar .dnow{border-right:0;padding-right:0;border-bottom:1px solid var(--line);padding-bottom:8px;flex-direction:row;align-items:baseline;gap:10px;flex-wrap:wrap} }
 .ckhead{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between;margin:-4px 0 16px}
 .ckhead p{margin:0;font-size:14px;color:var(--muted)}
 .ckstatus{display:inline-flex;gap:8px;flex-wrap:wrap}
@@ -604,16 +617,17 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
 
   <section class="tabpanel" id="tab-checkin" role="tabpanel" aria-labelledby="t-checkin" hidden>
+  <div class="daybar" id="dayBar" role="status"></div>
   <section data-sub="checkin:log" class="panel">
     <div class="head">
-      <h2>Log today's check-in</h2>
+      <h2 id="ckTitle">Log today's check-in</h2>
       <span class="small muted" id="dataTag"></span>
     </div>
     <form id="checkin" novalidate>
       <div class="ckhead"><p id="ckIntro">The values from your last check-in are filled in. Change what you measured today.</p><span class="ckstatus" id="ckStatus" aria-live="polite"></span></div>
       <div class="fields" id="fields"></div>
       <div class="ckcard full" style="margin-top:14px">
-        <h3>Today</h3>
+        <h3>Also on this day</h3>
         <div class="toggles">
           <label class="toggle" for="f_eva"><input type="checkbox" id="f_eva"><span class="sw" aria-hidden="true"></span><span>I did a spacewalk or surface excursion today<small>Used by the decompression, heat and radiation checks.</small></span></label>
           <label class="toggle" for="useSupplies"><input type="checkbox" id="useSupplies" checked><span class="sw" aria-hidden="true"></span><span>Count the test supplies this check-in uses<small>1 glucose test strip, 2 lancets and 1 blood analyzer cartridge</small></span></label>
@@ -685,7 +699,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
       <span id="gutPill"></span>
     </div>
     <div id="gutResult"></div>
-    <h3 style="margin:18px 0 8px">Today</h3>
+    <h3 style="margin:18px 0 8px" id="gutDayTitle">Today</h3>
     <form id="gutForm" novalidate>
       <fieldset style="border:0;margin:0;padding:0"><legend class="small" style="font-weight:500">Stool form (Bristol stool scale) of the last bowel movement</legend>
         <div class="bristol" id="bristolPick"></div>
@@ -695,7 +709,7 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
         <div class="field"><label for="gBloat">Bloating</label><select id="gBloat"><option value="0">None</option><option value="1">Mild</option><option value="2">Moderate</option><option value="3">Severe</option></select></div>
         <div class="field"><label for="gPain">Abdominal pain</label><select id="gPain"><option value="0">None</option><option value="1">Mild</option><option value="2">Moderate</option><option value="3">Severe</option></select></div>
       </div>
-      <div class="formfoot"><button class="btn primary" type="submit">Save for today</button><button class="btn" type="button" id="gutClear">Clear</button><span class="small" id="gutMsg" aria-live="polite"></span></div>
+      <div class="formfoot"><button class="btn primary" type="submit">Save for this day</button><button class="btn" type="button" id="gutClear">Clear</button><span class="small" id="gutMsg" aria-live="polite"></span></div>
     </form>
     <div class="rsec"><h3>Last 7 days</h3><div class="gutstrip" id="gutStrip"></div></div>
     <details class="how"><summary>What this screen can and cannot tell</summary><p>This is a screen of digestive signs, not a measurement of the gut microbiome: no instrument on board measures the gut flora. Gut bacteria do change in spaceflight (NASA Twins Study), and fiber, fluid, exercise, antibiotics and anti-diarrhea medicines all affect them, so the screen uses these together with the stool form and symptoms. Bristol types 1 to 2 point to constipation, 3 to 4 are healthy and 5 to 7 point to diarrhoea or urgency (Continence Foundation of Australia). Fewer than three bowel movements a week counts as constipation (NIDDK).</p></details>
@@ -770,6 +784,44 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
   </section>
   </section>
 
+  <section class="tabpanel" id="tab-live" role="tabpanel" aria-labelledby="t-live" hidden>
+  <section data-sub="health:live" class="panel">
+    <div class="head">
+      <div>
+        <p class="label">Wearable sensors · simulation mode</p>
+        <h2>Live telemetry</h2>
+        <p class="small muted">Simulated sensor readings arrive once a second, starting from your latest check-in. A flight version would read the crew member's wearable sensors.</p>
+      </div>
+      <div class="actions">
+        <span class="livebadge" id="liveBadge">● Paused</span>
+        <button class="btn primary" type="button" id="liveToggle">Start simulation</button>
+      </div>
+    </div>
+    <div class="injects">
+      <span class="small muted">Inject an event:</span>
+      <button class="btn" type="button" data-inject="tachy">Fast heart rate</button>
+      <button class="btn" type="button" data-inject="desat">Oxygen drop</button>
+      <button class="btn" type="button" data-inject="fever">Fever</button>
+      <button class="btn" type="button" data-inject="calm">Back to normal</button>
+    </div>
+    <div class="livegrid" id="liveGrid"></div>
+    <div class="formfoot">
+      <button class="btn" type="button" id="liveUse">Use the last 30 seconds in today's check-in</button>
+      <span class="small" id="liveMsg" aria-live="polite"></span>
+    </div>
+  </section>
+  <div data-sub="health:live" class="two">
+    <section class="panel">
+      <div class="head"><h2>Sensor alerts</h2><span class="small muted">Newest first</span></div>
+      <ul class="alerts" id="liveAlerts"></ul>
+    </section>
+    <section class="panel">
+      <div class="head"><div><h2>Last night's sleep stages</h2><p class="small muted">Simulated from the sleep length in your latest check-in.</p></div></div>
+      <div id="hypno"></div>
+    </section>
+  </div>
+  </section>
+
   <section class="tabpanel" id="tab-perf" role="tabpanel" aria-labelledby="t-perf" hidden>
   <section data-sub="perf:risk" class="panel">
     <div class="head">
@@ -817,44 +869,6 @@ details.more{margin-top:8px} details.more summary{cursor:pointer;font-size:13px;
     <section class="panel">
       <div class="head"><div><p class="label">Sleep hygiene</p><h2>Tips for better sleep</h2></div></div>
       <ul class="tips" id="hygiene"></ul>
-    </section>
-  </div>
-  </section>
-
-  <section class="tabpanel" id="tab-live" role="tabpanel" aria-labelledby="t-live" hidden>
-  <section data-sub="perf:live" class="panel">
-    <div class="head">
-      <div>
-        <p class="label">Wearable sensors · simulation mode</p>
-        <h2>Live telemetry</h2>
-        <p class="small muted">Simulated sensor readings arrive once a second, starting from your latest check-in. A flight version would read the crew member's wearable sensors.</p>
-      </div>
-      <div class="actions">
-        <span class="livebadge" id="liveBadge">● Paused</span>
-        <button class="btn primary" type="button" id="liveToggle">Start simulation</button>
-      </div>
-    </div>
-    <div class="injects">
-      <span class="small muted">Inject an event:</span>
-      <button class="btn" type="button" data-inject="tachy">Fast heart rate</button>
-      <button class="btn" type="button" data-inject="desat">Oxygen drop</button>
-      <button class="btn" type="button" data-inject="fever">Fever</button>
-      <button class="btn" type="button" data-inject="calm">Back to normal</button>
-    </div>
-    <div class="livegrid" id="liveGrid"></div>
-    <div class="formfoot">
-      <button class="btn" type="button" id="liveUse">Use the last 30 seconds in today's check-in</button>
-      <span class="small" id="liveMsg" aria-live="polite"></span>
-    </div>
-  </section>
-  <div data-sub="perf:live" class="two">
-    <section class="panel">
-      <div class="head"><h2>Sensor alerts</h2><span class="small muted">Newest first</span></div>
-      <ul class="alerts" id="liveAlerts"></ul>
-    </section>
-    <section class="panel">
-      <div class="head"><div><h2>Last night's sleep stages</h2><p class="small muted">Simulated from the sleep length in your latest check-in.</p></div></div>
-      <div id="hypno"></div>
     </section>
   </div>
   </section>
@@ -2787,9 +2801,29 @@ if(typeof document!=='undefined'){ (function(){
     });
     $('ckStatus').innerHTML = (n2 ? '<span class="pill st2">'+SYMBOL[2]+' '+n2+' act now</span>' : '')+(n1 ? '<span class="pill st1">'+SYMBOL[1]+' '+n1+' to watch</span>' : '')+(!n1 && !n2 ? '<span class="pill st0">'+SYMBOL[0]+' All in range</span>' : '');
   }
+  var MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  function two(n){ return (n<10?'0':'')+n; }
+  function sameDate(a, b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+  function renderDayBar(){
+    var days=(state.sim && state.realDays) ? state.realDays : state.days, last=days[days.length-1], next=(last ? last.day : 0)+1, now=new Date();
+    var at=last && last.at ? new Date(last.at) : null; if(at && isNaN(at.getTime())) at=null;
+    var lastLine=!last ? '<span>No days saved yet</span>' :
+      (last.example ? '<span>Last day: mission day '+last.day+' (example data)</span>' :
+        '<span>Last saved: mission day '+last.day+'</span>'+(at ? ' · <span class="nw">'+at.getDate()+' '+MON[at.getMonth()]+' '+at.getFullYear()+'</span> · <span class="nw">'+two(at.getHours())+':'+two(at.getMinutes())+'</span>' : ''));
+    var warn=at && !last.example && sameDate(at, now) ? '<p class="dwarn"><span>You already saved a day today (mission day '+last.day+')</span>. <span>Saving again starts a new day: mission day '+next+'</span>.</p>' : '';
+    var strip=days.slice(-6).map(function(d){ return '<li'+(d.example?' class="ex"':'')+'><span>Day '+d.day+'</span> ✓</li>'; }).join('')+'<li class="cur" aria-current="step"><span>Day '+next+'</span> · <span>now</span></li>';
+    $('dayBar').innerHTML='<div class="dnow"><span>You are logging</span><b>Mission day '+next+'</b></div>'+
+      '<div class="dinfo"><p><span>Measurements, water, nutrition and digestion that you enter now belong to this day</span>. <span>They are saved together when you press Save check-in</span>.</p>'+
+      '<p class="dlast">'+lastLine+'</p>'+warn+'</div><ol aria-label="Recent days">'+strip+'</ol>';
+    $('ckTitle').textContent='Check-in for mission day '+next;
+    $('waterTitle').textContent='Water · mission day '+next;
+    $('foodTitle').textContent='Nutrition · mission day '+next;
+    $('gutDayTitle').textContent='Mission day '+next;
+  }
   function renderForm(){
+    renderDayBar();
     var d=latest()||sample(state.env)[0];
-    $('ckIntro').textContent=latest() ? 'The values from your last check-in are filled in. Change what you measured today.' : 'Example values are filled in. Replace them with what you measured today.';
+    $('ckIntro').textContent=latest() ? 'The values from your last check-in are filled in. Change what you measured for this day.' : 'Example values are filled in. Replace them with what you measured for this day.';
     $('fields').innerHTML=CK_GROUPS.map(function(g){
       return '<section class="ckcard"><h3>'+g.t+(g.rt ? ' <button class="btn linkbtn" type="button" data-goto="rt">Run the reaction test</button>' : '')+'</h3><p class="hint">'+g.h+'</p><div class="mgrid">'+g.ids.map(function(id){ return ckField(id, d); }).join('')+'</div></section>';
     }).join('')+'<section class="ckcard full"><h3>Symptoms in the last 24 hours</h3><p class="hint">Choose the worst moment of the day.</p><div class="symlist">'+
@@ -3160,11 +3194,11 @@ if(typeof document!=='undefined'){ (function(){
 
   /* ===== Sub-tabs inside a tab ===== */
   var SUBS={checkin:[['log','Measurements'],['water','Water'],['food','Nutrition'],['gut','Digestion']],
-            health:[['map','Body map'],['analysis','Analysis'],['checks','Emergency checks']],
-            perf:[['risk','Risk'],['rt','Reaction test'],['light','Light and sleep'],['live','Live sensors']],
+            health:[['map','Body map'],['analysis','Analysis'],['checks','Emergency checks'],['live','Live sensors']],
+            perf:[['risk','Risk'],['rt','Reaction test'],['light','Light and sleep']],
             trends:[['charts','Charts'],['radiation','Radiation']],
             report:[['report','Report and PDF'],['profile','Profile']]};
-  var SUBNAME={body:['health','map'], analysis:['health','analysis'], checks:['health','checks'], live:['perf','live'], radiation:['trends','radiation'],
+  var SUBNAME={body:['health','map'], analysis:['health','analysis'], checks:['health','checks'], live:['health','live'], radiation:['trends','radiation'],
                log:['checkin','log'], water:['checkin','water'], food:['checkin','food'], gut:['checkin','gut'], profile:['report','profile'], rt:['perf','rt'], light:['perf','light']};
   var SUBCUR={}, SUBDOT={};
   function initSubs(){ Object.keys(SUBS).forEach(function(g){
@@ -3179,7 +3213,7 @@ if(typeof document!=='undefined'){ (function(){
     if(!SUBS[g]) return; SUBCUR[g]=id;
     [].forEach.call(document.querySelectorAll('[data-sub^="'+g+':"]'), function(el){ el.hidden=el.getAttribute('data-sub')!==g+':'+id; });
     [].forEach.call(document.querySelectorAll('.subtabs[data-group="'+g+'"] [data-subtab]'), function(b){ b.setAttribute('aria-pressed', String(b.dataset.subtab===id)); });
-    if(g==='perf' && id==='live') drawLive();
+    if(g==='health' && id==='live') drawLive();
     if(user){ var nav=document.querySelector('.subtabs[data-group="'+g+'"]'); if(nav && nav.getBoundingClientRect().top<0) nav.scrollIntoView({block:'start'}); }
   }
   /* a dot on a sub-tab: worst status of what it shows */
@@ -3553,7 +3587,7 @@ if(typeof document!=='undefined'){ (function(){
     $('formMsg').textContent='Live averages added for heart rate, blood oxygen, temperature and breathing rate. Fill in the rest and save.';
   });
   var TABS=['overview','checkin','health','perf','trends','morale','medkit','report','sources'];
-  var GROUPS={overview:['overview'], checkin:['checkin'], health:['body','analysis'], perf:['perf','live'], trends:['trends','radiation'], morale:['morale'], medkit:['medkit'], report:['report'], sources:['sources']};
+  var GROUPS={overview:['overview'], checkin:['checkin'], health:['body','analysis','live'], perf:['perf'], trends:['trends','radiation'], morale:['morale'], medkit:['medkit'], report:['report'], sources:['sources']};
   var GROUP_OF={}; Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn){ GROUP_OF[pn]=g; }); });
   Object.keys(GROUPS).forEach(function(g){ GROUPS[g].forEach(function(pn, i){ var el=$('tab-'+pn); el.setAttribute('aria-labelledby', 't-'+g); if(i) el.classList.add('joined'); }); $('t-'+g).setAttribute('aria-controls', GROUPS[g].map(function(pn){ return 'tab-'+pn; }).join(' ')); });
   function showTab(name, focus){
@@ -3637,7 +3671,7 @@ if(typeof document!=='undefined'){ (function(){
   var DOTS={};
   function dot(id, st, label){
     DOTS[id]={st:st, label:label};
-    var SD={body:['health','map'], analysis:['health','analysis'], live:['perf','live'], perf:['perf','risk'], radiation:['trends','radiation']}[id];
+    var SD={body:['health','map'], analysis:['health','analysis'], live:['health','live'], perf:['perf','risk'], radiation:['trends','radiation']}[id];
     if(SD && typeof subDot==='function') subDot(SD[0], SD[1], st==='due' ? 0 : st);
     var g=GROUP_OF[id]||id, best=null;
     GROUPS[g].forEach(function(pn){ var x=DOTS[pn]; if(!x || !x.st) return; var r=x.st==='due' ? 0.5 : x.st; if(!best || r>best.r) best={r:r, st:x.st, label:x.label}; });
@@ -3697,7 +3731,7 @@ if(typeof document!=='undefined'){ (function(){
   $('checkin').addEventListener('submit', function(ev){
     ev.preventDefault();
     endSim(true);
-    var day={day:(latest()?latest().day:0)+1, example:false}, bad=null;
+    var day={day:(latest()?latest().day:0)+1, example:false, at:new Date().toISOString()}, bad=null;
     ORDER.forEach(function(id){
       var el=$('f_'+id), v=parseFloat(el.value), I=IND[id];
       if(isNaN(v)||v<I.min||v>I.max){ if(!bad) bad=el; } else day[id]=v;
@@ -4044,6 +4078,7 @@ var TR_EXACT = {
 "All in range": "Hepsi aralıkta",
 "All indicators in range": "Bütün göstergeler aralıkta",
 "Allergy": "Alerji",
+"Also on this day": "Bu gün ayrıca",
 "Always measure at the same place on the body so the values can be compared": "Değerler karşılaştırılabilsin diye hep vücudun aynı yerinden ölçün",
 "American Diabetes Association": "Amerikan Diyabet Derneği",
 "American Heart Association, Understanding Blood Pressure Readings": "Amerikan Kalp Derneği, Understanding Blood Pressure Readings",
@@ -4191,6 +4226,7 @@ var TR_EXACT = {
 "Catching up after a short night": "Kısa bir gecenin ardından telafi",
 "Cerebrospinal fluid pressure cannot be measured directly in flight, so the optic nerve sheath is scanned by ultrasound instead": "Beyin omurilik sıvısı basıncı uçuşta doğrudan ölçülemez, bu yüzden optik sinir kılıfı ultrasonla taranır",
 "Cerebrospinal fluid pressure is not measured directly": "Beyin omurilik sıvısı basıncı doğrudan ölçülmez",
+"Change what you measured for this day": "Bu gün için ölçtüklerinizi değiştirin",
 "Change what you measured today": "Bugün ölçtüklerinizi değiştirin",
 "Charts": "Grafikler",
 "Check in every day": "Her gün kayıt girin",
@@ -4211,6 +4247,7 @@ var TR_EXACT = {
 "Check your temperature and mood": "Ateşinizi ve ruh halinizi kontrol edin",
 "Check your temperature and mood, keep to the light schedule, and tell the crew medical officer if it happens again": "Ateşinizi ve ruh halinizi kontrol edin, ışık programına uyun ve tekrarlarsa mürettebat sağlık görevlisine söyleyin",
 "Check-in": "Günlük kayıt",
+"Check-in for mission day #": "Görev günü # kaydı",
 "Choose": "Seçin",
 "Choose a period and save a short PDF with your score, what needs attention and what to do next": "Bir dönem seçin; puanınız, dikkat gerektirenler ve sonraki adımlarla kısa bir PDF kaydedin",
 "Choose female or male": "Kadın ya da erkek seçin",
@@ -4668,8 +4705,11 @@ var TR_EXACT = {
 "Language": "Dil",
 "Last # check-ins": "Son # kayıt",
 "Last # days": "Son # gün",
+"Last day: mission day # (example data)": "Son gün: görev günü # (örnek veri)",
 "Last night was # hours or less": "Dün gece # saat ya da daha azdı",
 "Last night's sleep stages": "Dün geceki uyku evreleri",
+"Last saved": "Son kayıt",
+"Last saved: mission day #": "Son kayıt: görev günü #",
 "Latest": "En son",
 "Leave and close the hatch if the air does not clear": "Hava temizlenmezse çıkın ve kapağı kapatın",
 "Less than # hours of sleep, or less than # hours two nights in a row": "# saatten az uyku ya da art arda iki gece # saatten az",
@@ -4774,6 +4814,7 @@ var TR_EXACT = {
 "Measure your temperature and note where the pain is": "Ateşinizi ölçün ve ağrının nerede olduğunu not edin",
 "Measured soon after a meal": "Yemekten kısa süre sonra ölçüldü",
 "Measurements": "Ölçümler",
+"Measurements, water, nutrition and digestion that you enter now belong to this day": "Şimdi girdiğiniz ölçümler, su, beslenme ve sindirim kayıtları bu güne aittir",
 "Measuring right after a cold drink": "Soğuk içecekten hemen sonra ölçmek",
 "Measuring right after a hot drink or exercise": "Sıcak içecek ya da egzersizden hemen sonra ölçmek",
 "Med": "İlaç",
@@ -4804,6 +4845,7 @@ var TR_EXACT = {
 "Min–max": "Min–maks",
 "Missing": "Eksik",
 "Mission day": "Görev günü",
+"Mission day #": "Görev günü #",
 "Mission days # to #": "Görev günleri #–#",
 "Mission environment": "Görev ortamı",
 "Mission week": "Görev haftası",
@@ -4900,6 +4942,7 @@ var TR_EXACT = {
 "No bowel movement": "Dışkılama yok",
 "No check-in yet": "Henüz kayıt yok",
 "No data": "Veri yok",
+"No days saved yet": "Henüz kaydedilmiş gün yok",
 "No digestion data yet": "Henüz sindirim verisi yok",
 "No early warning": "Erken uyarı yok",
 "No emergency pattern found (# checks)": "Acil durum düzeni bulunmadı (# kontrol)",
@@ -4944,6 +4987,7 @@ var TR_EXACT = {
 "Nutrition": "Beslenme",
 "Nutrition and digestion": "Beslenme ve sindirim",
 "Nutrition today": "Bugünkü beslenme",
+"Nutrition · mission day #": "Beslenme · görev günü #",
 "Nutrition: # kcal, # g protein logged today": "Beslenme: bugün # kcal, # g protein kaydedildi",
 "Nutrition: every target met on mission day #": "Beslenme: görev günü #: her hedef tutuldu",
 "Obesity": "Obezite",
@@ -5104,6 +5148,7 @@ var TR_EXACT = {
 "Readings return to the baseline": "Ölçümler temel değere döner",
 "Readings that left their normal range": "Normal aralığının dışına çıkan ölçümler",
 "Readings today": "Bugünkü ölçümler",
+"Recent days": "Son günler",
 "Recommended next steps": "Önerilen sonraki adımlar",
 "Red": "Kırmızı",
 "Red (high risk, critical)": "Kırmızı (yüksek risk, kritik)",
@@ -5117,6 +5162,7 @@ var TR_EXACT = {
 "Removed": "Kaldırıldı",
 "Repeat the reaction test after rest": "Dinlendikten sonra reaksiyon testini tekrarlayın",
 "Repeat the reaction test later today": "Reaksiyon testini bugün daha sonra tekrarlayın",
+"Replace them with what you measured for this day": "Bunları bu gün için ölçtüklerinizle değiştirin",
 "Replace them with what you measured today": "Bunları bugün ölçtüklerinizle değiştirin",
 "Report": "Rapor",
 "Report and PDF": "Rapor ve PDF",
@@ -5175,6 +5221,7 @@ var TR_EXACT = {
 "Save": "Kaydet",
 "Save check-in": "Kaydı kaydet",
 "Save earlier dose": "Önceki dozu kaydet",
+"Save for this day": "Bu gün için kaydet",
 "Save for today": "Bugün için kaydet",
 "Save profile": "Profili kaydet",
 "Save the result to your check-in": "Sonucu kaydınıza ekle",
@@ -5185,6 +5232,7 @@ var TR_EXACT = {
 "Saved for today: Bristol #, # bowel movements": "Bugün için kaydedildi: Bristol #, # dışkılama",
 "Saved for today: Bristol –, # bowel movements": "Bugün için kaydedildi: Bristol –, # dışkılama",
 "Saved. It goes into the standard weekly report": "Kaydedildi. Standart haftalık rapora eklenir",
+"Saving again starts a new day: mission day #": "Yeniden kaydederseniz yeni bir gün başlar: görev günü #",
 "Saving is not available in this view": "Bu görünümde kaydetme kullanılamıyor",
 "Saving was cancelled": "Kaydetme iptal edildi",
 "Schedule a resistance session today": "Bugün bir direnç seansı planlayın",
@@ -5450,6 +5498,7 @@ var TR_EXACT = {
 "These scales were chosen by the team": "Bu ölçekleri takım seçti",
 "They are added to your next check-in": "Sonraki kaydınıza eklenir",
 "They are not scored": "Puanlanmazlar",
+"They are saved together when you press Save check-in": "Kaydı kaydet düğmesine bastığınızda hepsi birlikte kaydedilir",
 "They do not replace official flight rules and medical checklists": "Resmi uçuş kurallarının ve tıbbi kontrol listelerinin yerini tutmazlar",
 "Think about the last # hours": "Son # saati düşünün",
 "Think about the whole day, not one moment": "Tek bir anı değil bütün günü düşünün",
@@ -5541,6 +5590,7 @@ var TR_EXACT = {
 "Water": "Su",
 "Water today": "Bugünkü su",
 "Water tracker: # L logged today": "Su takibi: bugün # L kaydedildi",
+"Water · mission day #": "Su · görev günü #",
 "Water, last check-in": "Su, son kayıt",
 "Weaker immune defences in spaceflight, which can also wake up dormant viruses": "Uzay uçuşunda zayıflayan bağışıklık, uyuyan virüsleri de uyandırabilir",
 "Wear a mask and clean shared surfaces": "Maske takın ve ortak yüzeyleri temizleyin",
@@ -5591,6 +5641,8 @@ var TR_EXACT = {
 "Write down what worries you and talk to a crewmate": "Sizi endişelendireni yazın ve bir mürettebat arkadaşınızla konuşun",
 "Yellow": "Sarı",
 "Yellow (moderate stress, attention)": "Sarı (orta stres, dikkat)",
+"You already saved a day today (mission day #)": "Bugün zaten bir gün kaydettiniz (görev günü #)",
+"You are logging": "Kaydettiğiniz gün",
 "You can start a new survey any time": "İstediğiniz zaman yeni bir anket başlatabilirsiniz",
 "You chose \"None today\", so the number of bowel movements should be #": "\"Bugün yok\" seçtiniz, bu yüzden dışkılama sayısı # olmalı",
 "You may be breathing too fast": "Çok hızlı nefes alıyor olabilirsiniz",
@@ -5910,6 +5962,7 @@ var TR_EXACT = {
 "not completed yet": "henüz tamamlanmadı",
 "not recorded": "kaydedilmedi",
 "note the reason in your log": "nedenini kaydınıza not edin",
+"now": "şimdi",
 "now and then": "ara sıra",
 "npj Microgravity": "npj Microgravity",
 "of #": "/#",
